@@ -3,13 +3,12 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask import render_template, url_for, flash, redirect, request
-from flaskblog import app, db, bcrypt
+from flaskblog import app, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm
-from flaskblog.models import User, Post
+from flaskblog.models import User, db_model
 from flask_login import login_user, current_user, logout_user, login_required
 
-
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 # Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
@@ -20,15 +19,17 @@ def landpage():
     # Registration Form Submitted
     if form_register.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-        user = User(username=form_register.username.data, email=form_register.email.data, password=hashed_password)
-        db.session.add(user)
-        db.session.commit()
+        db = db_model()
+        id = db.get_next_id()
+        db.add_user(id, form_register.username.data, form_register.email.data, 'default.jpg', hashed_password)
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
     # Login Form Submitted
     if form_login.validate_on_submit():
-        user = User.query.filter_by(email=form_login.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form_login.password.data):
+        db = db_model()
+        data = db.get_user_by_email(form_login.email.data)
+        if data and bcrypt.check_password_hash(data[0][4], form_login.password.data):
+            user = User(data[0][0], data[0][1], data[0][2], data[0][4])
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
@@ -37,8 +38,8 @@ def landpage():
     # Render both
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
-
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for('landpage'))
+	
