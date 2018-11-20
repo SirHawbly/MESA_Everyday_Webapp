@@ -22,14 +22,12 @@ class RegistrationForm(FlaskForm):
     def validate_username(self, username):
         db = db_model()
         data = db.get_user_by_username(username.data)
-        data
         if data:
             raise ValidationError('That username is taken. Please choose a different one.')
 
     def validate_email(self, email):
         db = db_model()
         data = db.get_user_by_email(email.data)
-        data
         if data:
             raise ValidationError('That email is taken. Please choose a different one.')
 
