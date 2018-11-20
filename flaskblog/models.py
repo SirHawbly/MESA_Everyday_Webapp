@@ -21,34 +21,34 @@ class User(UserMixin):
 	    self.username = username
 	    self.email = email
 	    self.image_file = 'default.jpg'
-	    self.password = password		
+	    self.password = password
 
 class db_model():
 	def __init__(self):
 	    self.conn = pymysql.connect(host='67.160.141.91', port=3306, user='flaskblog_user', passwd='test', db='flaskblog_db')
-	
+
 	def get_user_by_id(self, id):
 	    cur = self.conn.cursor()
 	    cur.execute("SELECT id, username, email, image_file, password FROM users WHERE id = %s", (id))
 	    return cur.fetchall()
-	
+
 	def get_user_by_username(self, username):
 		cur = self.conn.cursor()
 		cur.execute("SELECT id, username, email, image_file, password FROM users WHERE username = %s", (username))
 		return cur.fetchall()
-		
+
 	def get_user_by_email(self, email):
 	    cur = self.conn.cursor()
 	    cur.execute("SELECT id, username, email, image_file, password FROM users WHERE email = %s", (email))
 	    return cur.fetchall()
-		
+
 	def get_next_id(self):
 	    cur = self.conn.cursor()
 	    cur.execute("SELECT MAX(ID) FROM users")
-	    return cur.fetchall()[0][0]	
-		
+	    return cur.fetchall()[0][0]	+ 1
+
 	def add_user(self, id, username, email, image_file, password):
 		cur = self.conn.cursor()
 		cur.execute("INSERT INTO users(id, username, email, image_file, password) VALUES(%s, %s, %s, %s, %s)", (id, username, email, image_file, password))
 		self.conn.commit()
-	
+
