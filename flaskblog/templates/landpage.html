@@ -46,6 +46,15 @@
   <header class="masthead text-white text-center">
     <div class="overlay"></div>
     <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
         <div class="col-xl-9 mx-auto">
           <h1 class="mb-5">Welcome to MESA Everyday Website</h1>
         </div>
