@@ -27,7 +27,7 @@ def landpage():
     # Login Form Submitted
     if form_login.validate_on_submit():
         db = db_model()
-        data = db.get_user_by_email(form_login.email.data)
+        data = db.get_user_by_username(form_login.username.data)
         if data and bcrypt.check_password_hash(data[0][4], form_login.password.data):
             user = User(data[0][0], data[0][1], data[0][2], data[0][4])
             login_user(user, remember=form_login.remember.data)
