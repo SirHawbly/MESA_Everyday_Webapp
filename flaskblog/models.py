@@ -49,6 +49,6 @@ class db_model():
 
 	def add_user(self, id, username, email, image_file, password):
 		cur = self.conn.cursor()
-		cur.execute("INSERT INTO users(id, username, email, image_file, password) VALUES(%s, %s, %s, %s, %s)", (id, username, email, image_file, password))
+		cur.execute("INSERT INTO users(id, username, email, image_file, password, role) VALUES(%s, %s, %s, %s, %s, 'user')", (id, username, email, image_file, password))
 		self.conn.commit()
 
