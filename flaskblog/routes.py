@@ -16,7 +16,13 @@ def landpage():
         return redirect(url_for('dashboard'))
     form_register = RegistrationForm()
     form_login = LoginForm()
+    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+	
+@app.route("/register", methods=['GET', 'POST'])
+def register():
     # Registration Form Submitted
+    form_register = RegistrationForm()
+    form_login = LoginForm()
     if form_register.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
         db = db_model()
@@ -24,7 +30,13 @@ def landpage():
         db.add_user(id, form_register.username.data, form_register.email.data, 'default.jpg', hashed_password)
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
+    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+		
+@app.route("/login", methods=['GET', 'POST'])
+def login():
     # Login Form Submitted
+    form_register = RegistrationForm()
+    form_login = LoginForm()
     if form_login.validate_on_submit():
         db = db_model()
         data = db.get_user_by_username(form_login.username.data)
@@ -35,7 +47,6 @@ def landpage():
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
-    # Render both
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 @app.route("/dashboard")
