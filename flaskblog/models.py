@@ -29,17 +29,17 @@ class db_model():
 
 	def get_user_by_id(self, id):
 	    cur = self.conn.cursor()
-	    cur.execute("SELECT id, username, email, image_file, password FROM users WHERE id = %s", (id))
+	    cur.execute("SELECT id, username, email, image_file, password, role FROM users WHERE id = %s", (id))
 	    return cur.fetchall()
 
 	def get_user_by_username(self, username):
 		cur = self.conn.cursor()
-		cur.execute("SELECT id, username, email, image_file, password FROM users WHERE username = %s", (username))
+		cur.execute("SELECT id, username, email, image_file, password, role FROM users WHERE username = %s", (username))
 		return cur.fetchall()
 
 	def get_user_by_email(self, email):
 	    cur = self.conn.cursor()
-	    cur.execute("SELECT id, username, email, image_file, password FROM users WHERE email = %s", (email))
+	    cur.execute("SELECT id, username, email, image_file, password, role FROM users WHERE email = %s", (email))
 	    return cur.fetchall()
 
 	def get_next_id(self):
