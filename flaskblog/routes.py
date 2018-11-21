@@ -37,11 +37,13 @@ def landpage():
             flash('Login Unsuccessful. Please check email and password', 'danger')
     # Render both
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+
 @app.route("/dashboard")
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
+
 @app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for('landpage'))
-	
+
