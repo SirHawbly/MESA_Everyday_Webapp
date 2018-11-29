@@ -5,6 +5,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from datetime import datetime
 from flaskblog import login_manager
 from flask_login import UserMixin
+from flask_security import Security, RoleMixin, login_required
 from flask import flash
 import pymysql
 
@@ -15,13 +16,24 @@ def load_user(user_id):
     user = User(data[0][0], data[0][1], data[0][2], data[0][4])
     return user
 
+# Millen's Role class
+class Role(RoleMixin):
+        def __init__(self, id, name):
+            self.id = id
+            self.name = name
+
+        def __str__(self):
+            return self.name
+
 class User(UserMixin):
-	def __init__(self, id, username, email, password):
+	def __init__(self, id, username, email, password, role):
 	    self.id = id
 	    self.username = username
 	    self.email = email
 	    self.image_file = 'default.jpg'
 	    self.password = password
+            # Millen's hardcode
+            self.role = Role(id,role)
 
 class db_model():
 	def __init__(self):
@@ -33,9 +45,9 @@ class db_model():
 	    return cur.fetchall()
 
 	def get_user_by_username(self, username):
-		cur = self.conn.cursor()
-		cur.execute("SELECT id, username, email, image_file, password, role FROM users WHERE username = %s", (username))
-		return cur.fetchall()
+	    cur = self.conn.cursor()
+	    cur.execute("SELECT id, username, email, image_file, password, role FROM users WHERE username = %s", (username))
+	    return cur.fetchall()
 
 	def get_user_by_email(self, email):
 	    cur = self.conn.cursor()
@@ -48,7 +60,11 @@ class db_model():
 	    return cur.fetchall()[0][0]	+ 1
 
 	def add_user(self, id, username, email, image_file, password):
-		cur = self.conn.cursor()
-		cur.execute("INSERT INTO users(id, username, email, image_file, password, role) VALUES(%s, %s, %s, %s, %s, 'user')", (id, username, email, image_file, password))
-		self.conn.commit()
+	    cur = self.conn.cursor()
+            # Millen's hardcode participant role for all other users
+	    cur.execute("INSERT INTO users(id, username, email, image_file, password, role) VALUES(%s, %s, %s, %s, %s, 'user')", (id, username, email, image_file, password, 'participant'))
+	    self.conn.commit()
 
+        # Millen's hardcode admin
+        def add_admin(self, id):
+            add_user(id, 'admin', 'admin@admin.com', 'default.jpg', 'admin', 'admin')
