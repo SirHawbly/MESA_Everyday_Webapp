@@ -7,6 +7,9 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flaskblog.models import User, db_model
 
+def get_all_schools():
+    db = db_model()
+    return db.get_all_school_names()
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -14,8 +17,8 @@ class RegistrationForm(FlaskForm):
     username = StringField('Username',
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    school = SelectField('School', choices=[("idk", "i don't know..."), ("f", "fff")])
+                        validators=[DataRequired(), Email()])					
+    school = SelectField('School', coerce=int, choices=get_all_schools())
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
@@ -32,6 +35,9 @@ class RegistrationForm(FlaskForm):
         data = db.get_user_by_email(email.data)
         if data:
             raise ValidationError('That email is taken. Please choose a different one.')
+			
+
+        
 
 
 class LoginForm(FlaskForm):
