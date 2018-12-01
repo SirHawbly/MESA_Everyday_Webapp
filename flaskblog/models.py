@@ -57,3 +57,10 @@ class db_model():
 		cur = self.conn.cursor()
 		cur.execute("SELECT school_id, school_name FROM schools")
 		return cur.fetchall()
+		
+	def view_badge(self):
+		cur = self.conn.cursor()	
+		cur.execute("SELECT badge_name FROM badges")
+		rows = cur.fetchall()
+		rows=[i[0] for i in rows]
+		return rows
