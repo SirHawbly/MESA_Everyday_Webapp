@@ -107,10 +107,10 @@ def main():
 
     # grab the users token (has user's access and refresh tokens)
 		# if they dont exist then they are created upon autorization
-    store = file.Storage('token.json')
+    store = file.Storage('credentials/token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('event-client-cred.json', SCOPES)
+        flow = client.flow_from_clientsecrets('credentials/event-client-cred.json', SCOPES)
         creds = tools.run_flow(flow, store)
 
     # get a HTTP connection to googles calendar
