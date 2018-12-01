@@ -52,3 +52,9 @@ class db_model():
 		cur.execute("INSERT INTO users(id, username, email, image_file, password, role) VALUES(%s, %s, %s, %s, %s, 'user')", (id, username, email, image_file, password))
 		self.conn.commit()
 
+	def view_badge(self):
+		cur = self.conn.cursor()	
+		cur.execute("SELECT badge_name FROM badges")
+		rows = cur.fetchall()
+		rows=[i[0] for i in rows]
+		return rows

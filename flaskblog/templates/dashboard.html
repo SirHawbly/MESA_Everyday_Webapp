@@ -95,20 +95,10 @@
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <li><a href="./badge1.html" class="waves-effect">Badge 1</a>
+                                {% for r in result %}
+                                <li><a href="" class="waves-effect">{{ r }}</a>
                                 </li>
-                                <li><a href="./badge2.html" class="waves-effect">Badge 2</a>
-                                </li>
-                                <li><a href="./badge3.html" class="waves-effect">Badge 3</a>
-                                </li>
-                                <li><a href="./badge4.html" class="waves-effect">Badge 4</a>
-                                </li>
-                                <li><a href="./badge5.html" class="waves-effect">Badge 5</a>
-                                </li>
-                                <li><a href="./badge6.html" class="waves-effect">Badge 6</a>
-                                </li>
-                                <li><a href="./badge7.html" class="waves-effect">Badge 7</a>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </li>
@@ -174,8 +164,10 @@
                             Calendar
                         </div>
                         <div class="card-body">
-                        	Calendar goes here
-                            <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full calendar</button>
+														<div style="overflow-x:auto;">
+																		<iframe src="https://calendar.google.com/calendar/embed?height=300&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com&amp;color=%23AB8B00&amp;ctz=America%2FLos_Angeles" style="border-width:1" width="500" height="300" frameborder="0" scrolling="no"></iframe>	
+                            		<button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full calendar</button>
+                        		</div>
                         </div>
                     </div>
                     <!--/.Panel-->
