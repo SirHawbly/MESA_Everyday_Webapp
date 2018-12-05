@@ -6,16 +6,172 @@ from datetime import datetime
 from MESAeveryday import login_manager
 from flask_login import UserMixin
 from flask import flash
-import pymysql
+#import pymysql
 import os
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship, backref
+
+db_connection = 'mysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
+engine = create_engine(db_connection)
+Base = declarative_base(engine)
+
+def loadSession():
+    metadata = Base.metadata
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    return session
 
 @login_manager.user_loader
 def load_user(user_id):
-    db = db_model()
-    data = db.get_user_by_id(user_id)
-    user = User(data[0][0], data[0][1], data[0][2], data[0][3], data[0][4], data[0][6], data[0][7], data[0][8])
-    return user
+    session = loadSession()
+    return session.query(User).filter(User.id==user_id).first()
 
+#All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
+	
+    
+#Class for the "user_roles" table
+class UserRole(Base):
+    __tablename__ = 'user_roles'
+    
+    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True) 
+    role_id = Column(Integer, ForeignKey("roles.role_id"))  
+    
+    def __init__(self, user_id, role_id):
+	    self.user_id = user_id
+	    self.role_id = role_id 
+    
+#Class for the "roles" table
+class Role(Base):
+    __tablename__ = 'roles'
+    
+    id = Column('role_id', Integer, primary_key=True) 
+    name = Column('role_name', String)
+    description = Column(String)
+    
+    def __init__(self, name, description):
+	    self.name = name
+	    self.description = description 
+    
+#Class for the "users" table
+class User(Base, UserMixin):
+    __tablename__ = 'users'
+
+    id = Column('user_id', Integer, primary_key=True) 
+    first_name = Column(String) 
+    last_name = Column(String) 
+    username = Column(String)
+    email = Column(String)
+    picture = Column(String)
+    school_id = Column(Integer, ForeignKey("schools.school_id"))
+    password = Column('SSB', String) 
+    last_login = (DateTime)
+    
+    school = relationship("School", foreign_keys=[school_id])
+    role = relationship('Role', secondary='user_roles',
+                         backref=backref('users', lazy='dynamic'))
+    
+      
+    def __init__(self, username, first_name, last_name, email, password, school_id):
+        self.username = username
+        self.email = email
+        self.picture = 'default.jpg'
+        self.password = password
+        self.first_name = first_name
+        self.last_name = last_name
+        self.school_id = school_id
+
+
+        
+#Class for the "schools" table
+class School(Base):
+    __tablename__ = 'schools'
+    
+    school_id = Column(Integer, primary_key=True)
+    school_name = Column(String)
+    district = Column(String)
+    city = Column(String)
+    state = Column(String)
+    zip_code = Column(String)
+    
+    def __init__(self, school_name, district, city, state, zip_code):
+	    self.school_name = school_name
+	    self.district = district
+	    self.city = city
+	    self.state = state
+	    self.zip_code = zip_code
+    
+#Class for the "badges" table
+class Badge(Base):
+    __tablename__ = 'badges'
+    
+    badge_id = Column(Integer, primary_key=True)
+    badge_name = Column(String)
+    color = Column(String)
+    level1_points = Column(Integer)
+    level2_points = Column(Integer)	
+    level3_points = Column(Integer)	
+    level4_points = Column(Integer)	
+    level5_points = Column(Integer)	
+    level6_points = Column(Integer)	
+    level7_points = Column(Integer)	
+    level8_points = Column(Integer)	
+    level9_points = Column(Integer)	
+    level10_points = Column(Integer)
+    
+    def __init__(self, badge_name, color, level1_points, level2_points, level3_points, level4_points, 
+                    level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
+        self.badge_name = badge_name
+        self.level1_points = level1_points
+        self.level2_points = level2_points
+        self.level3_points = level3_points
+        self.level4_points = level4_points
+        self.level5_points = level5_points
+        self.level6_points = level6_points
+        self.level7_points = level7_points
+        self.level8_points = level8_points
+        self.level9_points = level9_points
+        self.level10_points = level10_points
+	
+#Class for the "stamps" table
+class Stamp(Base, UserMixin):
+    __tablename__ = 'stamps'
+
+    stamp_id = Column(Integer, primary_key=True) 
+    stamp_name = Column(String) 
+    badge_id = Column(Integer, ForeignKey("badges.badge_id"))
+    points = Column(Integer)
+    url = Column(String)
+    
+    badge = relationship("Badge", foreign_keys=[badge_id])
+    
+    def __init__(self, stamp_name, badge_id, points, url):
+        self.stamp_name = stamp_name
+        self.badge_id = badge_id
+        self.points = points
+        self.url = url
+	
+#Class for the "user_stamps" table
+class UserStamp(Base, UserMixin):
+    __tablename__ = 'user_stamps'
+
+    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True) 
+    stamp_id = Column(Integer, ForeignKey("stamps.stamp_id"), primary_key=True) 
+    log_date = Column(DateTime, primary_key=True)
+    stamp_date = Column(Date)
+    
+    user = relationship("User", foreign_keys=[user_id])
+    stamp = relationship("Stamp", foreign_keys=[stamp_id])
+    
+    def __init__(self, user_id, stamp_id, log_date, stamp_date):
+        self.user_id = user_id
+        self.stamp_id = stamp_id
+        self.log_date = log_date
+        self.stamp_date = stamp_date
+	
+	
+	
+'''
 class User(UserMixin):
 	def __init__(self, id, username, first_name, last_name, email, password, role, school_id):
 	    self.id = id
@@ -27,29 +183,29 @@ class User(UserMixin):
 	    self.last_name = last_name
 	    self.role = role
 	    self.school_id = school_id
-
+        
 class db_model():
 	def __init__(self):
 	    self.conn = pymysql.connect(host=os.environ['MESAhostname'], port=3306, user=os.environ['MESAusername'], passwd=os.environ['MESApassword'], db=os.environ['MESAusername'])
 
 	def get_user_by_id(self, id):
 	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, role, school_id FROM users WHERE user_id = %s", (id))
+	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE user_id = %s", (id))
 	    return cur.fetchall()
 
 	def get_user_by_username(self, username):
 		cur = self.conn.cursor()
-		cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, role, school_id FROM users WHERE username = %s", (username))
+		cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE username = %s", (username))
 		return cur.fetchall()
 
 	def get_user_by_email(self, email):
 	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, role, school_id FROM users WHERE email = %s", (email))
+	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE email = %s", (email))
 	    return cur.fetchall()
 
 	def add_user(self, username, first_name, last_name, email, picture, password, school_id):
 		cur = self.conn.cursor()
-		cur.execute("INSERT INTO users(username, first_name, last_name, email, picture, ssb, role, school_id) VALUES(%s, %s, %s, %s, %s, %s, 'user', %s)", 
+		cur.execute("INSERT INTO users(username, first_name, last_name, email, picture, ssb, school_id) VALUES(%s, %s, %s, %s, %s, %s, 'user', %s)", 
 					(username, first_name, last_name, email, picture, password, school_id))
 		self.conn.commit()
 
@@ -64,3 +220,4 @@ class db_model():
 		rows = cur.fetchall()
 		rows=[i[0] for i in rows]
 		return rows
+'''
