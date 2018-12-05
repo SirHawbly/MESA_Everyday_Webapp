@@ -3,9 +3,9 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask import render_template, url_for, flash, redirect, request
-from flaskblog import app, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm
-from flaskblog.models import User, db_model
+from MESAeveryday import app, bcrypt
+from MESAeveryday.forms import RegistrationForm, LoginForm
+from MESAeveryday.models import User, db_model
 from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route("/", methods=['GET', 'POST'])
@@ -46,10 +46,11 @@ def login():
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 @app.route("/dashboard", methods=['GET','POST'])
+@login_required
 def dashboard():
     result = ''
     db = db_model()

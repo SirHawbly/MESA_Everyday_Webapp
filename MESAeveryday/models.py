@@ -3,7 +3,7 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from datetime import datetime
-from flaskblog import login_manager
+from MESAeveryday import login_manager
 from flask_login import UserMixin
 from flask import flash
 import pymysql
