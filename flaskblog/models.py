@@ -74,10 +74,17 @@ class db_model():
 		cur.execute("INSERT INTO users(id, username, email, image_file, password, role) VALUES(%s, %s, %s, %s, %s, 'user')", (id, username, email, image_file, password))
 		self.conn.commit()
 
+	"""
+		MinhN: This is my test  function
+	"""
 	def count(self,email):
 		cur = self.conn.cursor()
 		cur.execute("SELECT count(*) FROM users WHERE email = %s", (email))
 		return cur.fetchall()
+
+	"""
+		MinhN: This function update the password by username
+	"""
 	def update_password_by_username(self,password,username):
 		cur = self.conn.cursor()
 		cur.execute("Update users SET password=%s  WHERE username = %s",(password,username))

@@ -60,7 +60,9 @@ def logout():
     logout_user()
     return redirect(url_for('landpage'))
 
-
+"""
+    Minh N:
+"""
 
 def send_reset_email(useremail,user):
 
@@ -76,7 +78,9 @@ If you did not make this request then simply ignore this email and no changes wi
 '''
     mail.send(msg)
 
-
+"""
+    Minh N:
+"""
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
     if current_user.is_authenticated:
@@ -95,6 +99,9 @@ def reset_request():
         return redirect(url_for('login'))
     return render_template('reset_request.html', title='Reset Password', form=form)
 
+"""
+    MinhN:
+"""
 
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
