@@ -22,4 +22,4 @@ app.config['MAIL_USERNAME'] ='minhnpcc@gmail.com'
 app.config['MAIL_PASSWORD'] ='sing@p0re'
 mail = Mail(app)
 
-from flaskblog import routes
+from MESAeveryday import routes

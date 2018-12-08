@@ -3,9 +3,15 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask import render_template, url_for, flash, redirect, request
+<<<<<<< HEAD:flaskblog/routes.py
 from flaskblog import app, bcrypt,mail
 from flaskblog.forms import RegistrationForm, LoginForm,RequestResetForm, ResetPasswordForm
 from flaskblog.models import User, db_model
+=======
+from MESAeveryday import app, bcrypt
+from MESAeveryday.forms import RegistrationForm, LoginForm
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession
+>>>>>>> dafc2c61685a869a239b162d46fb546ad4a36cbb:MESAeveryday/routes.py
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
@@ -27,9 +33,11 @@ def register():
     form_login = LoginForm()
     if form_register.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-        db = db_model()
-        id = db.get_next_id()
-        db.add_user(id, form_register.username.data, form_register.email.data, 'default.jpg', hashed_password)
+        new_user = User(form_register.username.data, form_register.firstname.data, form_register.lastname.data,
+                    form_register.email.data, hashed_password, form_register.school.data)        
+        session = loadSession()			
+        session.add(new_user)
+        session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
@@ -40,20 +48,22 @@ def login():
     form_register = RegistrationForm()
     form_login = LoginForm()
     if form_login.validate_on_submit():
-        db = db_model()
-        data = db.get_user_by_username(form_login.username.data)
-        if data and bcrypt.check_password_hash(data[0][4], form_login.password.data):
-            user = User(data[0][0], data[0][1], data[0][2], data[0][4])
+        session = loadSession()
+        user = session.query(User).filter(User.username==form_login.username.data).first()		
+        if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
-            flash('Login Unsuccessful. Please check email and password', 'danger')
+            flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=['GET','POST'])
+@login_required
 def dashboard():
-    return render_template('dashboard.html', title='Dashboard')
+    session = loadSession()     
+    result=[row.badge_name for row in session.query(Badge.badge_name)]
+    return render_template('dashboard.html', result = result)
 
 @app.route("/logout")
 def logout():
