@@ -44,28 +44,4 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
-<<<<<<< HEAD:flaskblog/forms.py
     submit = SubmitField('Login')
-
-
-class RequestResetForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    submit = SubmitField('Request Password Reset')
-
-    def validate_email(self, email):
-        db = db_model()
-        user = db.get_user_by_email(email.data)
-       # User.query.filter_by(email=email.data).first()
-        if user is None:
-            raise ValidationError('There is no account with that email. You must register first.')
-
-
-class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Reset Password')
-=======
-    submit = SubmitField('Login')
->>>>>>> dafc2c61685a869a239b162d46fb546ad4a36cbb:MESAeveryday/forms.py
