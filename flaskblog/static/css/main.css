@@ -30,6 +30,23 @@ body {
     border-top: 1px solid #eee;
 }
 
+.center {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+
+.calendar-plugin {
+    border-top: 1px solid #eee;
+    position: relative;
+    padding-bottom: 75%;
+    height: 0;
+    overflow: hidden;
+}
+
 select {
     display:block!important;
 }
