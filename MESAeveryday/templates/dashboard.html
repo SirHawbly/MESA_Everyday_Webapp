@@ -95,20 +95,10 @@
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <li><a href="./badge1.html" class="waves-effect">Badge 1</a>
+                                {% for r in result %}
+                                <li><a href="" class="waves-effect">{{ r }}</a>
                                 </li>
-                                <li><a href="./badge2.html" class="waves-effect">Badge 2</a>
-                                </li>
-                                <li><a href="./badge3.html" class="waves-effect">Badge 3</a>
-                                </li>
-                                <li><a href="./badge4.html" class="waves-effect">Badge 4</a>
-                                </li>
-                                <li><a href="./badge5.html" class="waves-effect">Badge 5</a>
-                                </li>
-                                <li><a href="./badge6.html" class="waves-effect">Badge 6</a>
-                                </li>
-                                <li><a href="./badge7.html" class="waves-effect">Badge 7</a>
-                                </li>
+                                {% endfor %}
                             </ul>
                         </div>
                     </li>
