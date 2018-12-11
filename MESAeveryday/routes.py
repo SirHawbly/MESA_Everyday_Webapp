@@ -102,6 +102,7 @@ def reset_token(token):
         return redirect(url_for('dashboard'))
 
     user = User.verify_reset_token(token)
+    print("this is coming from the code it self", user)
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('landpage'))

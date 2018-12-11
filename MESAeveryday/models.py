@@ -96,7 +96,8 @@ class User(Base, UserMixin):
         except:
             return None
 
-        return User.query.get(user_id)
+        session = loadSession()
+        return session.query(User).filter(User.id==user_id).first()
 
 
 #Class for the "schools" table
