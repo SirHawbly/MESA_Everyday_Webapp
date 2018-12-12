@@ -118,6 +118,10 @@ class School(Base):
 	    self.state = state
 	    self.zip_code = zip_code
 
+    def get_all_schools():
+        session = loadSession()
+        return session.query(School.school_id, School.school_name)
+
 #Class for the "badges" table
 class Badge(Base):
     __tablename__ = 'badges'

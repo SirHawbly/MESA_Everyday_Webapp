@@ -7,12 +7,6 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from MESAeveryday.models import User, School, loadSession
 
-
-def get_all_schools():
-    session = loadSession()
-    return session.query(School.school_id, School.school_name)
-
-
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
     lastname = StringField('Lastname', validators=[DataRequired()])
@@ -20,7 +14,7 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    school = SelectField('School', coerce=int, choices=get_all_schools())
+    school = SelectField('School', coerce=int, choices=School.get_all_schools())
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
