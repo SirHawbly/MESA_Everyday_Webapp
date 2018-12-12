@@ -111,10 +111,14 @@ def reset_token(token):
     if form.validate_on_submit():
         #this is the new password that the user has chosen
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        print("Original: ", user.password)
         #updating the password happens here
         session = loadSession()
-        user.password = hashed_password
+        row = session.query(User).filter(User.id==user.id).first()
+        row.password = hashed_password
         session.commit()
+        print("Updated: ", user.password)
+        print("Same as: ", hashed_password)
         #send a message to the user telling them that there account has been updated successfully
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
