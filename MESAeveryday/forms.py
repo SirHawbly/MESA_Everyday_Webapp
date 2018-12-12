@@ -14,7 +14,7 @@ class RegistrationForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=20)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    school = SelectField('School', coerce=int, choices=School.get_all_schools())
+    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
     password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])

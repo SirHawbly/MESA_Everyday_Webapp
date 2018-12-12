@@ -58,8 +58,7 @@ def login():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    session = loadSession()
-    result = [row.badge_name for row in session.query(Badge.badge_name)]
+    result = [row.badge_name for row in Badge.get_all_badges_names()]
     return render_template('dashboard.html', result=result)
 
 
