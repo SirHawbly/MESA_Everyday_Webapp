@@ -112,13 +112,16 @@ def reset_token(token):
         #this is the new password that the user has chosen
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         print("Original: ", user.password)
-        #updating the password happens here
+        #updating the password requires first loading a new session 
         session = loadSession()
+        #once a session is loaded we want to get the row 
+        #where User.id matches the id of the user returned by User.verify_reset_token(token)
+        #this insures that the password for the correct user will be the one changed
         row = session.query(User).filter(User.id==user.id).first()
+        #Change the password is a simple assign statement
         row.password = hashed_password
+        #Changes need to be committed in order to make it to the database
         session.commit()
-        print("Updated: ", user.password)
-        print("Same as: ", hashed_password)
         #send a message to the user telling them that there account has been updated successfully
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
