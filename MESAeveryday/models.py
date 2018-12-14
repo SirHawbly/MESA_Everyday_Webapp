@@ -13,8 +13,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 # Added by Millen
 from MESAeveryday import app
-from flask.ext.security import current_user
-from flask.ext.admin.contrib import sqla
+from flask_security import current_user
+from flask_admin.contrib import sqla
+# from flask_security import Security, SQLAlchemyUserDatastore
 
 db_connection = 'mysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 engine = create_engine(db_connection)
@@ -27,11 +28,30 @@ def loadSession():
     return session
 
 # Added by Millen
-def admin_creation():
-    admin = Admin(app)
+def admin_init():
+    admin = flask_admin.Admin(app)
     session = loadSession()
 
-    admin.add_view(AdminRole(Role,session))
+    admin.add_view(AdminView(Role,session))
+    admin.add_view(AdminView(User,session))
+
+    hard_admin = User(admin, admin, admin, admin@sample.com, admin, 0)
+    session.add(hard_admin)
+    session.commit()
+
+# Added by Millen
+def admin_create():
+    # Setup Flask-Security from Flask-Admin examples
+    session = loadSession()
+    """
+    user_datastore = SQLAlchemyUserDatastore(session, User, Role)
+    security = Security(app, user_datastore)
+    """
+    if(session.query(User).filter(User.username=="admin").first()):
+        flash('Admin already created')
+    else:
+        admin_init()
+        flash('Creating Admin')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -93,11 +113,33 @@ class User(Base, UserMixin):
         self.school_id = school_id
 
 # Added by Millen
-# Class for the administrator
-class AdminRole(sqla.ModelView):
+"""
+View for the administrator
+Modified from flask-admin example
+https://github.com/flask-admin/flask-admin/blob/master/examples/auth/app.py
+"""
+class AdminView(sqla.ModelView):
     # Prevent normal users from accessing admin view
     def is_accessible(self):
-        return current_user.has_role('admin')
+        if not current_user.is_active or not current_user.is_authenticated:
+            return False
+        if current_user.has_role('admin'):
+            return True
+
+        return False
+
+    def _handle_view(self, name, **kwargs):
+        """
+        Override builtin _handle_view in order to redirect users when a view is not accessible
+        """
+        if not self.is_accessible():
+            if current_user.is_authenticated:
+                if current_user.is_authenticated:
+                    # permission denied
+                    abort(403)
+                else:
+                    # login
+                    return redirect(url_for('landpage'))
 
 #Class for the "schools" table
 class School(Base):
