@@ -3,9 +3,9 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
-from MESAeveryday.models import User, School, loadSession
+from MESAeveryday.models import User, School, loadSession, Badge, Stamp
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -57,3 +57,14 @@ class ResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+class EarnStampsForm(FlaskForm):
+    stamps = SelectField('Stamp', coerce=int)
+    time_finished = DateField('time finished', format='%m/%d/%Y', validators=[DataRequired()])
+    submit = SubmitField('earn stamp')
+    def __init__(self, badge_name, *args, **kwargs):
+        super(EarnStampsForm, self).__init__(*args, **kwargs)
+        self.badge_name = badge_name
+
+
+        

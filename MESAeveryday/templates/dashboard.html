@@ -88,9 +88,9 @@
             <!-- Side navigation links -->
             <li>
                 <ul class="collapsible collapsible-accordion">
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboards</a>
+                    <li><a href="{{ url_for('dashboard') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboards</a>
                     </li>
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
+                    <li><a href="{{ url_for('earn_stamps') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
                     </li>
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">

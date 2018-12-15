@@ -16,6 +16,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
+
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
 
@@ -158,6 +159,10 @@ class Badge(Base):
         session = loadSession()
         return session.query(Badge.badge_name)
 
+    def get_all_badges_id_with_names():
+        session = loadSession()
+        return session.query(Badge.badge_id, Badge.badge_name)
+
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
     __tablename__ = 'stamps'
@@ -175,6 +180,15 @@ class Stamp(Base, UserMixin):
         self.badge_id = badge_id
         self.points = points
         self.url = url
+
+    def get_stamps_of_badge(badge_id):
+        session = loadSession()
+        return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
+
+    def get_unearned_stamps_of_badge(user_id, badge_id):
+        session = loadSession()
+        subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+        return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -194,7 +208,21 @@ class UserStamp(Base, UserMixin):
         self.log_date = log_date
         self.stamp_date = stamp_date
 
+    def get_earned_stamp(user_id):
+        session = loadSession()
+        return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
 
+    def earn_stamp(user_id, stamp_id, log_date, stamp_date):
+        session = loadSession()
+        temp = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == stamp_id)
+        t = [i.stamp_id for i in temp]
+        if not t:
+            new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
+            session.add(new_UserStamp)
+            session.commit()
+            return True
+        else:
+            return False
 
 '''
 class User(UserMixin):

@@ -4,10 +4,11 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm, EarnStampsForm
 from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
+import datetime
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -125,3 +126,44 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
     return render_template('reset_token.html', title='Rest Password', form=form)
+
+@app.route("/earn_stamps", methods=['GET', 'POST'])
+@login_required
+def earn_stamps():
+    result = [row.badge_name for row in Badge.get_all_badges_names()]                                   # maintain some objects in dashboard
+    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    # a dictionary -> badge_id : badge_name
+    id = current_user.id    # acquire the user_id of current user
+    forms, t = [], 1        # several pairs of forms (stamp, date, submit). t is used to assign unique id
+    for badge in badges:
+        unearned = Stamp.get_unearned_stamps_of_badge(id, badge[0])  # get unearned stamps of current user
+        # the form will not be created if there's no available stamp to add for a badge
+        if unearned.first() is not None:
+            form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
+
+            form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
+                                                                # JS doesnt seem to be friendly to an object with long id, sigh
+                                                                
+            form.stamps.choices = unearned                      # assign unearned stamps to the select field
+            forms.append(form)                                  # create a list of forms             
+            t += 1
+    for form in forms:
+        if form.submit.data:
+            if form.validate_on_submit():
+                print('is submitted')
+                if UserStamp.earn_stamp(id, form.stamps.data, datetime.datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
+                    # flash('You\'ve earned a new stamp!', 'success')
+                    # some message should be shown here, flash doesnt work
+                    print('k.')
+                else:
+                    print("nah")
+                    # flash('Stamp already exists!', 'warning')
+                    # some message should be shown here, flash doesnt work
+                return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
+    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=result)
+
+# @app.route("/add_stamp", methods=['GET'])
+# @login_required
+# def add_stamp():
+#     result = [row.badge_name for row in Badge.get_all_badges_names()]
+
+#     return render_template('dashboard.html', result=result)
