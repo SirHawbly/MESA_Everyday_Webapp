@@ -8,12 +8,17 @@ from MESAeveryday.forms import RegistrationForm, LoginForm
 from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, admin_create
 from flask_login import login_user, current_user, logout_user, login_required
 
+
 @app.route("/", methods=['GET', 'POST'])
+# Added by Millen
+def initadmin():
+    admin_create()
+    return redirect(url_for('landpage'))
+
 # Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
     # Added by Millen
-    admin_create()
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
     form_register = RegistrationForm()
