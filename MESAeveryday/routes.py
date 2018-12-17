@@ -3,9 +3,8 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask import render_template, url_for, flash, redirect, request
-from MESAeveryday import app, bcrypt
+from MESAeveryday import app, bcrypt, User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, admin_create
 from MESAeveryday.forms import RegistrationForm, LoginForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, admin_create
 from flask_login import login_user, current_user, logout_user, login_required
 
 
