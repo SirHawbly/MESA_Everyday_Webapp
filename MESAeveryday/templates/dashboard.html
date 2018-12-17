@@ -164,10 +164,9 @@
                             Calendar
                         </div>
                         <div class="card-body">
-														<iframe id='cv_if1' src='http://cdn.instantcal.com/cvir.html?id=cv_nav1&theme=RE&ntype=cv_datepicker&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&border_radius=5&ichrome=1' allowTransparency='true' scrolling='no' frameborder=0 height=200 width=200></iframe>
-
-														<button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full calendar</button>
+														<iframe id='cv_if1' src='http://cdn.instantcal.com/cvir.html?id=cv_nav1&theme=RE&ntype=cv_datepicker&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&border_radius=5&ichrome=1' allowTransparency='true' scrolling='no' frameborder=0 height=360 width=360></iframe>
                         </div>
+
                     </div>
                     <!--/.Panel-->
 
@@ -177,7 +176,25 @@
                             Upcoming Events
                         </div>
                         <div class="card-body">
-                        	Upcoming events goes here
+                            <table> 
+                            		{% for event in events[:10] %} 
+                            		<tr>
+                            				<table> 
+																				<tr>
+																						<td>{{event['summary']}} in {{event['remain_days']}} days</td>
+																				</tr>
+																				<tr>
+																						<td>on {{event['start_string']}}</td> 
+																				</tr>
+																				<tr>
+																						<td>{{event['location']}}</td> 
+																				</tr>
+																				<tr><td>--</td></tr>
+																		</table>
+                                </tr>
+                                {% endfor %}
+                            </table>
+
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full upcoming events</button>
                         </div>
                     </div>
