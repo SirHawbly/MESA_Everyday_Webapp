@@ -2,12 +2,13 @@
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request,session
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm
 from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
+from datetime import datetime
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -44,8 +45,12 @@ def login():
     form_register = RegistrationForm()
     form_login = LoginForm()
     if form_login.validate_on_submit():
+
         session = loadSession()
         user = session.query(User).filter(User.username == form_login.username.data).first()
+        user.last_login=datetime.now()
+        print(user.last_login)
+        session.commit()
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
@@ -62,9 +67,12 @@ def dashboard():
     return render_template('dashboard.html', result=result)
 
 
+
 @app.route("/logout")
 def logout():
+
     logout_user()
+
     return redirect(url_for('landpage'))
 
 def send_reset_email(user):
@@ -125,3 +133,35 @@ def reset_token(token):
         flash('Your password has been updated! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
     return render_template('reset_token.html', title='Rest Password', form=form)
+
+
+@app.route("/reset_user", methods=['GET', 'POST'])
+def reset_user():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    form = RequestResetUserForm()
+
+    if form.validate_on_submit():
+        session = loadSession()
+        user = session.query(User).filter(User.email == form.email.data).first()
+
+        send_reset_user(user)
+        flash('An email has been sent with your username.', 'info')
+        return redirect(url_for('landpage'))
+
+    return render_template('reset_user.html', title='Rest User', form=form)
+
+
+
+def send_reset_user(user):
+    msg = Message('User Reset Request',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''Hi '''+user.first_name+'''\n Your user name is ''' + user.username
+    mail.send(msg)
+
+
+
+
+
