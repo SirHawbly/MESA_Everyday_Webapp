@@ -49,7 +49,6 @@ def login():
         session = loadSession()
         user = session.query(User).filter(User.username == form_login.username.data).first()
         user.last_login=datetime.now()
-        print(user.last_login)
         session.commit()
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             login_user(user, remember=form_login.remember.data)
