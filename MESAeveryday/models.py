@@ -13,6 +13,8 @@ from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateT
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
+from contextlib import contextmanager
+
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
@@ -20,16 +22,29 @@ db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.envir
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
 
+# def loadSession():
+#     metadata = Base.metadata
+#     Session = sessionmaker(bind=engine)
+#     session = Session()
+#     return session
+
+@contextmanager
 def loadSession():
     metadata = Base.metadata
     Session = sessionmaker(bind=engine)
     session = Session()
-    return session
+    try:
+        yield session
+        # session.commit()
+    except:
+        session.rollback()
+    finally:
+        session.close()
 
 @login_manager.user_loader
 def load_user(user_id):
-    session = loadSession()
-    return session.query(User).filter(User.id==user_id).first()
+    with loadSession() as session:
+        return session.query(User).filter(User.id==user_id).first()
 
 #All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
 
@@ -97,8 +112,24 @@ class User(Base, UserMixin):
         except:
             return None
 
-        session = loadSession()
-        return session.query(User).filter(User.id==user_id).first()
+        with loadSession() as session:
+            return session.query(User).filter(User.id==user_id).first()
+
+    def validate_username(username):
+        with loadSession() as session:
+            user = user = session.query(User).filter(User.username == username.data).first()
+            if user:
+                return True
+            else:
+                return False
+
+    def validate_email(email):
+        with loadSession() as session:
+            user = session.query(User).filter(User.email == email.data).first()
+            if user:
+                return True
+            else:
+                return False 
 
 
 #Class for the "schools" table
@@ -120,8 +151,8 @@ class School(Base):
 	    self.zip_code = zip_code
 
     def get_all_schools_names():
-        session = loadSession()
-        return session.query(School.school_id, School.school_name)
+        with loadSession() as session:
+            return session.query(School.school_id, School.school_name)
 
 #Class for the "badges" table
 class Badge(Base):
@@ -156,12 +187,12 @@ class Badge(Base):
         self.level10_points = level10_points
 
     def get_all_badges_names():
-        session = loadSession()
-        return session.query(Badge.badge_name)
+        with loadSession() as session:
+            return session.query(Badge.badge_name)
 
     def get_all_badges_id_with_names():
-        session = loadSession()
-        return session.query(Badge.badge_id, Badge.badge_name)
+        with loadSession() as session:
+            return session.query(Badge.badge_id, Badge.badge_name)
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
@@ -182,13 +213,13 @@ class Stamp(Base, UserMixin):
         self.url = url
 
     def get_stamps_of_badge(badge_id):
-        session = loadSession()
-        return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
+        with loadSession() as session:
+            return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
 
-    def get_unearned_stamps_of_badge(user_id, badge_id):
-        session = loadSession()
-        subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-        return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
+    # def get_unearned_stamps_of_badge(user_id, badge_id):
+    #     session = loadSession()
+    #     subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+    #     return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -209,20 +240,16 @@ class UserStamp(Base, UserMixin):
         self.stamp_date = stamp_date
 
     def get_earned_stamp(user_id):
-        session = loadSession()
-        return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+        with loadSession() as session:
+            return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
 
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
-        session = loadSession()
-        temp = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == stamp_id)
-        t = [i.stamp_id for i in temp]
-        if not t:
+        with loadSession() as session:
             new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
             session.add(new_UserStamp)
             session.commit()
             return True
-        else:
-            return False
+        return False
 
 '''
 class User(UserMixin):
