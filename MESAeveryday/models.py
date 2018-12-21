@@ -117,7 +117,7 @@ class User(Base, UserMixin):
 
     def validate_username(username):
         with loadSession() as session:
-            user = user = session.query(User).filter(User.username == username.data).first()
+            user = session.query(User).filter(User.username == username.data).first()
             if user:
                 return True
             else:
