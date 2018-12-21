@@ -29,6 +29,30 @@ MONTHS = ['None', 'January', 'February', 'March',
           'August', 'September', 'October', 'November',
           'December']
 
+CAL_COLORS = {
+              '1' : 'PALE_BLUE',
+              '2' : 'PALE_GREEN',
+              '3' : 'MAUVE',
+              '4' : 'PALE_RED',
+              '5' : 'YELLOW',
+              '6' : 'ORANGE',
+              '7' : 'CYAN',
+              '8' : 'GRAY',
+              '9' : 'BLUE',
+              '10': 'GREEN',
+              '11': 'RED',
+             }
+
+MESA_COLORS = {
+               '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'},
+               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'},
+               '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'},
+               '1' : {'r':130,'g':149,'b':177,'hex':'8195b1'},
+               '8' : {'r':114,'g':102,'b':88,'hex':'716558'},
+               # NOT USED, NO LIGHT GRAY IN G CAL
+               '12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'},
+              }
+
 # --
 
 
@@ -57,11 +81,15 @@ def parse_time_string(date_str):
 
     # pull the second half of the date 
     # parse it by hyphens then by colons
-    time_obj = tokens[1].split('-')
-    time_obj = time_obj[0].split(':')
-    t['hr'] = int(time_obj[0])
-    t['mn'] = int(time_obj[1])
-
+    try:
+        time_obj = tokens[1].split('-')
+        time_obj = time_obj[0].split(':')
+        t['hr'] = int(time_obj[0])
+        t['mn'] = int(time_obj[1])
+    except:
+        t['hr'] = 0
+        t['mn'] = 0
+         
 		# return the dict obj
     # print("passed obj:", json_obj, '\nparsed obj:',t)
     return t 
@@ -89,6 +117,7 @@ def add_time_tuples(event):
 
     start = event['start'].get('dateTime', event['start'].get('date'))
     end = event['end'].get('dateTime', event['end'].get('date'))
+
     start_tuple = parse_time_string(start)
     end_tuple = parse_time_string(end)
 
@@ -197,12 +226,23 @@ def get_event_list():
                                         orderBy='startTime').execute()
     # grab the results
     events = events_result.get('items', [])
-    
+   
     for event in events:
         add_time_tuples(event)
         add_time_strings(event)
         add_remain_days(event)
-
+        if 'colorId' in event: 
+            event['calColor'] = CAL_COLORS[event['colorId']]
+            if event['colorId'] in MESA_COLORS: 
+                event['mesaColor'] = MESA_COLORS[event['colorId']]
+            else:
+                event['mesaColor'] = 'Not a MESA Color'
+        else:
+            event['calColor'] = 'None'
+            event['mesaColor'] = 'None'
+        if 'location' not in event: 
+            event['location'] = 'No Location Provided'
+ 
     # if we have not found any events print
     # failure.
     if not events:
@@ -222,12 +262,20 @@ def main():
 
     events = get_event_list()
 
-    for event in events[:3]:
+    for event in events[:6]:
+        # print(event)
         print(events.index(event))
-        print(event['summary'])
-        print(event['location'])
-        print(event['start_string'],'to',event['end_string'])
-        print(event['remain_days'],'\n')
+        if 'calColor' in event: 
+            print('calendar color:',event['calColor'])
+        if 'mesaColor' in event: 
+            print('mesa color:',event['mesaColor'])
+        if 'summary' in event: 
+            print('summary:', event['summary'])
+        if 'location' in event: 
+            print('location', event['location'])
+        if 'start_string' in event: 
+            print('time:', event['start_string'],'to',event['end_string'])
+        print('Days Left:',event['remain_days'],'\n')
 
 # --
 
