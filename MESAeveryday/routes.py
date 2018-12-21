@@ -49,12 +49,12 @@ def login():
             user = session.query(User).filter(User.username == form_login.username.data).first()
             user.last_login = datetime.now()
             session.commit()
-            if user and bcrypt.check_password_hash(user.password, form_login.password.data):
-                login_user(user, remember=form_login.remember.data)
-                next_page = request.args.get('next')
-                return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-            else:
-                flash('Login Unsuccessful. Please check username and password', 'danger')
+        if user and bcrypt.check_password_hash(user.password, form_login.password.data):
+            login_user(user, remember=form_login.remember.data)
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+        else:
+            flash('Login Unsuccessful. Please check username and password', 'danger')
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 
