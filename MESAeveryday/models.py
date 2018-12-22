@@ -56,7 +56,11 @@ session = Session()
 @login_manager.user_loader
 def load_user(user_id):
     # with loadSession() as session:
-    return session.query(User).filter(User.id==user_id).first()
+    try:
+        return session.query(User).filter(User.id==user_id).first()
+    except:
+        session.rollback()
+        return None
 
 #All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
 
@@ -96,7 +100,7 @@ class User(Base, UserMixin):
     picture = Column(String)
     school_id = Column(Integer, ForeignKey("schools.school_id"))
     password = Column('SSB', String)
-    last_login = (DateTime)
+    last_login = Column(DateTime)
 
     school = relationship("School", foreign_keys=[school_id])
     role = relationship('Role', secondary='user_roles',
@@ -128,16 +132,22 @@ class User(Base, UserMixin):
         return session.query(User).filter(User.id==user_id).first()
 
     def validate_username(username):
-        # with loadSession() as session:
-        user = session.query(User).filter(User.username == username.data).first()
+        try:
+            user = session.query(User).filter(User.username == username.data).first()
+        except:
+            session.rollback()
+            user = None
         if user:
             return True
         else:
             return False
 
     def validate_email(email):
-        # with loadSession() as session:
-        user = session.query(User).filter(User.email == email.data).first()
+        try:
+            user = session.query(User).filter(User.email == email.data).first()
+        except:
+            session.rollback()
+            user = None
         if user:
             # test whether false will be returned
             return True
@@ -146,20 +156,38 @@ class User(Base, UserMixin):
 
     def add_new_user(new_user):
         # with loadSession() as session:
-        session.add(new_user)
+        try:
+            session.add(new_user)
+        except:
+            session.rollback()
 
     def get_user_by_email(email):
         # with loadSession() as session:
-        return session.query(User).filter(User.email == email).first()
+        try:
+            return session.query(User).filter(User.email == email).first()
+        except:
+            session.rollback()
+            return None
+    
+    def get_user_by_username(username):
+        try:
+            return session.query(User).filter(User.username == username).first()
+        except:
+            session.rollback()
+            return None
 
     def reset_pwd(id, hashed_pwd):
         # with loadSession() as session:
         #once a session is loaded we want to get the row 
         #where User.id matches the id of the user returned by User.verify_reset_token(token)
         #this insures that the password for the correct user will be the one changed
-        row = session.query(User).filter(User.id == id).first()
+        try:
+            row = session.query(User).filter(User.id == id).first()
         #Change the password is a simple assign statement
-        row.password = hashed_pwd
+            row.password = hashed_pwd
+        except:
+            session.rollback()
+            return False
         return True
 
 #Class for the "schools" table
@@ -182,7 +210,11 @@ class School(Base):
 
     def get_all_schools_names():
         # with loadSession() as session:
-        return session.query(School.school_id, School.school_name)
+        try:
+            return session.query(School.school_id, School.school_name)
+        except:
+            session.rollback()
+            return None
 
 #Class for the "badges" table
 class Badge(Base):
@@ -218,11 +250,19 @@ class Badge(Base):
 
     def get_all_badges_names():
         # with loadSession() as session:
-        return session.query(Badge.badge_name)
+        try:
+            return session.query(Badge.badge_name)
+        except:
+            session.rollback()
+            return None
 
     def get_all_badges_id_with_names():
         # with loadSession() as session:
-        return session.query(Badge.badge_id, Badge.badge_name)
+        try:
+            return session.query(Badge.badge_id, Badge.badge_name)
+        except:
+            session.rollback()
+            return None
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
@@ -244,7 +284,11 @@ class Stamp(Base, UserMixin):
 
     def get_stamps_of_badge(badge_id):
         # with loadSession() as session:
-        return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
+        try:
+            return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
+        except:
+            session.rollback()
+            return None
 
     # def get_unearned_stamps_of_badge(user_id, badge_id):
     #     session = loadSession()
@@ -271,13 +315,21 @@ class UserStamp(Base, UserMixin):
 
     def get_earned_stamp(user_id):
         # with loadSession() as session:
-        return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+        try:
+            return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+        except:
+            session.rollback()
+            return None
 
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
         # with loadSession() as session:
         new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
-        session.add(new_UserStamp)
-        session.commit()
+        try:
+            session.add(new_UserStamp)
+            session.commit()
+        except:
+            session.rollback()
+            return False
         return True
 
 '''
