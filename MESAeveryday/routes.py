@@ -5,13 +5,18 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, session  #, loadSession, loadLoginSession
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, session, admin_create  #, loadSession, loadLoginSession
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from datetime import datetime
 
 
 @app.route("/", methods=['GET', 'POST'])
+# Added by Millen
+def initadmin():
+    admin_create()
+    return redirect(url_for('landpage'))
+
 # Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
@@ -110,9 +115,9 @@ def reset_token(token):
         #this is the new password that the user has chosen
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         print("Original: ", user.password)
-        #updating the password requires first loading a new session 
+        #updating the password requires first loading a new session
         # with loadSession() as session:
-        #     #once a session is loaded we want to get the row 
+        #     #once a session is loaded we want to get the row
         #     #where User.id matches the id of the user returned by User.verify_reset_token(token)
         #     #this insures that the password for the correct user will be the one changed
         #     row = session.query(User).filter(User.id==user.id).first()
@@ -163,9 +168,9 @@ def earn_stamps():
 
             form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
                                                                 # JS doesnt seem to be friendly to an object with long id, sigh
-                                                                
+
             form.stamps.choices = stamps                      # assign unearned stamps to the select field
-            forms.append(form)                                  # create a list of forms             
+            forms.append(form)                                  # create a list of forms
             t += 1
     for form in forms:
         if form.submit.data:
