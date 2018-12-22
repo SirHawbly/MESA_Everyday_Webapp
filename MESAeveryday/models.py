@@ -98,6 +98,9 @@ class User(Base, UserMixin):
 
         session = loadSession()
         return session.query(User).filter(User.id==user_id).first()
+    def get_all_username():
+        session = loadSession()
+        return session.query(User.username)
 
 
 #Class for the "schools" table
