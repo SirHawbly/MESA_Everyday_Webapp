@@ -31,9 +31,6 @@ def register():
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
         new_user = User(form_register.username.data, form_register.firstname.data, form_register.lastname.data,
                         form_register.email.data, hashed_password, form_register.school.data)
-        # with loadSession() as session:
-        #     session.add(new_user)
-        #     session.commit()
         User.add_new_user(new_user)
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
@@ -46,7 +43,7 @@ def login():
     form_register = RegistrationForm()
     form_login = LoginForm()
     if form_login.validate_on_submit():
-        user = session.query(User).filter(User.username == form_login.username.data).first()
+        user = User.get_user_by_username(form_login.username.data)
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             user.last_login = datetime.now()
             login_user(user, remember=form_login.remember.data)
@@ -90,8 +87,6 @@ def reset_request():
 
     if form.validate_on_submit():
         user = User.get_user_by_email(form.email.data)
-        # with loadSession() as session:
-        #     user = session.query(User).filter(User.email == form.email.data).first()
         send_reset_email(user)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('landpage'))
@@ -138,9 +133,6 @@ def reset_user():
 
     form = RequestResetUserForm()
     if form.validate_on_submit():
-        # with loadSession() as session:
-        #     user = session.query(User).filter(User.email == form.email.data).first()
-        #     send_reset_user(user)
         user = User.get_user_by_email(form.email.data)
         send_reset_user(user)
         flash('An email has been sent with your username.', 'info')
@@ -162,13 +154,10 @@ def send_reset_user(user):
 def earn_stamps():
     result = [row.badge_name for row in Badge.get_all_badges_names()]                                   # maintain some objects in dashboard
     badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    # a dictionary -> badge_id : badge_name
-    # with loadSession() as session:
-        # id = current_user.id    # acquire the user_id of current user
     forms, t = [], 1        # several pairs of forms (stamp, date, submit). t is used to assign unique id
     for badge in badges:
-        # unearned = Stamp.get_unearned_stamps_of_badge(id, badge[0])  # get unearned stamps of current user
         stamps = Stamp.get_stamps_of_badge(badge[0])
-        # the form will not be created if there's no available stamp to add for a badge
+
         if stamps.first() is not None:
             form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
 
