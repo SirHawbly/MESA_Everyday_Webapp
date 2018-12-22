@@ -27,6 +27,7 @@ def register():
     # Registration Form Submitted
     form_register = RegistrationForm()
     form_login = LoginForm()
+
     if form_register.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
         new_user = User(form_register.username.data, form_register.firstname.data, form_register.lastname.data,
@@ -36,7 +37,86 @@ def register():
         session.commit()
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('landpage'))
-    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+
+    else:
+
+        newusername=combinename(form_register.firstname.data,form_register.lastname.data,random())
+        result = [row.username for row in User.get_all_username()]
+        print(result)
+        newusername=checkfirstlastrand(newusername,result)
+        hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
+        new_user = User(newusername, form_register.firstname.data, form_register.lastname.data,
+                        form_register.email.data, hashed_password, form_register.school.data)
+        session = loadSession()
+        session.add(new_user)
+        session.commit()
+        flash('Your account has been created! You are now able to log in with username:'+newusername, 'success')
+
+        send_generate_username(form_register.email.data,newusername)
+        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+
+def random():
+    import random
+    x=random.randint(000,999)
+    if x<10:
+        x= '0'+str(x)+'0'
+    else:
+        if x>=10 and x<100:
+            x= '0'+str(x)
+
+    return x
+def combinename(first_name,last_name,random):
+	if len(first_name) > 8 and len(last_name)>8:
+	  return first_name[0:8] + last_name[0:8] + str(random)
+	else:
+	  if len(first_name)>8:
+	    return first_name[0:8] + last_name +str(random)
+	  else:
+	    if len(last_name)>8:
+	      return first_name + last_name[0:8] +str(random)
+	    else:
+	      return first_name+last_name+str(random)
+
+def checkfirstlastrand(first_last_rand,arr):
+
+    global match
+    match=False
+
+    for item in arr:
+        if item == first_last_rand:
+            match = True
+            break
+    if not match:
+        return first_last_rand
+    else :
+        randnumber = int(first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)])
+        randnumberstring = first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)]
+        while match:
+			#randnumber = int(first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)])
+			#randnumberstring = first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)]
+
+                if randnumber == 999:
+                    randnumberstring = '000'
+                else:
+                    randnumber = randnumber + 1
+                    randnumberstring = str(randnumber)
+                    if randnumber < 10:
+                        randnumberstring = '00' + str(randnumber)
+                    if (randnumber >= 10) and (randnumber < 100):
+                        randnumberstring = '0' + str(randnumber)
+                match=False
+                for item1 in arr:
+
+                    if item1==(first_last_rand[0:len(first_last_rand) - 3]+str(randnumberstring)):
+                        randnumber= int(randnumberstring)
+                        match=True
+                        break
+
+        return (first_last_rand[0:len(first_last_rand) - 3]+ str(randnumberstring))
+
+
+
+
 
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -48,11 +128,13 @@ def login():
 
         session = loadSession()
         user = session.query(User).filter(User.username == form_login.username.data).first()
-        user.last_login=datetime.now()
-        session.commit()
+       # user.last_login=datetime.now()
+       # session.commit()
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
+            user.last_login = datetime.now()
+            session.commit()
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
@@ -161,6 +243,12 @@ def send_reset_user(user):
     mail.send(msg)
 
 
-
-
-
+def send_generate_username(useremail,username):
+    msg = Message('Username Generation',
+                  sender='noreply@demo.com',
+                  recipients=[useremail])
+    msg.body = f'''Thank you for registering an account with Oregon MESA your unique
+username has been generated and it is '''+username+'''
+please keep this email handy as you will need that username every time you
+login to the app. '''
+    mail.send(msg)
