@@ -26,6 +26,21 @@ metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
+# hardcode admin addition to database
+def admin_create():
+    try:
+        if(session.query(User).filter(User.username=="admin").first()):
+            flash('Admin already created')
+        else:
+            # hardcode admin
+            hard_admin = User("admin", "admin", "admin", "mwan@pdx.edu", bcrypt.generate_password_hash("password").decode('utf-8'), "1")
+            session.add(hard_admin)
+            session.commit()
+
+            flash('Creating Admin')
+    except:
+        session.rollback()
+
 # do not delete those until the new loadSession method is proved working
 # def loadSession():
 #     metadata = Base.metadata
@@ -152,7 +167,7 @@ class User(Base, UserMixin):
             # test whether false will be returned
             return True
         else:
-            return False 
+            return False
 
     def add_new_user(new_user):
         # with loadSession() as session:
@@ -168,7 +183,7 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return None
-    
+
     def get_user_by_username(username):
         try:
             return session.query(User).filter(User.username == username).first()
@@ -178,7 +193,7 @@ class User(Base, UserMixin):
 
     def reset_pwd(id, hashed_pwd):
         # with loadSession() as session:
-        #once a session is loaded we want to get the row 
+        #once a session is loaded we want to get the row
         #where User.id matches the id of the user returned by User.verify_reset_token(token)
         #this insures that the password for the correct user will be the one changed
         try:
