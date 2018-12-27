@@ -261,6 +261,8 @@ def main():
     """
 
     events = get_event_list()
+    upcoming_events = [event for event in events if (event['remain_days'] < 7)]
+    print(upcoming_events)
 
     for event in events[:6]:
         # print(event)

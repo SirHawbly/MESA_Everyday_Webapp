@@ -61,8 +61,12 @@ def login():
 def dashboard():
     session = loadSession()
     result = [row.badge_name for row in session.query(Badge.badge_name)]
+    events = get_event_list()
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
     return render_template('dashboard.html',
-                           events=get_event_list(),
+                           events=events,
+                           number_upcoming=len(upcoming_events),
+                           upcoming_events=upcoming_events,
                            result=result)
 
 
