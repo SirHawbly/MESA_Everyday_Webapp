@@ -126,15 +126,19 @@ def login():
     form_login = LoginForm()
     if form_login.validate_on_submit():
 
-        session = loadSession()
-        user = session.query(User).filter(User.username == form_login.username.data).first()
+        mysession = loadSession()
+        user = mysession.query(User).filter(User.username == form_login.username.data).first()
        # user.last_login=datetime.now()
        # session.commit()
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
             user.last_login = datetime.now()
-            session.commit()
+            mysession.commit()
+            """
+              MN:  use session to store username
+            """
+            session['myusername']=form_login.username.data
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
