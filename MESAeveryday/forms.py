@@ -6,6 +6,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError,Regexp
 from MESAeveryday.models import User, School, loadSession
+from flask_wtf.file import FileField, FileAllowed
+from flask_login import current_user
+from MESAeveryday.models import User
+
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -73,3 +77,27 @@ class ResetPasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+
+
+class UpdateAccountForm(FlaskForm):
+    username = StringField('Username',
+                           validators=[DataRequired(), Length(min=2, max=20)])
+    email = StringField('Email',
+                        validators=[DataRequired(), Email()])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+
+    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
+
+    submit = SubmitField('Update')
+
+    def validate_username(self, username):
+        session = loadSession()
+        user = session.query(User).filter(User.username == username.data).first()
+        if user:
+            raise ValidationError('That username is taken. Please choose a different one.')
+
+    def validate_email(self, email):
+        session = loadSession()
+        user = session.query(User).filter(User.email == email.data).first()
+        if user:
+            raise ValidationError('That email is taken. Please choose a different one.')
