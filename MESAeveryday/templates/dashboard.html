@@ -94,12 +94,13 @@
                     </li>
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">
-                            <ul>
-                                {% for r in result %}
-                                <li><a href="" class="waves-effect">{{ r }}</a>
-                                </li>
+                            {% for r, u, i in result %}
+                                <h6 class="dropdown-header">{{ r }}</h6>
+                                {% for badge in u %}
+                                    <a class="dropdown-item" href="#">{{ badge }}</a>
                                 {% endfor %}
-                            </ul>
+                                <div class="dropdown-divider"></div>
+                            {% endfor %}
                         </div>
                     </li>
                 </ul>
@@ -131,7 +132,11 @@
                            Badge Information
                         </div>
                         <div class="card-body">
-                        	Main student badge content goes here 
+                            <!-- Main student badge content goes here -->
+                            <h5>Earned points</h5>
+                            {% for r, p in points %}
+                                <p>{{ r }}: {{ p }}</p>
+                            {% endfor %}
 
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full report</button>
 
@@ -203,3 +208,6 @@
     </footer>
     <!--/.Footer-->
 {% endblock content %}
+{% block scripts %}
+    {{ super() }}
+{% endblock scripts %}

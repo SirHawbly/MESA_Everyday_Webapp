@@ -64,7 +64,26 @@ def login():
 @login_required
 def dashboard():
     result = [row.badge_name for row in Badge.get_all_badges_names()]
-    return render_template('dashboard.html', result=result)
+    # this block for viewing needed stamps
+    id = current_user.id    # get the id of current user
+    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    # get all badges id with name as a dict
+    unearned_badges, ids, pts, t = [], [], [], 1    
+    for badge in badges:
+        stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badge[0])]   # get unearned stamps name of a badge
+        points = [row.points for row in Stamp.get_earned_points(id, badge[0])]                  # get earned points of a badge
+        pt = 0
+        for p in points:
+            pt += p
+        pts.append(pt)
+        if stamps:
+            unearned_badges.append(stamps)
+        else:
+            unearned_badges.append([])
+        # to assign an unique, no space id to each badge object
+        ids.append("badge" + str(t))
+        t += 1
+    print(pts)
+    return render_template('dashboard.html', result=zip(result, unearned_badges, ids), points=zip(result, pts))
 
 
 @app.route("/logout")
@@ -131,6 +150,7 @@ def reset_token(token):
             return redirect(url_for('landpage'))
     return render_template('reset_token.html', title='Rest Password', form=form)
 
+
 @app.route("/reset_user", methods=['GET', 'POST'])
 def reset_user():
     if current_user.is_authenticated:
@@ -143,8 +163,6 @@ def reset_user():
         flash('An email has been sent with your username.', 'info')
         return redirect(url_for('landpage'))
     return render_template('reset_user.html', title='Rest User', form=form)
-
-
 
 def send_reset_user(user):
     msg = Message('User Reset Request',
@@ -167,7 +185,7 @@ def earn_stamps():
             form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
 
             form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
-                                                                # JS doesnt seem to be friendly to an object with long id, sigh
+                                                                # HTML doesnt seem to be friendly to an id with space(s), sigh
 
             form.stamps.choices = stamps                      # assign unearned stamps to the select field
             forms.append(form)                                  # create a list of forms
@@ -181,7 +199,7 @@ def earn_stamps():
                 if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
                     # flash('You\'ve earned a new stamp!', 'success')
                     # some message should be shown here, flash doesnt work
-                    print('k.')
+                    print('successfully added.')
                 # else:
                     # flash('Failed adding stamp', 'warning')
                     # some message should be shown here, flash doesnt work
