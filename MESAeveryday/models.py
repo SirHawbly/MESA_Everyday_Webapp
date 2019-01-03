@@ -310,17 +310,28 @@ class Stamp(Base, UserMixin):
         self.url = url
 
     def get_stamps_of_badge(badge_id):
-        # with loadSession() as session:
         try:
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
         except:
             session.rollback()
             return None
 
-    # def get_unearned_stamps_of_badge(user_id, badge_id):
-    #     session = loadSession()
-    #     subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-    #     return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
+    def get_unearned_stamps_of_badge(user_id, badge_id):
+        try:
+            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
+        except:
+            session.rollback()
+            return None
+    
+    def get_earned_points(user_id, badge_id):
+        try:
+            # subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            # return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
+            return session.query(UserStamp.stamp_id, Stamp.points).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == Stamp.stamp_id).filter(Stamp.badge_id == badge_id)
+        except:
+            session.rollback()
+            return None
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -341,7 +352,6 @@ class UserStamp(Base, UserMixin):
         self.stamp_date = stamp_date
 
     def get_earned_stamp(user_id):
-        # with loadSession() as session:
         try:
             return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
         except:
