@@ -81,23 +81,11 @@ class ResetPasswordForm(FlaskForm):
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
+                           validators=[DataRequired(), Length(min=2, max=20)],render_kw={'readonly': True})
     email = StringField('Email',
-                        validators=[DataRequired(), Email()])
+                        validators=[DataRequired(), Email()],render_kw={'readonly': True})
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
 
     submit = SubmitField('Update')
-
-    def validate_username(self, username):
-        session = loadSession()
-        user = session.query(User).filter(User.username == username.data).first()
-        if user:
-            raise ValidationError('That username is taken. Please choose a different one.')
-
-    def validate_email(self, email):
-        session = loadSession()
-        user = session.query(User).filter(User.email == email.data).first()
-        if user:
-            raise ValidationError('That email is taken. Please choose a different one.')
