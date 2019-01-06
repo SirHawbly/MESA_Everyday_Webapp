@@ -24,35 +24,34 @@
                     <a class="nav-link dropdown-toggle waves-effect" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
 
-												{% if number_upcoming > 0 %}
-														<span class="badge red">{{number_upcoming}}</span> <i class="fa fa-bell"></i>
-												{% endif %}
+						{% if number_upcoming > 0 %}
+							<span class="badge red">{{number_upcoming}}</span> <i class="fa fa-bell"></i>
+						{% endif %}
 
                         <span class="d-none d-md-inline-block">Notifications</span>
                     </a>
 
                     <div class="dropdown-menu dropdown-info" aria-labelledby="navbarDropdownMenuLink">
-
-												{% if number_upcoming > 0 %}
-														{% for event in upcoming_events %}
-																<a class="dropdown-item" href="#">
-																		<i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
-																		<span> {{ event['summary'] }} </span>
-																		<span class="float-right"><i class="fa fa-clock-o" aria-hidden="true"></i>
-																				{{ event['remain_days'] }} days
-																		</span>
-																</a>
-														{% endfor %}
-												{% else %}
-														<a class="dropdown-item" href="#">
-																<i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
-																<span> No Events </span>
-																<span class="float-right"><i class="fa fa-clock-o" aria-hidden="true"></i>
-																0 days
-																</span>
-														</a>
-												{% endif %}
-		
+						{% if number_upcoming > 0 %}
+							{% for event in upcoming_events %}
+								<a class="dropdown-item" href="#">
+									<i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
+									<span> {{ event['summary'] }} </span>
+									<span class="float-right"><i class="fa fa-clock-o" aria-hidden="true"></i>
+									    {{ event['remain_days'] }} days
+									</span>
+								</a>
+							{% endfor %}
+						{% else %}
+							<a class="dropdown-item" href="#">
+							    <i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
+							    <span> No Events </span>
+							    <span class="float-right">  
+                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+							        0 days
+						        </span>
+							</a>
+						{% endif %}
                     </div>
                 </li>
                 <li class="nav-item">
@@ -170,12 +169,12 @@
                 <div class="col-lg-4 col-md-12">
 
                     <!--Panel-->
-                    <div class="card mb-4">
+                    <div class="card mb-4" id='calendar-div'>
                         <div class="card-header white-text primary-color">
                             Calendar
                         </div>
                         <div class="embed-responsive embed-responsive-16by9">
-														<iframe class="embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent' allowTransparency=true scrolling='no' frameborder=0 height=300 width=300></iframe>
+							<iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent' allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
                         </div>
                     </div>
                     <!--/.Panel-->
@@ -187,20 +186,22 @@
                         </div>
                         <div class="card-body">
                             <table> 
-                            		{% for event in events[:10] %} 
-                            		<tr>
-                            				<table> 
-																				<tr>
-																						<td>{{event['summary']}} in {{event['remain_days']}} days ({{event['calColor']}} : {{event['mesaColor']}})</td>
-																				</tr>
-																				<tr>
-																						<td>on {{event['start_string']}}</td> 
-																				</tr>
-																				<tr>
-																						<td>at {{event['location']}}</td> 
-																				</tr>
-																				<tr><td>--</td></tr>
-																		</table>
+                            	{% for event in events[:10] %} 
+                            	<tr>
+                           			<table>
+									{% if event['remain_days'] < 30 %} 
+    			                        <tr>
+									        <td>{{event['summary']}} in {{event['remain_days']}} days ({{event['calColor']}} : {{event['mesaColor']}})</td>
+										</tr>
+										<tr>
+											<td>on {{event['start_string']}}</td> 
+										</tr>
+										<tr>
+									    	<td>at {{event['location']}}</td> 
+										</tr>
+										<tr><td>--</td></tr>
+								    {% endif %}
+								    </table>
                                 </tr>
                                 {% endfor %}
                             </table>

@@ -33,7 +33,8 @@ body {
 .cal-div {
 		position: relative;
 		overflow: hidden;
-		padding-top: 56.25%;
+		padding-bottom: 56.25%;
+		height: 0;
 }
 
 .cal-iframe {
@@ -41,7 +42,7 @@ body {
 		top: 0;
 		left: 0;
 		width: 100%;
-		height: 100;
+		height: 100%;
 		border: 0;
 }
 
