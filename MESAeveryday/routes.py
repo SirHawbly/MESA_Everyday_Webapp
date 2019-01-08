@@ -63,27 +63,17 @@ def login():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    result = [row.badge_name for row in Badge.get_all_badges_names()]
+    # result = [row.badge_name for row in Badge.get_all_badges_names()]
+    temp = Badge.get_all_badges_id_with_names()
+    result, badges = [row.badge_name for row in temp], [row.badge_id for row in temp]
     # this block for viewing needed stamps
     id = current_user.id    # get the id of current user
-    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    # get all badges id with name as a dict
-    unearned_badges, ids, pts, t = [], [], [], 1    
+    pts= []  
     for badge in badges:
-        stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badge[0])]   # get unearned stamps name of a badge
-        points = [row.points for row in Stamp.get_earned_points(id, badge[0])]                  # get earned points of a badge
-        pt = 0
-        for p in points:
-            pt += p
+        points = [row.points for row in Stamp.get_earned_points(id, badge)]                  # get earned points of a badge
+        pt = 0 if not points else sum(points)
         pts.append(pt)
-        if stamps:
-            unearned_badges.append(stamps)
-        else:
-            unearned_badges.append([])
-        # to assign an unique, no space id to each badge object
-        ids.append("badge" + str(t))
-        t += 1
-    print(pts)
-    return render_template('dashboard.html', result=zip(result, unearned_badges, ids), points=zip(result, pts))
+    return render_template('dashboard.html', result=zip(result, badges), points=zip(result, pts))
 
 
 @app.route("/logout")
@@ -193,11 +183,9 @@ def earn_stamps():
     for form in forms:
         if form.submit.data:
             if form.validate_on_submit():
-                print('is submitted')
                 id = current_user.id    # acquire the user_id of current user
-                print(id)
                 if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
-                    # flash('You\'ve earned a new stamp!', 'success')
+                    # flash('You've earned a new stamp!', 'success')
                     # some message should be shown here, flash doesnt work
                     print('successfully added.')
                 # else:
@@ -206,9 +194,16 @@ def earn_stamps():
                 return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
     return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=result)
 
-# @app.route("/add_stamp", methods=['GET'])
-# @login_required
-# def add_stamp():
-#     result = [row.badge_name for row in Badge.get_all_badges_names()]
-
-#     return render_template('dashboard.html', result=result)
+@app.route("/badges/<badgeid>", methods=['GET', 'POST'])
+@login_required
+def needed_stamps(badgeid):
+    temp = Badge.get_all_badges_id_with_names()
+    result, ids = [row.badge_name for row in temp], [row.badge_id for row in temp]
+    badge_name = Badge.get_badge_name(badgeid).first()[0]
+    id = current_user.id    # get the id of current user
+    unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badgeid)]   # the unearned stamps of current user
+    if not unearned_stamps:
+        unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
+    points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
+    pt = 0 if not points else sum(points)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt)

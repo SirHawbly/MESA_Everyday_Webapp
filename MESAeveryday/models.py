@@ -276,7 +276,6 @@ class Badge(Base):
         self.level10_points = level10_points
 
     def get_all_badges_names():
-        # with loadSession() as session:
         try:
             return session.query(Badge.badge_name)
         except:
@@ -284,9 +283,15 @@ class Badge(Base):
             return None
 
     def get_all_badges_id_with_names():
-        # with loadSession() as session:
         try:
             return session.query(Badge.badge_id, Badge.badge_name)
+        except:
+            session.rollback()
+            return None
+
+    def get_badge_name(badge_id):
+        try:
+            return session.query(Badge.badge_name).filter(Badge.badge_id == badge_id)
         except:
             session.rollback()
             return None
