@@ -94,13 +94,11 @@
                     </li>
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">
-                            {% for r, u, i in result %}
-                                <h6 class="dropdown-header">{{ r }}</h6>
-                                {% for badge in u %}
-                                    <a class="dropdown-item" href="#">{{ badge }}</a>
+                            <ul>
+                                {% for r, i in result %}
+                                    <li><a href="/badges/{{ i }}" class="waves-effect">{{ r }}</a></li>
                                 {% endfor %}
-                                <div class="dropdown-divider"></div>
-                            {% endfor %}
+                            </ul>
                         </div>
                     </li>
                 </ul>
