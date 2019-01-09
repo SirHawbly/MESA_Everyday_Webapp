@@ -35,19 +35,23 @@ def register():
         all_usernames = [row.username for row in User.get_all_username()]
         new_username = check_username(new_username, all_usernames)
         
-        # Generate hashed password
-        hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
+        if new_username == 'ERROR':
+            flash('Sorry, we were unable to generate an account for you.', danger)
+        else:
         
-        # Add user to the database
-        new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
+            # Generate hashed password
+            hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
+        
+            # Add user to the database
+            new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
                         form_register.email.data, hashed_password, form_register.school.data)
-        session = loadSession()
-        session.add(new_user)
-        session.commit()
+            session = loadSession()
+            session.add(new_user)
+            session.commit()
         
-        # Tell the user their new username and send them an email with the username
-        flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
-        send_generate_username(form_register.email.data, new_username)
+            # Tell the user their new username and send them an email with the username
+            flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
+            send_generate_username(form_register.email.data, new_username)
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 # Generates a random 3 digit code. Returns a 3 character long string
@@ -94,9 +98,14 @@ def check_username(first_last_rand, all_usernames):
     if match:
         randnumberstring = new_username[(len(new_username) - 3):(len(new_username) + 1)]
         randnumber = int(randnumberstring)
+        number_of_matches = 1
         
         # Add 1 to the 3 digit code until we find an unused code
         while match:
+        
+                # If we've tried every possible code, return 'ERROR'
+                if number_of_matches == 1000:
+                    return 'ERROR'
         
                 # Loop back to 000 if the code is 999
                 if randnumber == 999:
@@ -118,7 +127,8 @@ def check_username(first_last_rand, all_usernames):
                 for username in all_usernames:
                     if username == new_username:
                         randnumber = int(randnumberstring)
-                        match=True
+                        match = True
+                        number_of_matches += 1
                         break
 
     return new_username
