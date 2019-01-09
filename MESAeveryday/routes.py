@@ -29,33 +29,21 @@ def register():
     form_register = RegistrationForm()
     form_login = LoginForm()
 
-    if form_register.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-        new_user = User(form_register.username.data, form_register.firstname.data, form_register.lastname.data,
-                        form_register.email.data, hashed_password, form_register.school.data)
-
-        session = loadSession()
-        session.add(new_user)
-        session.commit()
-        flash('Your account has been created! You are now able to log in', 'success')
-        return redirect(url_for('landpage'))
-
-    else:
-
-        newusername=combinename(form_register.firstname.data,form_register.lastname.data,random())
+    if form_register.validate_on_submit():   
+        new_username = combine_name(form_register.firstname.data,form_register.lastname.data,random())
         result = [row.username for row in User.get_all_username()]
         print(result)
-        newusername=checkfirstlastrand(newusername,result)
+        new_username = check_first_last_rand(new_username, result)
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-        new_user = User(newusername, form_register.firstname.data, form_register.lastname.data,
+        new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
                         form_register.email.data, hashed_password, form_register.school.data)
+
         session = loadSession()
         session.add(new_user)
         session.commit()
-        flash('Your account has been created! You are now able to log in with username:'+newusername, 'success')
-
-        send_generate_username(form_register.email.data,newusername)
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        flash('Your account has been created! You are now able to log in with username:' + new_username, 'success')
+        send_generate_username(form_register.email.data, new_username)
+    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 def random():
     import random
@@ -67,7 +55,8 @@ def random():
             x= '0'+str(x)
 
     return x
-def combinename(first_name,last_name,random):
+    
+def combine_name(first_name, last_name, random):
 	if len(first_name) > 8 and len(last_name)>8:
 	  return first_name[0:8] + last_name[0:8] + str(random)
 	else:
@@ -79,7 +68,7 @@ def combinename(first_name,last_name,random):
 	    else:
 	      return first_name+last_name+str(random)
 
-def checkfirstlastrand(first_last_rand,arr):
+def check_first_last_rand(first_last_rand, arr):
 
     global match
     match=False
