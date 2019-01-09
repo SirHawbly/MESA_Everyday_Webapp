@@ -54,90 +54,6 @@ def register():
             send_generate_username(form_register.email.data, new_username)
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
-# Generates a random 3 digit code. Returns a 3 character long string
-def random_code():
-    import random
-    x=random.randint(000,999)
-    if x<10:
-        x= '0'+str(x)+'0'
-    else:
-        if x>=10 and x<100:
-            x= '0'+str(x)
-
-    return x
-
-# Generates a username based on the users first name, last name, and a randomly generated 3 digit code
-def generate_username(first_name, last_name, random):
-	if len(first_name) > 8 and len(last_name)>8:
-	  return first_name[0:8] + last_name[0:8] + str(random)
-	else:
-	  if len(first_name)>8:
-	    return first_name[0:8] + last_name +str(random)
-	  else:
-	    if len(last_name)>8:
-	      return first_name + last_name[0:8] +str(random)
-	    else:
-	      return first_name+last_name+str(random)
-
-# Checks to see if the username is already taken. If it is, add 1 to the 3 digit code (it repeats this until it finds an unused code)
-# It returns the original username if it is not taken, and returns the new username if it is taken
-# If all 1000 possible usernames are taken, it will return 'ERRROR'
-def check_username(first_last_rand, all_usernames):
-
-    global match
-    match = False
-    new_username = first_last_rand
-
-    # Check if username is taken
-    for username in all_usernames:
-        if username == first_last_rand:
-            match = True
-            break
-            
-    # If the username is taken, generate a new code
-    if match:
-        randnumberstring = new_username[(len(new_username) - 3):(len(new_username) + 1)]
-        randnumber = int(randnumberstring)
-        number_of_matches = 1
-        
-        # Add 1 to the 3 digit code until we find an unused code
-        while match:
-        
-                # If we've tried every possible code, return 'ERROR'
-                if number_of_matches == 1000:
-                    return 'ERROR'
-        
-                # Loop back to 000 if the code is 999
-                if randnumber == 999:
-                    randnumberstring = '000'              
-                # Otherwise add 1 to the code
-                else:
-                    randnumber = randnumber + 1
-                    randnumberstring = str(randnumber)
-                    if randnumber < 10:
-                        randnumberstring = '00' + str(randnumber)
-                    if (randnumber >= 10) and (randnumber < 100):
-                        randnumberstring = '0' + str(randnumber)
-                        
-                #Create the new username
-                new_username = (new_username[0:len(new_username) - 3]+ str(randnumberstring))
-                match = False
-                
-                # Check to make sure the new username isn't already in use
-                for username in all_usernames:
-                    if username == new_username:
-                        randnumber = int(randnumberstring)
-                        match = True
-                        number_of_matches += 1
-                        break
-
-    return new_username
-
-
-
-
-
-
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     # Login Form Submitted
@@ -329,3 +245,83 @@ def save_picture(form_picture):
     i.save(picture_path)
 
     return picture_fn
+	
+	
+# Generates a random 3 digit code. Returns a 3 character long string
+def random_code():
+    import random
+    x=random.randint(000,999)
+    if x<10:
+        x= '0'+str(x)+'0'
+    else:
+        if x>=10 and x<100:
+            x= '0'+str(x)
+
+    return x
+
+# Generates a username based on the users first name, last name, and a randomly generated 3 digit code
+def generate_username(first_name, last_name, random):
+	if len(first_name) > 8 and len(last_name)>8:
+	  return first_name[0:8] + last_name[0:8] + str(random)
+	else:
+	  if len(first_name)>8:
+	    return first_name[0:8] + last_name +str(random)
+	  else:
+	    if len(last_name)>8:
+	      return first_name + last_name[0:8] +str(random)
+	    else:
+	      return first_name+last_name+str(random)
+
+# Checks to see if the username is already taken. If it is, add 1 to the 3 digit code (it repeats this until it finds an unused code)
+# It returns the original username if it is not taken, and returns the new username if it is taken
+# If all 1000 possible usernames are taken, it will return 'ERRROR'
+def check_username(first_last_rand, all_usernames):
+
+    global match
+    match = False
+    new_username = first_last_rand
+
+    # Check if username is taken
+    for username in all_usernames:
+        if username == first_last_rand:
+            match = True
+            break
+            
+    # If the username is taken, generate a new code
+    if match:
+        randnumberstring = new_username[(len(new_username) - 3):(len(new_username) + 1)]
+        randnumber = int(randnumberstring)
+        number_of_matches = 1
+        
+        # Add 1 to the 3 digit code until we find an unused code
+        while match:
+        
+                # If we've tried every possible code, return 'ERROR'
+                if number_of_matches == 1000:
+                    return 'ERROR'
+        
+                # Loop back to 000 if the code is 999
+                if randnumber == 999:
+                    randnumberstring = '000'              
+                # Otherwise add 1 to the code
+                else:
+                    randnumber = randnumber + 1
+                    randnumberstring = str(randnumber)
+                    if randnumber < 10:
+                        randnumberstring = '00' + str(randnumber)
+                    if (randnumber >= 10) and (randnumber < 100):
+                        randnumberstring = '0' + str(randnumber)
+                        
+                #Create the new username
+                new_username = (new_username[0:len(new_username) - 3]+ str(randnumberstring))
+                match = False
+                
+                # Check to make sure the new username isn't already in use
+                for username in all_usernames:
+                    if username == new_username:
+                        randnumber = int(randnumberstring)
+                        match = True
+                        number_of_matches += 1
+                        break
+
+    return new_username
