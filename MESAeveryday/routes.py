@@ -30,22 +30,28 @@ def register():
     form_login = LoginForm()
 
     if form_register.validate_on_submit():   
-        new_username = combine_name(form_register.firstname.data,form_register.lastname.data,random())
-        result = [row.username for row in User.get_all_username()]
-        print(result)
-        new_username = check_first_last_rand(new_username, result)
+        # Generate username
+        new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
+        all_usernames = [row.username for row in User.get_all_username()]
+        new_username = check_username(new_username, all_usernames)
+        
+        # Generate hashed password
         hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
+        
+        # Add user to the database
         new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
                         form_register.email.data, hashed_password, form_register.school.data)
-
         session = loadSession()
         session.add(new_user)
         session.commit()
-        flash('Your account has been created! You are now able to log in with username:' + new_username, 'success')
+        
+        # Tell the user their new username and send them an email with the username
+        flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
         send_generate_username(form_register.email.data, new_username)
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
-def random():
+# Generates a random 3 digit code. Returns a 3 character long string
+def random_code():
     import random
     x=random.randint(000,999)
     if x<10:
@@ -55,8 +61,9 @@ def random():
             x= '0'+str(x)
 
     return x
-    
-def combine_name(first_name, last_name, random):
+
+# Generates a username based on the users first name, last name, and a randomly generated 3 digit code
+def generate_username(first_name, last_name, random):
 	if len(first_name) > 8 and len(last_name)>8:
 	  return first_name[0:8] + last_name[0:8] + str(random)
 	else:
@@ -68,26 +75,33 @@ def combine_name(first_name, last_name, random):
 	    else:
 	      return first_name+last_name+str(random)
 
-def check_first_last_rand(first_last_rand, arr):
+# Checks to see if the username is already taken. If it is, add 1 to the 3 digit code (it repeats this until it finds an unused code)
+# It returns the original username if it is not taken, and returns the new username if it is taken
+# If all 1000 possible usernames are taken, it will return 'ERRROR'
+def check_username(first_last_rand, all_usernames):
 
     global match
-    match=False
+    match = False
+    new_username = first_last_rand
 
-    for item in arr:
-        if item == first_last_rand:
+    # Check if username is taken
+    for username in all_usernames:
+        if username == first_last_rand:
             match = True
             break
-    if not match:
-        return first_last_rand
-    else :
-        randnumber = int(first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)])
-        randnumberstring = first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)]
+            
+    # If the username is taken, generate a new code
+    if match:
+        randnumberstring = new_username[(len(new_username) - 3):(len(new_username) + 1)]
+        randnumber = int(randnumberstring)
+        
+        # Add 1 to the 3 digit code until we find an unused code
         while match:
-			#randnumber = int(first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)])
-			#randnumberstring = first_last_rand[(len(first_last_rand) - 3):(len(first_last_rand) + 1)]
-
+        
+                # Loop back to 000 if the code is 999
                 if randnumber == 999:
-                    randnumberstring = '000'
+                    randnumberstring = '000'              
+                # Otherwise add 1 to the code
                 else:
                     randnumber = randnumber + 1
                     randnumberstring = str(randnumber)
@@ -95,15 +109,19 @@ def check_first_last_rand(first_last_rand, arr):
                         randnumberstring = '00' + str(randnumber)
                     if (randnumber >= 10) and (randnumber < 100):
                         randnumberstring = '0' + str(randnumber)
-                match=False
-                for item1 in arr:
-
-                    if item1==(first_last_rand[0:len(first_last_rand) - 3]+str(randnumberstring)):
-                        randnumber= int(randnumberstring)
+                        
+                #Create the new username
+                new_username = (new_username[0:len(new_username) - 3]+ str(randnumberstring))
+                match = False
+                
+                # Check to make sure the new username isn't already in use
+                for username in all_usernames:
+                    if username == new_username:
+                        randnumber = int(randnumberstring)
                         match=True
                         break
 
-        return (first_last_rand[0:len(first_last_rand) - 3]+ str(randnumberstring))
+    return new_username
 
 
 
