@@ -36,15 +36,15 @@ def register():
         new_username = check_username(new_username, all_usernames)
         
         if new_username == 'ERROR':
-            flash('Sorry, we were unable to generate an account for you.', danger)
+            flash('Sorry, we were unable to generate an account for you.', 'danger')
         else:
         
             # Generate hashed password
             hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-        
+      
             # Add user to the database
             new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
-                        form_register.email.data, hashed_password, form_register.school.data)
+                    form_register.email.data, hashed_password, form_register.school.data)
             session = loadSession()
             session.add(new_user)
             session.commit()
