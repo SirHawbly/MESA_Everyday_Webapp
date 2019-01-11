@@ -218,8 +218,8 @@ def account():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
             myaccount.picture=picture_file
-            myaccount.school = form.school.data
 
+        myaccount.school_id = form.school.data
         session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
