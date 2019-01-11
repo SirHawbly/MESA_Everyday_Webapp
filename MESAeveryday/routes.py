@@ -4,7 +4,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request,session
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateAccountForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateAccountForm,UpdateSchoolForm,UpdatePasswordForm
 from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
@@ -277,27 +277,57 @@ def save_picture(form_picture):
 @login_required
 def account():
     form = UpdateAccountForm()
+    schoolform = UpdateSchoolForm()
+    passwordform= UpdatePasswordForm()
 
-    if form.validate_on_submit():
-        session = loadSession()
-        myaccount = session.query(User).filter(User.username == current_user.username).first()
+    if request.method=='POST':
 
-        if form.picture.data:
-            picture_file = save_picture(form.picture.data)
-            myaccount.picture=picture_file
-            myaccount.school = form.school.data
+        if 'email' in request.form:
 
-        session.commit()
-        flash('Your account has been updated!', 'success')
-        return redirect(url_for('account'))
-    elif request.method == 'GET':
+        #if form.validate_on_submit():
+            session = loadSession()
+            myaccount = session.query(User).filter(User.username == current_user.username).first()
+            myaccount.email=form.email.data
+            myaccount.first_name=form.firstname.data
+            myaccount.last_name=form.lastname.data
 
-        form.username.data = current_user.username
+
+            if form.picture.data:
+                picture_file = save_picture(form.picture.data)
+                myaccount.picture=picture_file
+            session.commit()
+            print(myaccount.email)
+            print(myaccount.picture)
+           # flash('Your account has been updated!', 'success')
+            return redirect(url_for('account'))
+        elif 'school' in request.form:
+            session = loadSession()
+            myaccount = session.query(User).filter(User.username == current_user.username).first()
+            myaccount.schoolid = schoolform.school.data
+            print(schoolform.school.data)
+            session.commit()
+
+            return redirect(url_for('account'))
+        elif 'password' in request.form:
+            session = loadSession()
+            myaccount = session.query(User).filter(User.username == current_user.username).first()
+            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+            myaccount.password = hashed_password
+            session.commit()
+
+
+    elif request.method =='GET':
+
         form.email.data = current_user.email
-        print(current_user.picture)
+        form.firstname.data=current_user.first_name
+        form.lastname.data=current_user.last_name
+
+
+
     image_file = url_for('static', filename='img/' + current_user.picture)
-    return render_template('account.html', title='Account',
-                           image_file=image_file, form=form)
+    print(image_file)
+
+    return render_template('account.html', title='Account', image_file=image_file, form=form)
 
 
 def save_picture(form_picture):
