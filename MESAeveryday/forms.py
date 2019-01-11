@@ -102,4 +102,4 @@ class UpdatePasswordForm(FlaskForm):
                  message="The string must contain at least 1 numeric digit and 1 symbol")])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Update')
+    submit = SubmitField('Update') 
