@@ -80,12 +80,34 @@ class ResetPasswordForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)],render_kw={'readonly': True})
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()],render_kw={'readonly': True})
+
+    email = StringField('Email')
+    firstname = StringField('Firstname')
+    lastname = StringField('Lastname')
+
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
 
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
+                                                                            message="your password must be at least %(min)d characters")
+        , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
+                 message="The string must contain at least 1 numeric digit and 1 symbol")])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
 
+    submit = SubmitField('Update',_name='account')
+
+class UpdateSchoolForm(FlaskForm):
+
+    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
+
+    submit = SubmitField('Update',_name='school')
+
+class UpdatePasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
+                                                                            message="your password must be at least %(min)d characters")
+        , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
+                 message="The string must contain at least 1 numeric digit and 1 symbol")])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Update')
