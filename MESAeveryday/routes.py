@@ -236,7 +236,7 @@ def account():
         elif 'school' in request.form:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.schoolid = schoolform.school.data
+            myaccount.school_id = form.school.data
             print(schoolform.school.data)
             session.commit()
 
@@ -254,6 +254,7 @@ def account():
         form.email.data = current_user.email
         form.firstname.data=current_user.first_name
         form.lastname.data=current_user.last_name
+        form.school.data = current_user.school_id
 
 
     image_file = url_for('static', filename='img/' + current_user.picture)
