@@ -224,7 +224,7 @@ def account():
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
-
+        form.school.data = current_user.school_id
         form.username.data = current_user.username
         form.email.data = current_user.email
         print(current_user.picture)
