@@ -178,7 +178,7 @@ def send_reset_user(user):
     msg = Message('User Reset Request',
                   sender='noreply@demo.com',
                   recipients=[user.email])
-    msg.body = f'''Hi '''+user.first_name+'''\n Your user name is ''' + user.username
+    msg.body = f'''Hi '''+user.first_name+'''\nYour username is ''' + user.username
     mail.send(msg)
 
 
