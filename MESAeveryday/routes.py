@@ -196,7 +196,7 @@ def earn_stamps():
 
 @app.route("/badges/<badgeid>", methods=['GET', 'POST'])
 @login_required
-def needed_stamps(badgeid):
+def check_badge(badgeid):
     temp = Badge.get_all_badges_id_with_names()
     result, ids = [row.badge_name for row in temp], [row.badge_id for row in temp]
     badge_name = Badge.get_badge_name(badgeid).first()[0]
@@ -206,4 +206,5 @@ def needed_stamps(badgeid):
         unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
     points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
     pt = 0 if not points else sum(points)
-    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt)
+    current_level, to_next_lv = Badge.get_level_related_info(badgeid, pt)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv)
