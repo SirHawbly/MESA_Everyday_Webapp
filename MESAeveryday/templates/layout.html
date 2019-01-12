@@ -16,32 +16,49 @@
     <!-- Material Design Bootstrap -->
     <link href="../static/css/mdbdashboard2.min.css" rel="stylesheet">
     <!-- Main css -->
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">  
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
+    <!-- Bootstrap 4 DatePicker-->  
+    <link href="../static/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"> -->
 </head>
 
+
+
+    
+
     {% block content %}{% endblock %}
+
+    {% block scripts %}
     <!--JavaScript -->
     <!-- SCRIPTS -->
-    <!-- JQuery -->
-    <script type="text/javascript" src="../static/js/jquery-3.3.1.min.js"></script>
-    <!-- Bootstrap tooltips -->
-    <script type="text/javascript" src="../static/js/popper.min.js"></script>
-    <!-- Bootstrap core JavaScript -->
-    <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
-    <!-- MDB core JavaScript -->
-    <script type="text/javascript" src="../static/js/mdbdashboard2.min.js"></script>
-    <!--Custom scripts-->
-    <script>
-        // SideNav Initialization
-        $(".button-collapse").sideNav();
 
-        var container = document.querySelector('.custom-scrollbar');
-        Ps.initialize(container, {
-            wheelSpeed: 2,
-            wheelPropagation: true,
-            minScrollbarLength: 20
-        });
-    </script>
+        <!-- JQuery -->
+        <script type="text/javascript" src="../static/js/jquery-3.3.1.min.js"></script>
+        <!-- Bootstrap tooltips -->
+        <script type="text/javascript" src="../static/js/popper.min.js"></script>
+        <!-- Bootstrap core JavaScript -->
+        <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
+        <!-- MDB core JavaScript -->
+        <script type="text/javascript" src="../static/js/mdbdashboard2.min.js"></script>
+        <!-- Gijgo Datepicker -->
+        <script type="text/javascript" src="../static/js/gijgo.min.js"></script>
+        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> -->
+        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
+
+        <!--Custom scripts-->
+        <script>
+            // SideNav Initialization
+            $(".button-collapse").sideNav();
+
+            var container = document.querySelector('.custom-scrollbar');
+            Ps.initialize(container, {
+                wheelSpeed: 2,
+                wheelPropagation: true,
+                minScrollbarLength: 20
+            });
+        </script>
+    {% endblock scripts %}
+
 </body>
 </html>
 
