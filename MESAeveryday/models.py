@@ -296,6 +296,20 @@ class Badge(Base):
             session.rollback()
             return None
 
+    def get_level_related_info(badge_id, points):
+        try:
+            target_badge = session.query(Badge.level1_points, Badge.level2_points, Badge.level3_points, Badge.level4_points,Badge.level5_points, Badge.level6_points, Badge.level7_points, Badge.level8_points, Badge.level9_points, Badge.level10_points).filter(Badge.badge_id == badge_id).first()
+            # target_badge = session.query(Badge).filter(Badge.badge_id == badge_id).first()
+            for level in range(11):
+                if not target_badge[level]:
+                    return level, 0
+                if points < target_badge[level]:
+                    return level, target_badge[level] - points
+            return 10, 0
+        except:
+            session.rollback()
+            return None, None
+
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
     __tablename__ = 'stamps'
