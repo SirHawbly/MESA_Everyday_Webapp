@@ -65,12 +65,13 @@ class User(Base, UserMixin):
     last_name = Column(String)
     username = Column(String)
     email = Column(String)
-    picture = Column(String)
     school_id = Column(Integer, ForeignKey("schools.school_id"))
+    avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
     last_login = (DateTime)
 
     school = relationship("School", foreign_keys=[school_id])
+    avatar = relationship("Avatar", foreign_keys=[avatar_id])
     role = relationship('Role', secondary='user_roles',
                          backref=backref('users', lazy='dynamic'))
 
@@ -197,6 +198,15 @@ class UserStamp(Base, UserMixin):
         self.log_date = log_date
         self.stamp_date = stamp_date
 
+#Class for the "avatars" table
+class Avatar(Base):
+    __tablename__ = 'avatars'
+
+    id = Column(Integer, primary_key=True)
+    file_name = Column(String)
+
+    def __init__(self, file_name):
+	    self.file_name = feile_name
 
 
 '''

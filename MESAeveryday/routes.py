@@ -5,7 +5,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request,session
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateAccountForm,UpdateSchoolForm,UpdatePasswordForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, Avatar
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from datetime import datetime
@@ -218,7 +218,7 @@ def account():
         if avatarSelect:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.picture = avatarSelect
+            myaccount.avatar_id = avatarSelect
             session.commit()
             return redirect(url_for('account'))
             
@@ -252,8 +252,10 @@ def account():
         form.firstname.data=current_user.first_name
         form.lastname.data=current_user.last_name
         form.school.data = current_user.school_id
+        session = loadSession()
+        files = session.query(Avatar)
 
-    return render_template('account.html', title='Account', form=form)
+    return render_template('account.html', title='Account', avatar_files=files, form=form)
 
 
 def save_picture(form_picture):

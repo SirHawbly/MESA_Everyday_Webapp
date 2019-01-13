@@ -2,7 +2,7 @@
 {% block content %}
     <div class="content-section">
       <div class="media">
-        <img class="rounded-circle account-img" src="static/avatar/{{ current_user.picture }}"width="75" height="75">
+        <img class="rounded-circle account-img" src="static/avatar/{{ current_user.avatar.file_name }}"width="75" height="75">
         <div class="media-body">
           <h2 class="account-heading">{{ current_user.username }}</h2>
           <p class="text-secondary">{{ current_user.email }}</p>
@@ -43,7 +43,7 @@
             <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#avatarModal">
               Change Profile Picture
             </button>
-            <img class="rounded-circle account-img" src="static/avatar/{{ current_user.picture }}"width="75" height="75">  
+            <img class="rounded-circle account-img" src="static/avatar/{{ current_user.avatar.file_name }}"width="75" height="75">  
         </div>
         
         
@@ -116,13 +116,9 @@
       </div>
       <div class="modal-body">
         <select class="image-picker" name="avatarSelect">
-              <option data-img-src="static/avatar/default.png" value="default.png"></option>
-              <option data-img-src="static/avatar/Demo_Day_Logo.png" value="Demo_Day_Logo.png"></option>
-              <option data-img-src="static/avatar/Horizontal_Header.png" value="Horizontal_Header.png"></option>
-              <option data-img-src="static/avatar/illustration_logo_dark.png" value="illustration_logo_dark.png"></option>
-              <option data-img-src="static/avatar/MESA OR_Logo_Large_25Years.jpg" value="MESA OR_Logo_Large_25Years.jpg"></option>
-              <option data-img-src="static/avatar/mesa-invention-b-2.png" value="mesa-invention-b-2.png"></option>
-              <option data-img-src="static/avatar/Portland_State_University.png" value="Portland_State_University.png"></option>
+              {% for file in avatar_files %}
+              <option data-img-src="static/avatar/{{ file.file_name }}" value="{{ file.id }}"></option>
+              {% endfor %}  
         </select>
             
       </div>
