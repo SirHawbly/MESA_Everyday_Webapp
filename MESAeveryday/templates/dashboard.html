@@ -189,7 +189,7 @@
                             	{% for event in events[:10] %} 
                             	<tr>
                                     <table>
-                                        {% if event['remain_days'] < 30 %} 
+                                        {% if event['remain_days'] < 8 %} 
                                             <tr>
                                                 <td>{{event['summary']}} in {{event['remain_days']}} days ({{event['calColor']}} : {{event['mesaColor']}})</td>
                                             </tr>
