@@ -222,6 +222,7 @@ def account():
             session.commit()
             flash(select, 'success')
             return redirect(url_for('account'))
+            
         if 'email' in request.form:
         #if form.validate_on_submit():
             session = loadSession()
@@ -232,6 +233,7 @@ def account():
             session.commit()
            # flash('Your account has been updated!', 'success')
             return redirect(url_for('account'))
+            
         elif 'school' in request.form:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
@@ -247,13 +249,12 @@ def account():
             session.commit()
 
     elif request.method =='GET':
-
         form.email.data = current_user.email
         form.firstname.data=current_user.first_name
         form.lastname.data=current_user.last_name
         form.school.data = current_user.school_id
 
-    return render_template('account.html', title='Account', image_file=image_file, form=form)
+    return render_template('account.html', title='Account', form=form)
 
 
 def save_picture(form_picture):
