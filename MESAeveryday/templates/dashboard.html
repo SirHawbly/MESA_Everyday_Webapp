@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
+
 <body class="fixed-sn white-skin">
 
     <!--Main Navigation-->
@@ -21,13 +22,10 @@
 
                 <!-- Dropdown -->
                 <li class="nav-item dropdown notifications-nav">
-                    <a class="nav-link dropdown-toggle waves-effect" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-
+                    <a class="nav-link dropdown-toggle waves-effect" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {% if number_upcoming > 0 %}
-                             <span class="badge red">{{number_upcoming}}</span> <i class="fa fa-bell"></i>
+                            <span class="badge red">{{number_upcoming}}</span> <i class="fa fa-bell"></i>
                         {% endif %}
-
                         <span class="d-none d-md-inline-block">Notifications</span>
                     </a>
 
@@ -46,7 +44,7 @@
                             <a class="dropdown-item" href="#">
                                 <i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
                                 <span> No Events </span>
-                                <span class="float-right">  
+                                <span class="float-right">
                                     <i class="fa fa-clock-o" aria-hidden="true"></i>
                                     0 days
                                 </span>
@@ -58,7 +56,10 @@
                     <a class="nav-link waves-effect"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Inbox</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link waves-effect" href="https://calendar.google.com/calendar/embed?src=pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com&ctz=America%2FLos_Angeles"><i class="fa fa-calendar"></i> <span class="clearfix d-none d-sm-inline-block">Calendar</span></a>
+                    <a class="nav-link waves-effect" href="https://calendar.google.com/calendar/embed?src=pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com&ctz=America%2FLos_Angeles">
+                        <i class="fa fa-calendar"></i>
+                        <span class="clearfix d-none d-sm-inline-block">Calendar</span>
+                    </a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle waves-effect" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -78,43 +79,45 @@
         <!-- Sidebar navigation -->
         <div id="slide-out" class="side-nav sn-bg-4 fixed">
             <ul class="custom-scrollbar">
-            <!-- Logo -->
-            <li class="logo-sn waves-effect">
-                <div class="text-center">
-                    <a href="#" class="pl-0"><img src="../static/img/mesa.png" class=""></a>
-                </div>
-            </li>
-            <!--/. Logo -->
-
-            <!--Search Form-->
-            <li>
-                <form class="search-form" role="search">
-                    <div class="form-group md-form mt-0 pt-1 waves-light">
-                        <input type="text" class="form-control" placeholder="Search">
+                <!-- Logo -->
+                <li class="logo-sn waves-effect">
+                    <div class="text-center">
+                        <a href="#" class="pl-0"><img src="../static/img/mesa.png" class=""></a>
                     </div>
-                </form>
-            </li>
-            <!--/.Search Form-->
-            <!-- Side navigation links -->
-            <li>
-                <ul class="collapsible collapsible-accordion">
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboards</a>
-                    </li>
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
-                    </li>
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
-                        <div class="collapsible-body">
-                            <ul>
-                                {% for r in result %}
-                                <li><a href="" class="waves-effect">{{ r }}</a>
-                                </li>
-                                {% endfor %}
-                            </ul>
+                </li>
+                <!--/. Logo -->
+
+                <!--Search Form-->
+                <li>
+                    <form class="search-form" role="search">
+                        <div class="form-group md-form mt-0 pt-1 waves-light">
+                            <input type="text" class="form-control" placeholder="Search">
                         </div>
-                    </li>
-                </ul>
-            </li>
-            <!--/. Side navigation links -->
+                    </form>
+                </li>
+                <!--/.Search Form-->
+                <!-- Side navigation links -->
+                <li>
+                    <ul class="collapsible collapsible-accordion">
+                        <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i>
+                                Dashboards</a>
+                        </li>
+                        <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
+                        </li>
+                        <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i
+                                    class="fa fa-angle-down rotate-icon"></i></a>
+                            <div class="collapsible-body">
+                                <ul>
+                                    {% for r in result %}
+                                    <li><a href="" class="waves-effect">{{ r }}</a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                <!--/. Side navigation links -->
             </ul>
             <div class="sidenav-bg mask-strong"></div>
         </div>
@@ -138,10 +141,10 @@
                     <!--Panel-->
                     <div class="card mb-4">
                         <div class="card-header white-text primary-color">
-                           Badge Information
+                            Badge Information
                         </div>
                         <div class="card-body">
-                        	Main student badge content goes here 
+                            Main student badge content goes here
 
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full report</button>
 
@@ -156,7 +159,8 @@
                             Users activity
                         </div>
                         <div class="card-body">
-                        	User activity content goes here
+                            Time Until First Event!!!
+                            <span id="clock" data-date-string={{ events[0]['date_string'] }}></span>
                         </div>
                     </div>
 
@@ -174,7 +178,8 @@
                             Calendar
                         </div>
                         <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent' allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
+                            <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent'
+                                allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
                         </div>
                     </div>
                     <!--/.Panel-->
@@ -185,28 +190,34 @@
                             Upcoming Events
                         </div>
                         <div class="card-body">
-                            <table> 
-                            	{% for event in events[:10] %} 
-                            	<tr>
+                            <table>
+                                {% for event in events[:10] %}
+                                <tr>
                                     <table>
-                                        {% if event['remain_days'] < 8 %} 
-                                            <tr>
-                                                <td>{{event['summary']}} in {{event['remain_days']}} days ({{event['calColor']}} : {{event['mesaColor']}})</td>
-                                            </tr>
-                                            <tr>
-                                                <td>on {{event['start_string']}}</td> 
-                                            </tr>
-                                            <tr>
-                                                <td>at {{event['location']}}</td> 
-                                            </tr>
-                                            <tr><td>--</td></tr>
-                                        {% endif %}
-                                    </table>
+                                        {% if event['remain_days'] < 8 %} <tr>
+                                            <td>{{event['summary']}} in {{event['remain_days']}} days
+                                                ({{event['calColor']}} : {{event['mesaColor']}})</td>
                                 </tr>
-                                {% endfor %}
+                                <tr>
+                                    <td>on {{event['start_string']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>on {{event['date_string']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>at {{event['location']}}</td>
+                                </tr>
+                                <tr>
+                                    <td>--</td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                            </tr>
+                            {% endfor %}
                             </table>
 
-                            <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full upcoming events</button>
+                            <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View
+                                full upcoming events</button>
                         </div>
                     </div>
                     <!--/.Panel-->
@@ -221,12 +232,12 @@
 
         <!--Copyright-->
         <div class="footer-copyright py-3 text-center">
-              <div class="container-fluid">
-                 <a> MESA Office Contact Information </a>
+            <div class="container-fluid">
+                <a> MESA Office Contact Information </a>
             </div>
         </div>
         <!--/.Copyright-->
 
     </footer>
     <!--/.Footer-->
-{% endblock content %}
+    {% endblock content %}

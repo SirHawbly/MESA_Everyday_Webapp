@@ -30,6 +30,12 @@
     <script type="text/javascript" src="../static/js/bootstrap.min.js"></script>
     <!-- MDB core JavaScript -->
     <script type="text/javascript" src="../static/js/mdbdashboard2.min.js"></script>
+    <!--Countdown Clock-->
+    <script type="text/javascript" src="../static/js/jquery.countdown.min.js"></script>
+    <!--<script type="text/javascript" href="{{ url_for('static', filename='js/jquery.countdown.min.js') }}"></script>-->
+    <!--Countdown Bridge for Div Data-->
+    <script type="text/javascript" src="../static/js/jinja.countdown.js"></script>
+    <!--<script type="text/javascript" href="{{ url_for('static', filename='js/jinja.countdown.js') }}"></script>-->
     <!--Custom scripts-->
     <script>
         // SideNav Initialization
@@ -42,9 +48,7 @@
             minScrollbarLength: 20
         });
 
-        window.addEventListener('resize', ()=>{
-            document.getElementById('cv_if5').src = document.getElementById('cv_if5').src
-        })
+        $(console.log( url_for('static', filename='js/jinja.countdown.js')))
     </script>
 </body>
 </html>
