@@ -215,12 +215,11 @@ def account():
 
     if request.method=='POST':
         avatarSelect = request.form.get('avatarSelect')
-        if select:
+        if avatarSelect:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
             myaccount.picture = avatarSelect
             session.commit()
-            flash(select, 'success')
             return redirect(url_for('account'))
             
         if 'email' in request.form:
