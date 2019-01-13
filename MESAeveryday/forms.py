@@ -77,8 +77,6 @@ class UpdateAccountForm(FlaskForm):
     firstname = StringField('Firstname')
     lastname = StringField('Lastname')
 
-    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
-
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
                                                                             message="your password must be at least %(min)d characters")

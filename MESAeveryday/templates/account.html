@@ -27,28 +27,26 @@
                     {% endif %}
                 </div>
                   <div class="form-group">
-
-                              {{ form.firstname(class="form-control", placeholder="First Name") }}
+                      {{ form.firstname(class="form-control", placeholder="First Name") }}
                   </div>
               <div class="form-group">
-
-                              {{ form.lastname(class="form-control", placeholder="Last Name") }}
-                      </div>
-                <div class="form-group">
-                    {{ form.picture.label() }}
-                    {{ form.picture(class="form-control-file") }}
-                    {% if form.picture.errors %}
-                        {% for error in form.picture.errors %}
-                            <span class="text-danger">{{ error }}</span></br>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-
+                {{ form.lastname(class="form-control", placeholder="Last Name") }}
+              </div>        
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
             </div>
         </form>
+        <!-- Update Avatar -->
+        <div class="form-group">           
+            <!-- This button makes the popup modal "avatarModal" appear-->
+            <button type="button" class="btn btn-outline-info" data-toggle="modal" data-target="#avatarModal">
+              Select New Profile Picture
+            </button>
+            <img class="rounded-circle account-img" src="static/avatar/{{ current_user.picture }}"width="75" height="75">  
+        </div>
+        
+        
         <form method="POST" action="" enctype="multipart/form-data">
                  <div class="form-group">
                         {% if form.school.errors %}
@@ -103,4 +101,39 @@
             </div>
         </form>
     </div>
+    
+<!-- Avater Popup Modal -->
+
+<div class="modal fade" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document" >
+  <form  method="POST" action="{{ url_for('account') }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="avatarModalLabel">Select an Avatar</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <select class="image-picker" name="avatarSelect">
+              <option data-img-src="static/avatar/default.png" value="default.png"></option>
+              <option data-img-src="static/avatar/Demo_Day_Logo.png" value="Demo_Day_Logo.png"></option>
+              <option data-img-src="static/avatar/Horizontal_Header.png" value="Horizontal_Header.png"></option>
+              <option data-img-src="static/avatar/illustration_logo_dark.png" value="illustration_logo_dark.png"></option>
+              <option data-img-src="static/avatar/MESA OR_Logo_Large_25Years.jpg" value="MESA OR_Logo_Large_25Years.jpg"></option>
+              <option data-img-src="static/avatar/mesa-invention-b-2.png" value="mesa-invention-b-2.png"></option>
+              <option data-img-src="static/avatar/Portland_State_University.png" value="Portland_State_University.png"></option>
+        </select>
+            
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-default" type="submit">Update Avatar</button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+
 {% endblock content %} 

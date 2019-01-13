@@ -214,7 +214,14 @@ def account():
     passwordform= UpdatePasswordForm()
 
     if request.method=='POST':
-
+        select = request.form.get('avatarSelect')
+        if select:
+            session = loadSession()
+            myaccount = session.query(User).filter(User.username == current_user.username).first()
+            myaccount.picture = select
+            session.commit()
+            flash(select, 'success')
+            return redirect(url_for('account'))
         if 'email' in request.form:
 
         #if form.validate_on_submit():
@@ -224,13 +231,7 @@ def account():
             myaccount.first_name=form.firstname.data
             myaccount.last_name=form.lastname.data
 
-
-            if form.picture.data:
-                picture_file = save_picture(form.picture.data)
-                myaccount.picture=picture_file
             session.commit()
-            print(myaccount.email)
-            print(myaccount.picture)
            # flash('Your account has been updated!', 'success')
             return redirect(url_for('account'))
         elif 'school' in request.form:
