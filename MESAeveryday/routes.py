@@ -214,23 +214,21 @@ def account():
     passwordform= UpdatePasswordForm()
 
     if request.method=='POST':
-        select = request.form.get('avatarSelect')
+        avatarSelect = request.form.get('avatarSelect')
         if select:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.picture = select
+            myaccount.picture = avatarSelect
             session.commit()
             flash(select, 'success')
             return redirect(url_for('account'))
         if 'email' in request.form:
-
         #if form.validate_on_submit():
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
             myaccount.email=form.email.data
             myaccount.first_name=form.firstname.data
             myaccount.last_name=form.lastname.data
-
             session.commit()
            # flash('Your account has been updated!', 'success')
             return redirect(url_for('account'))
@@ -238,10 +236,9 @@ def account():
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
             myaccount.school_id = form.school.data
-            print(schoolform.school.data)
             session.commit()
-
             return redirect(url_for('account'))
+            
         elif 'password' in request.form:
             session = loadSession()
             myaccount = session.query(User).filter(User.username == current_user.username).first()
@@ -249,17 +246,12 @@ def account():
             myaccount.password = hashed_password
             session.commit()
 
-
     elif request.method =='GET':
 
         form.email.data = current_user.email
         form.firstname.data=current_user.first_name
         form.lastname.data=current_user.last_name
         form.school.data = current_user.school_id
-
-
-    image_file = url_for('static', filename='img/' + current_user.picture)
-    print(image_file)
 
     return render_template('account.html', title='Account', image_file=image_file, form=form)
 
