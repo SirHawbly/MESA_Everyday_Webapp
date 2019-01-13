@@ -1,9 +1,7 @@
 # # modified from google dev
 # https://developers.google.com/calendar/quickstart/python 
 
-# # here is the first line
-# # this file is for a Google
-# # Calendar Bridge
+# pylint: disable=E1101
 
 from __future__ import print_function
 from googleapiclient.discovery import build
@@ -146,19 +144,24 @@ def add_time_strings(event):
     end_tuple = event['end_tuple']
 
     start_string = MONTHS[start_tuple['mt']] \
-                   + "-" + str(start_tuple['dy']) \
-                   + "-" + str(start_tuple['yr']) \
-                   + " " + str(start_tuple['hr']) \
-                   + ":" + str(start_tuple['mn']).zfill(2)
+                   + '-' + str(start_tuple['dy']) \
+                   + '-' + str(start_tuple['yr']) \
+                   + ' ' + str(start_tuple['hr']) \
+                   + ':' + str(start_tuple['mn']).zfill(2)
 
     end_string = MONTHS[end_tuple['mt']] \
-                 + "-" + str(end_tuple['dy']) \
-                 + "-" + str(end_tuple['yr']) \
-                 + " " + str(end_tuple['hr']) \
-                 + ":" + str(end_tuple['mn']).zfill(2)
+                 + '-' + str(end_tuple['dy']) \
+                 + '-' + str(end_tuple['yr']) \
+                 + ' ' + str(end_tuple['hr']) \
+                 + ':' + str(end_tuple['mn']).zfill(2)
+
+    date_string = str(end_tuple['yr']) \
+                  + '/' + str(end_tuple['mt']) \
+                  + '/' + str(end_tuple['dy']) \
 
     event['start_string'] = start_string
     event['end_string'] = end_string
+    event['date_string'] = date_string
 
 # --
 
@@ -221,9 +224,11 @@ def get_event_list():
 
     # Call the Calendar API
     now = d.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    events_result = service.events().list(calendarId='primary', timeMin=now,
-                                        maxResults=30, singleEvents=True,
-                                        orderBy='startTime').execute()
+    events_result = service.events().list(calendarId='primary', 
+                                            timeMin=now,
+                                            maxResults=30, 
+                                            singleEvents=True,
+                                            orderBy='startTime').execute()
     # grab the results
     events = events_result.get('items', [])
    
