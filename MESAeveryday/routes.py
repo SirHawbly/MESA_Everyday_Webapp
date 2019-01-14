@@ -219,6 +219,7 @@ def account():
         hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
         myaccount.password = hashed_password
         session.commit()
+        return redirect(url_for('account'))
 
     if request.method=='POST':
 
