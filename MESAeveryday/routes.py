@@ -210,10 +210,18 @@ def save_picture(form_picture):
 @login_required
 def account():
     form = UpdateAccountForm()
-    schoolform = UpdateSchoolForm()
+    #schoolform = UpdateSchoolForm()
     passwordform= UpdatePasswordForm()
+    files=""
+    if passwordform.validate_on_submit():
+        session = loadSession()
+        myaccount = session.query(User).filter(User.username == current_user.username).first()
+        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+        myaccount.password = hashed_password
+        session.commit()
 
     if request.method=='POST':
+
         avatarSelect = request.form.get('avatarSelect')
         if avatarSelect:
             session = loadSession()
@@ -239,13 +247,6 @@ def account():
             myaccount.school_id = form.school.data
             session.commit()
             return redirect(url_for('account'))
-            
-        elif 'password' in request.form:
-            session = loadSession()
-            myaccount = session.query(User).filter(User.username == current_user.username).first()
-            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-            myaccount.password = hashed_password
-            session.commit()
 
     elif request.method =='GET':
         form.email.data = current_user.email
@@ -255,7 +256,7 @@ def account():
         session = loadSession()
         files = session.query(Avatar)
 
-    return render_template('account.html', title='Account', avatar_files=files, form=form)
+    return render_template('account.html', title='Account', avatar_files=files, form=form,form_r=passwordform)
 
 
 def save_picture(form_picture):
