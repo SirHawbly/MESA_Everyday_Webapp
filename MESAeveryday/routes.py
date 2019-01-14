@@ -12,6 +12,8 @@ from datetime import datetime
 import secrets
 from PIL import Image
 import os
+
+
 @app.route("/", methods=['GET', 'POST'])
 # Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
@@ -87,24 +89,13 @@ def dashboard():
     return render_template('dashboard.html', result=result)
 
 
-
 @app.route("/logout")
 def logout():
 
     logout_user()
 
     return redirect(url_for('landpage'))
-
-def send_reset_email(user):
-    token = user.get_reset_token()
-    msg = Message('Password Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[user.email])
-    msg.body = f'''To reset your password, visit the following link:
-{url_for('reset_token', token=token, _external=True)}
-If you did not make this request then simply ignore this email and no changes will be made.
-'''
-    mail.send(msg)
+	
 
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -173,39 +164,6 @@ def reset_user():
     return render_template('reset_user.html', title='Rest User', form=form)
 
 
-
-def send_reset_user(user):
-    msg = Message('User Reset Request',
-                  sender='noreply@demo.com',
-                  recipients=[user.email])
-    msg.body = f'''Hi '''+user.first_name+'''\nYour username is ''' + user.username
-    mail.send(msg)
-
-
-def send_generate_username(useremail,username):
-    msg = Message('Username Generation',
-                  sender='noreply@demo.com',
-                  recipients=[useremail])
-    msg.body = f'''Thank you for registering an account with Oregon MESA your unique
-username has been generated and it is '''+username+'''
-please keep this email handy as you will need that username every time you
-login to the app. '''
-    mail.send(msg)
-
-
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/img', picture_fn)
-
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
-
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -258,21 +216,6 @@ def account():
         files = session.query(Avatar)
 
     return render_template('account.html', title='Account', avatar_files=files, form=form,form_r=passwordform)
-
-
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
-    picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/img', picture_fn)
-
-    output_size = (125, 125)
-    i = Image.open(form_picture)
-    i.thumbnail(output_size)
-    i.save(picture_path)
-
-    return picture_fn
-	
 	
 # Generates a random 3 digit code. Returns a 3 character long string
 def random_code():
@@ -352,3 +295,34 @@ def check_username(first_last_rand, all_usernames):
                         break
 
     return new_username
+
+#Sends a link to the user for resetting their password	
+def send_reset_email(user):
+    token = user.get_reset_token()
+    msg = Message('Password Reset Request',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''To reset your password, visit the following link:
+{url_for('reset_token', token=token, _external=True)}
+If you did not make this request then simply ignore this email and no changes will be made.
+'''
+    mail.send(msg)
+
+#Sends the username of a user. Used when I user selects "Forgot Username"
+def send_reset_user(user):
+    msg = Message('User Reset Request',
+                  sender='noreply@demo.com',
+                  recipients=[user.email])
+    msg.body = f'''Hi '''+user.first_name+'''\nYour username is ''' + user.username
+    mail.send(msg)
+
+#Sends the username generate to an account. This email sent only after registration
+def send_generate_username(useremail,username):
+    msg = Message('Username Generation',
+                  sender='noreply@demo.com',
+                  recipients=[useremail])
+    msg.body = f'''Thank you for registering an account with Oregon MESA your unique
+username has been generated and it is '''+username+'''
+please keep this email handy as you will need that username every time you
+login to the app. '''
+    mail.send(msg)
