@@ -78,12 +78,7 @@ class UpdateAccountForm(FlaskForm):
     lastname = StringField('Lastname')
 
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
-                                                                            message="your password must be at least %(min)d characters")
-        , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
-                 message="The string must contain at least 1 numeric digit and 1 symbol")])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
+
 
     submit = SubmitField('Update',_name='account')
 
@@ -100,4 +95,4 @@ class UpdatePasswordForm(FlaskForm):
                  message="The string must contain at least 1 numeric digit and 1 symbol")])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Update') 
+    submit = SubmitField('Update Password')
