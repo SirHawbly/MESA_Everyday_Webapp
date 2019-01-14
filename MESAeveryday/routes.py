@@ -5,23 +5,15 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, session, admin_create  #, loadSession, loadLoginSession
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, session
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from datetime import datetime
 
 
 @app.route("/", methods=['GET', 'POST'])
-# Added by Millen
-def initadmin():
-    admin_create()
-    return redirect(url_for('landpage'))
-
-# Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
     form_register = RegistrationForm()
     form_login = LoginForm()
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
@@ -68,7 +60,7 @@ def dashboard():
     result, badges = [row.badge_name for row in temp], [row.badge_id for row in temp]
     # this block for viewing needed stamps
     id = current_user.id    # get the id of current user
-    pts= []  
+    pts= []
     for badge in badges:
         points = [row.points for row in Stamp.get_earned_points(id, badge)]                  # get earned points of a badge
         pt = 0 if not points else sum(points)

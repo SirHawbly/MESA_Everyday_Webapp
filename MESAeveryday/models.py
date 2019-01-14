@@ -26,33 +26,6 @@ metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Check if admin already exists in database
-def admin_exist():
-    try:
-        exist = session.query(User).filter(User.username=="admin").first()
-    except:
-        session.rollback()
-        exist = None
-
-    if exist:
-        flash('Admin already created')
-        return True
-    else:
-        return False
-
-# Hardcode admin addition to database
-def admin_create():
-    if not (admin_exist()):
-        flash('Creating Admin...')
-        try:
-            hard_admin = User("admin", "admin", "admin", "mwan@pdx.edu", bcrypt.generate_password_hash("password").decode('utf-8'), "1")
-            session.add(hard_admin)
-            session.commit()
-            flash('Admin creation successful')
-        except:
-            session.rollback()
-            flash('Failed to create Admin')
-
 # do not delete those until the new loadSession method is proved working
 # def loadSession():
 #     metadata = Base.metadata
