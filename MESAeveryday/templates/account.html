@@ -125,7 +125,7 @@
         </button>
       </div>
       <div class="modal-body">
-        <select class="image-picker" name="avatarSelect">
+        <select class="image-picker" id="avatarSelect" name="avatarSelect">
               {% for file in avatar_files %}
               <option data-img-src="static/avatar/{{ file.file_name }}" value="{{ file.id }}"></option>
               {% endfor %}  

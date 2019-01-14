@@ -34,6 +34,10 @@ select {
     display:block!important;
 }
 
+#avatarSelect {
+    display:none!important;
+}
+
 .p-5 {
     padding: 0rem!important;
 }
