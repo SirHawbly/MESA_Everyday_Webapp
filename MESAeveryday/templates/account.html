@@ -8,6 +8,15 @@
           <p class="text-secondary">{{ current_user.email }}</p>
         </div>
       </div>
+	    {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
 	  
 	    <!-- Update first name, last name, or email -->
         <form name ="form_account" method="POST" action="" enctype="multipart/form-data">

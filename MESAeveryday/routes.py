@@ -170,7 +170,7 @@ def account():
     accountform = UpdateAccountForm()
     schoolform = UpdateSchoolForm()
     passwordform= UpdatePasswordForm()
-    files=""
+    avatars = ""
 	
     if passwordform.password.data and passwordform.validate_on_submit():
         session = loadSession()
@@ -178,6 +178,7 @@ def account():
         hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
         myaccount.password = hashed_password
         session.commit()
+        flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
 		
     if (accountform.email.data or accountform.firstname.data or accountform.lastname.data) and accountform.validate_on_submit():
@@ -187,6 +188,7 @@ def account():
         myaccount.first_name=accountform.firstname.data
         myaccount.last_name=accountform.lastname.data
         session.commit()
+        flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
 
     if schoolform.school.data and schoolform.validate_on_submit():
@@ -194,6 +196,7 @@ def account():
         myaccount = session.query(User).filter(User.username == current_user.username).first()
         myaccount.school_id = schoolform.school.data
         session.commit()
+        flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
 
     if request.method=='POST':
@@ -203,6 +206,7 @@ def account():
             myaccount = session.query(User).filter(User.username == current_user.username).first()
             myaccount.avatar_id = avatarSelect
             session.commit()
+            flash('Your account has been successfully updated!', 'success')
             return redirect(url_for('account'))
 
     if request.method =='GET':
@@ -211,9 +215,9 @@ def account():
         accountform.lastname.data=current_user.last_name
         schoolform.school.data = current_user.school_id
         session = loadSession()
-        files = session.query(Avatar)
+        avatars = session.query(Avatar)
 
-    return render_template('account.html', title='Account', avatar_files=files, form_account=accountform, form_password=passwordform, form_school=schoolform)
+    return render_template('account.html', title='Account', avatar_files=avatars, form_account=accountform, form_password=passwordform, form_school=schoolform)
 	
 # Generates a random 3 digit code. Returns a 3 character long string
 def random_code():
