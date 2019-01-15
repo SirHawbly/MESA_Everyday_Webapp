@@ -18,34 +18,43 @@
           {% endif %}
         {% endwith %}
 	  
-	    <!-- Update first name, last name, or email -->
-        <form name ="form_account" method="POST" action="" enctype="multipart/form-data">
-            {{ form_account.hidden_tag() }}
+		<!-- Update Email -->
+        <form name ="form_email" method="POST" action="" enctype="multipart/form-data">
+            {{ form_email.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Account Info</legend>
-
                 <div class="form-group">
-                    {{ form_account.email.label(class="form-control-label") }}
-                    {% if form_account.email.errors %}
-                        {{ form_account.email(class="form-control form-control-lg is-invalid") }}
+                    {{ form_email.email.label(class="form-control-label") }}
+                    {% if form_email.email.errors %}
+                        {{ form_email.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form_account.email.errors %}
+                            {% for error in form_email.email.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form_account.email(class="form-control form-control-lg") }}
+                        {{ form_email.email(class="form-control form-control-lg") }}
                     {% endif %}
-                </div>
-                  <div class="form-group">
-                      {{ form_account.firstname(class="form-control", placeholder="First Name") }}
-                  </div>
-              <div class="form-group">
-                {{ form_account.lastname(class="form-control", placeholder="Last Name") }}
-              </div>        
+                </div>          
             </fieldset>
             <div class="form-group">
-                {{ form_account.submit(class="btn btn-outline-info") }}
+                {{ form_email.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+	  
+	    <!-- Update Name -->
+        <form name ="form_name" method="POST" action="" enctype="multipart/form-data">
+            {{ form_name.hidden_tag() }}
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form_name.firstname(class="form-control", placeholder="First Name") }}
+                </div>
+                <div class="form-group">
+                    {{ form_name.lastname(class="form-control", placeholder="Last Name") }}
+                </div>        
+            </fieldset>
+            <div class="form-group">
+                {{ form_name.submit(class="btn btn-outline-info") }}
             </div>
         </form>
 		

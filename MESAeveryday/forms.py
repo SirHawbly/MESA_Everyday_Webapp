@@ -70,10 +70,14 @@ class ResetPasswordForm(FlaskForm):
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
 
-
-class UpdateAccountForm(FlaskForm):
+class UpdateEmailForm(FlaskForm):
 
     email = StringField('Email', validators=[Email()])
+	
+    submit = SubmitField('Update',_name='account')
+
+class UpdateNameForm(FlaskForm):
+
     firstname = StringField('Firstname')
     lastname = StringField('Lastname')
 

@@ -4,7 +4,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request,session
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateAccountForm,UpdateSchoolForm,UpdatePasswordForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateEmailForm,UpdateNameForm,UpdateSchoolForm,UpdatePasswordForm
 from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, Avatar
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
@@ -167,11 +167,13 @@ def reset_user():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    accountform = UpdateAccountForm()
+    emailform = UpdateEmailForm()
+    nameform = UpdateNameForm()
     schoolform = UpdateSchoolForm()
     passwordform= UpdatePasswordForm()
     avatars = ""
 	
+	#Update password
     if passwordform.password.data and passwordform.validate_on_submit():
         session = loadSession()
         myaccount = session.query(User).filter(User.username == current_user.username).first()
@@ -180,17 +182,27 @@ def account():
         session.commit()
         flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
-		
-    if (accountform.email.data or accountform.firstname.data or accountform.lastname.data) and accountform.validate_on_submit():
+	
+	#Update email
+    if emailform.email.data and emailform.validate_on_submit():
         session = loadSession()
         myaccount = session.query(User).filter(User.username == current_user.username).first()
-        myaccount.email=accountform.email.data
-        myaccount.first_name=accountform.firstname.data
-        myaccount.last_name=accountform.lastname.data
+        myaccount.email=emailform.email.data
+        session.commit()
+        flash('Your account has been successfully updated!', 'success')
+        return redirect(url_for('account'))	
+	
+	#Update name
+    if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
+        session = loadSession()
+        myaccount = session.query(User).filter(User.username == current_user.username).first()
+        myaccount.first_name=nameform.firstname.data
+        myaccount.last_name=nameform.lastname.data
         session.commit()
         flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
 
+    #Update school
     if schoolform.school.data and schoolform.validate_on_submit():
         session = loadSession()
         myaccount = session.query(User).filter(User.username == current_user.username).first()
@@ -199,6 +211,7 @@ def account():
         flash('Your account has been successfully updated!', 'success')
         return redirect(url_for('account'))
 
+    #Update avatar
     if request.method=='POST':
         avatarSelect = request.form.get('avatarSelect')
         if avatarSelect:
@@ -209,15 +222,17 @@ def account():
             flash('Your account has been successfully updated!', 'success')
             return redirect(url_for('account'))
 
+    #Load page
     if request.method =='GET':
-        accountform.email.data = current_user.email
-        accountform.firstname.data=current_user.first_name
-        accountform.lastname.data=current_user.last_name
+        emailform.email.data = current_user.email
+        nameform.firstname.data=current_user.first_name
+        nameform.lastname.data=current_user.last_name
         schoolform.school.data = current_user.school_id
         session = loadSession()
         avatars = session.query(Avatar)
+        session.commit()
 
-    return render_template('account.html', title='Account', avatar_files=avatars, form_account=accountform, form_password=passwordform, form_school=schoolform)
+    return render_template('account.html', title='Account', avatar_files=avatars, form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
 	
 # Generates a random 3 digit code. Returns a 3 character long string
 def random_code():
