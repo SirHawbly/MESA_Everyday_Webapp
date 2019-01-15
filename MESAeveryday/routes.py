@@ -167,20 +167,36 @@ def reset_user():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    form = UpdateAccountForm()
-    #schoolform = UpdateSchoolForm()
+    accountform = UpdateAccountForm()
+    schoolform = UpdateSchoolForm()
     passwordform= UpdatePasswordForm()
     files=""
-    if passwordform.validate_on_submit():
+	
+    if passwordform.password.data and passwordform.validate_on_submit():
         session = loadSession()
         myaccount = session.query(User).filter(User.username == current_user.username).first()
         hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
         myaccount.password = hashed_password
         session.commit()
         return redirect(url_for('account'))
+		
+    if (accountform.email.data or accountform.firstname.data or accountform.lastname.data) and accountform.validate_on_submit():
+        session = loadSession()
+        myaccount = session.query(User).filter(User.username == current_user.username).first()
+        myaccount.email=accountform.email.data
+        myaccount.first_name=accountform.firstname.data
+        myaccount.last_name=accountform.lastname.data
+        session.commit()
+        return redirect(url_for('account'))
+
+    if schoolform.school.data and schoolform.validate_on_submit():
+        session = loadSession()
+        myaccount = session.query(User).filter(User.username == current_user.username).first()
+        myaccount.school_id = schoolform.school.data
+        session.commit()
+        return redirect(url_for('account'))
 
     if request.method=='POST':
-
         avatarSelect = request.form.get('avatarSelect')
         if avatarSelect:
             session = loadSession()
@@ -188,34 +204,16 @@ def account():
             myaccount.avatar_id = avatarSelect
             session.commit()
             return redirect(url_for('account'))
-            
-        if 'email' in request.form:
-        #if form.validate_on_submit():
-            session = loadSession()
-            myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.email=form.email.data
-            myaccount.first_name=form.firstname.data
-            myaccount.last_name=form.lastname.data
-            session.commit()
-           # flash('Your account has been updated!', 'success')
-            return redirect(url_for('account'))
-            
-        elif 'school' in request.form:
-            session = loadSession()
-            myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.school_id = form.school.data
-            session.commit()
-            return redirect(url_for('account'))
 
-    elif request.method =='GET':
-        form.email.data = current_user.email
-        form.firstname.data=current_user.first_name
-        form.lastname.data=current_user.last_name
-        form.school.data = current_user.school_id
+    if request.method =='GET':
+        accountform.email.data = current_user.email
+        accountform.firstname.data=current_user.first_name
+        accountform.lastname.data=current_user.last_name
+        schoolform.school.data = current_user.school_id
         session = loadSession()
         files = session.query(Avatar)
 
-    return render_template('account.html', title='Account', avatar_files=files, form=form,form_r=passwordform)
+    return render_template('account.html', title='Account', avatar_files=files, form_account=accountform, form_password=passwordform, form_school=schoolform)
 	
 # Generates a random 3 digit code. Returns a 3 character long string
 def random_code():

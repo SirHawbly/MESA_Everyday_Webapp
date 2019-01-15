@@ -73,12 +73,9 @@ class ResetPasswordForm(FlaskForm):
 
 class UpdateAccountForm(FlaskForm):
 
-    email = StringField('Email')
+    email = StringField('Email', validators=[Email()])
     firstname = StringField('Firstname')
     lastname = StringField('Lastname')
-
-    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
-
 
     submit = SubmitField('Update',_name='account')
 

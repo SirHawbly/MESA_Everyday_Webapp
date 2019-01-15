@@ -8,35 +8,38 @@
           <p class="text-secondary">{{ current_user.email }}</p>
         </div>
       </div>
-        <form method="POST" action="" enctype="multipart/form-data">
-            {{ form.hidden_tag() }}
+	  
+	    <!-- Update first name, last name, or email -->
+        <form name ="form_account" method="POST" action="" enctype="multipart/form-data">
+            {{ form_account.hidden_tag() }}
             <fieldset class="form-group">
                 <legend class="border-bottom mb-4">Account Info</legend>
 
                 <div class="form-group">
-                    {{ form.email.label(class="form-control-label") }}
-                    {% if form.email.errors %}
-                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                    {{ form_account.email.label(class="form-control-label") }}
+                    {% if form_account.email.errors %}
+                        {{ form_account.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
-                            {% for error in form.email.errors %}
+                            {% for error in form_account.email.errors %}
                                 <span>{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
-                        {{ form.email(class="form-control form-control-lg") }}
+                        {{ form_account.email(class="form-control form-control-lg") }}
                     {% endif %}
                 </div>
                   <div class="form-group">
-                      {{ form.firstname(class="form-control", placeholder="First Name") }}
+                      {{ form_account.firstname(class="form-control", placeholder="First Name") }}
                   </div>
               <div class="form-group">
-                {{ form.lastname(class="form-control", placeholder="Last Name") }}
+                {{ form_account.lastname(class="form-control", placeholder="Last Name") }}
               </div>        
             </fieldset>
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form_account.submit(class="btn btn-outline-info") }}
             </div>
         </form>
+		
         <!-- Update Avatar -->
         <div class="form-group">           
             <!-- This button makes the popup modal "avatarModal" appear-->
@@ -46,27 +49,29 @@
             <img class="rounded-circle account-img" src="static/avatar/{{ current_user.avatar.file_name }}"width="75" height="75">  
         </div>
         
-        
-        <form method="POST" action="" enctype="multipart/form-data">
+        <!-- Update School -->
+        <form name="form_school" method="POST" action="" enctype="multipart/form-data">
                  <div class="form-group">
-                        {% if form.school.errors %}
-                            {{ form.school(class="form-control form-control-lg is-invalid") }}
+                        {% if form_school.school.errors %}
+                            {{ form_school.school(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
-                                {% for error in form.school.errors %}
+                                {% for error in form_school.school.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form.school(class="form-control", placeholder="School") }}
+                            {{ form_school.school(class="form-control", placeholder="School") }}
                         {% endif %}
                 </div>
 
             <div class="form-group">
-                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form_school.submit(class="btn btn-outline-info") }}
             </div>
         </form>
-          <form name="form_r" method="POST" action="{{ url_for('account') }}" class="text-center p-5">
-              {{ form_r.hidden_tag() }}
+		
+		<!-- Update Password -->
+        <form name="form_password" method="POST" action="{{ url_for('account') }}" class="text-center p-5">
+              {{ form_password.hidden_tag() }}
               <fieldset class="form-group">
                  <p class="h4 mb-4">Update Password</p>
 
@@ -75,29 +80,29 @@
                 <div class="form-row mb-0">
                   <div class="col">
                     <div class="form-group">
-                        {% if form_r.password.errors %}
-                            {{ form_r.password(class="form-control form-control-lg is-invalid") }}
+                        {% if form_password.password.errors %}
+                            {{ form_password.password(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
-                                {% for error in form_r.password.errors %}
+                                {% for error in form_password.password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form_r.password(class="form-control", placeholder="Password") }}
+                            {{ form_password.password(class="form-control", placeholder="Password") }}
                         {% endif %}
                     </div>
                   </div>
                   <div class="col">
                     <div class="form-group">
-                        {% if form_r.confirm_password.errors %}
-                            {{ form_r.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        {% if form_password.confirm_password.errors %}
+                            {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
                             <div class="invalid-feedback">
-                                {% for error in form_r.confirm_password.errors %}
+                                {% for error in form_password.confirm_password.errors %}
                                     <span>{{ error }}</span>
                                 {% endfor %}
                             </div>
                         {% else %}
-                            {{ form_r.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                            {{ form_password.confirm_password(class="form-control", placeholder="Confirm Password") }}
                         {% endif %}
                     </div>
                   </div>
@@ -105,7 +110,7 @@
 
               </fieldset>
               <div class="form-group">
-                  {{ form_r.submit(class="btn btn-outline-info") }}
+                  {{ form_password.submit(class="btn btn-outline-info") }}
               </div>
 
 
