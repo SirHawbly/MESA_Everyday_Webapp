@@ -2,17 +2,17 @@
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from flask import render_template, url_for, flash, redirect, request,session
+from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, ResetPasswordForm,RequestResetUserForm,UpdateEmailForm,UpdateNameForm,UpdateSchoolForm,UpdatePasswordForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, loadSession, Avatar
+
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, Avatar, admin_create  #, loadSession, loadLoginSession
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from datetime import datetime
 import secrets
 from PIL import Image
 import os
-
 
 @app.route("/", methods=['GET', 'POST'])
 # Millen's Added code for a merged landing page
@@ -30,30 +30,27 @@ def register():
     # Registration Form Submitted
     form_register = RegistrationForm()
     form_login = LoginForm()
-
-    if form_register.validate_on_submit():   
+    
+    if form_register.validate_on_submit():
         # Generate username
         new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
-        all_usernames = [row.username for row in User.get_all_username()]
-        new_username = check_username(new_username, all_usernames)
-        
+        new_username = check_username(new_username, [row.username for row in User.get_all_username()])    
+    
         if new_username == 'ERROR':
             flash('Sorry, we were unable to generate an account for you.', 'danger')
-        else:
-        
+        else:    
             # Generate hashed password
             hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-      
-            # Add user to the database
+            
+            # Add user to the databas
             new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
-                    form_register.email.data, hashed_password, form_register.school.data)
-            session = loadSession()
-            session.add(new_user)
-            session.commit()
-        
+                            form_register.email.data, hashed_password, form_register.school.data)
+            User.add_new_user(new_user)
+            
             # Tell the user their new username and send them an email with the username
             flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
             send_generate_username(form_register.email.data, new_username)
+           
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -62,20 +59,11 @@ def login():
     form_register = RegistrationForm()
     form_login = LoginForm()
     if form_login.validate_on_submit():
-
-        mysession = loadSession()
-        user = mysession.query(User).filter(User.username == form_login.username.data).first()
-       # user.last_login=datetime.now()
-       # session.commit()
+        user = User.get_user_by_username(form_login.username.data)
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
+            User.update_last_login(user.id, datetime.now())
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
-            user.last_login = datetime.now()
-            mysession.commit()
-            """
-              MN:  use session to store username
-            """
-            session['myusername']=form_login.username.data
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
@@ -85,8 +73,17 @@ def login():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    result = [row.badge_name for row in Badge.get_all_badges_names()]
-    return render_template('dashboard.html', result=result)
+    # result = [row.badge_name for row in Badge.get_all_badges_names()]
+    temp = Badge.get_all_badges_id_with_names()
+    result, badges = [row.badge_name for row in temp], [row.badge_id for row in temp]
+    # this block for viewing needed stamps
+    id = current_user.id    # get the id of current user
+    pts= []  
+    for badge in badges:
+        points = [row.points for row in Stamp.get_earned_points(id, badge)]                  # get earned points of a badge
+        pt = 0 if not points else sum(points)
+        pts.append(pt)
+    return render_template('dashboard.html', result=zip(result, badges), points=zip(result, pts))
 
 
 @app.route("/logout")
@@ -105,8 +102,7 @@ def reset_request():
     form = RequestResetForm()
 
     if form.validate_on_submit():
-        session = loadSession()
-        user = session.query(User).filter(User.email == form.email.data).first()
+        user = User.get_user_by_email(form.email.data)
         send_reset_email(user)
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('landpage'))
@@ -130,19 +126,20 @@ def reset_token(token):
         #this is the new password that the user has chosen
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         print("Original: ", user.password)
-        #updating the password requires first loading a new session 
-        session = loadSession()
-        #once a session is loaded we want to get the row 
-        #where User.id matches the id of the user returned by User.verify_reset_token(token)
-        #this insures that the password for the correct user will be the one changed
-        row = session.query(User).filter(User.id==user.id).first()
-        #Change the password is a simple assign statement
-        row.password = hashed_password
-        #Changes need to be committed in order to make it to the database
-        session.commit()
-        #send a message to the user telling them that there account has been updated successfully
-        flash('Your password has been updated! You are now able to log in', 'success')
-        return redirect(url_for('landpage'))
+        #updating the password requires first loading a new session
+        # with loadSession() as session:
+        #     #once a session is loaded we want to get the row
+        #     #where User.id matches the id of the user returned by User.verify_reset_token(token)
+        #     #this insures that the password for the correct user will be the one changed
+        #     row = session.query(User).filter(User.id==user.id).first()
+        #     #Change the password is a simple assign statement
+        #     row.password = hashed_password
+        #     #Changes need to be committed in order to make it to the database
+        #     session.commit()
+        # #send a message to the user telling them that there account has been updated successfully
+        if User.reset_pwd(user.id, hashed_password) == True:
+            flash('Your password has been updated! You are now able to log in', 'success')
+            return redirect(url_for('landpage'))
     return render_template('reset_token.html', title='Rest Password', form=form)
 
 
@@ -150,20 +147,15 @@ def reset_token(token):
 def reset_user():
     if current_user.is_authenticated:
         return redirect(url_for('dashboard'))
-
     form = RequestResetUserForm()
-
     if form.validate_on_submit():
-        session = loadSession()
-        user = session.query(User).filter(User.email == form.email.data).first()
-
+        user = User.get_user_by_email(form.email.data)
         send_reset_user(user)
         flash('An email has been sent with your username.', 'info')
         return redirect(url_for('landpage'))
-
     return render_template('reset_user.html', title='Rest User', form=form)
-
-
+    
+   
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
@@ -172,69 +164,107 @@ def account():
     schoolform = UpdateSchoolForm()
     passwordform= UpdatePasswordForm()
     avatars = ""
+    myaccount = User.get_user_by_username(current_user.username)
 	
 	#Update password
-    if passwordform.password.data and passwordform.validate_on_submit():
-        session = loadSession()
-        myaccount = session.query(User).filter(User.username == current_user.username).first()
+    if passwordform.password.data and passwordform.validate_on_submit():     
         hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-        myaccount.password = hashed_password
-        session.commit()
-        flash('Your account has been successfully updated!', 'success')
+        if User.reset_pwd(myaccount.id, hashed_password) == True:
+            flash('Your account has been successfully updated!', 'success')          
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
-	
+        
 	#Update email
-    if emailform.email.data and emailform.validate_on_submit():
-        session = loadSession()
-        myaccount = session.query(User).filter(User.username == current_user.username).first()
-        myaccount.email=emailform.email.data
-        session.commit()
-        flash('Your account has been successfully updated!', 'success')
-        return redirect(url_for('account'))	
+    if emailform.email.data and emailform.validate_on_submit():      
+        if User.update_email(myaccount.id, emailform.email.data) == True:
+            flash('Your account has been successfully updated!', 'success')          
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('account'))
 	
 	#Update name
     if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
-        session = loadSession()
-        myaccount = session.query(User).filter(User.username == current_user.username).first()
-        myaccount.first_name=nameform.firstname.data
-        myaccount.last_name=nameform.lastname.data
-        session.commit()
-        flash('Your account has been successfully updated!', 'success')
+        if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
+            flash('Your account has been successfully updated!', 'success')          
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
 
     #Update school
     if schoolform.school.data and schoolform.validate_on_submit():
-        session = loadSession()
-        myaccount = session.query(User).filter(User.username == current_user.username).first()
-        myaccount.school_id = schoolform.school.data
-        session.commit()
-        flash('Your account has been successfully updated!', 'success')
+        if User.update_school(myaccount.id, schoolform.school.data) == True:
+            flash('Your account has been successfully updated!', 'success')          
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
 
     #Update avatar
     if request.method=='POST':
         avatarSelect = request.form.get('avatarSelect')
         if avatarSelect:
-            session = loadSession()
-            myaccount = session.query(User).filter(User.username == current_user.username).first()
-            myaccount.avatar_id = avatarSelect
-            session.commit()
-            flash('Your account has been successfully updated!', 'success')
+            if User.update_avatar(myaccount.id, avatarSelect) == True:
+                flash('Your account has been successfully updated!', 'success')          
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
             return redirect(url_for('account'))
 
     #Load page
     if request.method =='GET':
         emailform.email.data = current_user.email
-        nameform.firstname.data=current_user.first_name
-        nameform.lastname.data=current_user.last_name
+        nameform.firstname.data = current_user.first_name
+        nameform.lastname.data = current_user.last_name
         schoolform.school.data = current_user.school_id
-        session = loadSession()
-        avatars = session.query(Avatar)
-        session.commit()
 
-    return render_template('account.html', title='Account', avatar_files=avatars, form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
+    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
+
+@app.route("/earn_stamps", methods=['GET', 'POST'])
+@login_required
+def earn_stamps():
+    result = [row.badge_name for row in Badge.get_all_badges_names()]                                   # maintain some objects in dashboard
+    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    # a dictionary -> badge_id : badge_name
+    forms, t = [], 1        # several pairs of forms (stamp, date, submit). t is used to assign unique id
+    for badge in badges:
+        stamps = Stamp.get_stamps_of_badge(badge[0])
+
+        if stamps.first() is not None:
+            form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
+
+            form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
+                                                                # HTML doesnt seem to be friendly to an id with space(s), sigh
+
+            form.stamps.choices = stamps                      # assign unearned stamps to the select field
+            forms.append(form)                                  # create a list of forms
+            t += 1
+    for form in forms:
+        if form.submit.data:
+            if form.validate_on_submit():
+                id = current_user.id    # acquire the user_id of current user
+                if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
+                    # flash('You've earned a new stamp!', 'success')
+                    # some message should be shown here, flash doesnt work
+                    print('successfully added.')
+                # else:
+                    # flash('Failed adding stamp', 'warning')
+                    # some message should be shown here, flash doesnt work
+                return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
+    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=result)
+
+@app.route("/badges/<badgeid>", methods=['GET', 'POST'])
+@login_required
+def needed_stamps(badgeid):
+    temp = Badge.get_all_badges_id_with_names()
+    result, ids = [row.badge_name for row in temp], [row.badge_id for row in temp]
+    badge_name = Badge.get_badge_name(badgeid).first()[0]
+    id = current_user.id    # get the id of current user
+    unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badgeid)]   # the unearned stamps of current user
+    if not unearned_stamps:
+        unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
+    points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
+    pt = 0 if not points else sum(points)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt)
 	
-# Generates a random 3 digit code. Returns a 3 character long string
+# Generates a random 3 digit code. Returns the code as a 3 character long string
 def random_code():
     import random
     x=random.randint(000,999)
@@ -326,12 +356,14 @@ If you did not make this request then simply ignore this email and no changes wi
     mail.send(msg)
 
 #Sends the username of a user. Used when I user selects "Forgot Username"
+
 def send_reset_user(user):
     msg = Message('User Reset Request',
                   sender='noreply@demo.com',
                   recipients=[user.email])
     msg.body = f'''Hi '''+user.first_name+'''\nYour username is ''' + user.username
     mail.send(msg)
+    
 
 #Sends the username generate to an account. This email sent only after registration
 def send_generate_username(useremail,username):
@@ -343,3 +375,6 @@ username has been generated and it is '''+username+'''
 please keep this email handy as you will need that username every time you
 login to the app. '''
     mail.send(msg)
+
+
+

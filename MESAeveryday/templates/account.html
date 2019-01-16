@@ -69,6 +69,8 @@
         
         <!-- Update School -->
         <form name="form_school" method="POST" action="" enctype="multipart/form-data">
+            {{ form_school.hidden_tag() }}
+            <fieldset class="form-group">
                  <div class="form-group">
                         {% if form_school.school.errors %}
                             {{ form_school.school(class="form-control form-control-lg is-invalid") }}
@@ -81,7 +83,7 @@
                             {{ form_school.school(class="form-control", placeholder="School") }}
                         {% endif %}
                 </div>
-
+            </fieldset>
             <div class="form-group">
                 {{ form_school.submit(class="btn btn-outline-info") }}
             </div>
