@@ -133,6 +133,12 @@
                             <!-- Main student badge content goes here -->
                             <h5>Earned points for Badge {{ badge_name }}</h5>
                             <p>You've earned {{ pt }} points for this badge</p>
+                            <p>You are at level {{ lv }}</p>
+                            {% if to_next_lv == 0 %}
+                                <p>You've achieved the maximum level!</p>
+                            {% else %}
+                                <p>You need {{ to_next_lv }} points to get next level</p>
+                            {% endif %}
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full report</button>
 
                         </div>

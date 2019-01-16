@@ -26,33 +26,6 @@ metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Check if admin already exists in database
-def admin_exist():
-    try:
-        exist = session.query(User).filter(User.username=="admin").first()
-    except:
-        session.rollback()
-        exist = None
-
-    if exist:
-        flash('Admin already created')
-        return True
-    else:
-        return False
-
-# Hardcode admin addition to database
-def admin_create():
-    if not (admin_exist()):
-        flash('Creating Admin...')
-        try:
-            hard_admin = User("admin", "admin", "admin", "mwan@pdx.edu", bcrypt.generate_password_hash("password").decode('utf-8'), "1")
-            session.add(hard_admin)
-            session.commit()
-            flash('Admin creation successful')
-        except:
-            session.rollback()
-            flash('Failed to create Admin')
-
 # do not delete those until the new loadSession method is proved working
 # def loadSession():
 #     metadata = Base.metadata
@@ -351,6 +324,20 @@ class Badge(Base):
         except:
             session.rollback()
             return None
+
+    def get_level_related_info(badge_id, points):
+        try:
+            target_badge = session.query(Badge.level1_points, Badge.level2_points, Badge.level3_points, Badge.level4_points,Badge.level5_points, Badge.level6_points, Badge.level7_points, Badge.level8_points, Badge.level9_points, Badge.level10_points).filter(Badge.badge_id == badge_id).first()
+            # target_badge = session.query(Badge).filter(Badge.badge_id == badge_id).first()
+            for level in range(11):
+                if not target_badge[level]:
+                    return level, 0
+                if points < target_badge[level]:
+                    return level, target_badge[level] - points
+            return 10, 0
+        except:
+            session.rollback()
+            return None, None
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):

@@ -4,9 +4,8 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, Avatar, admin_create  #, loadSession, loadLoginSession
+from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, Avatar
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 from datetime import datetime
@@ -15,11 +14,8 @@ from PIL import Image
 import os
 
 @app.route("/", methods=['GET', 'POST'])
-# Millen's Added code for a merged landing page
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
     form_register = RegistrationForm()
     form_login = LoginForm()
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
@@ -78,7 +74,7 @@ def dashboard():
     result, badges = [row.badge_name for row in temp], [row.badge_id for row in temp]
     # this block for viewing needed stamps
     id = current_user.id    # get the id of current user
-    pts= []  
+    pts= []
     for badge in badges:
         points = [row.points for row in Stamp.get_earned_points(id, badge)]                  # get earned points of a badge
         pt = 0 if not points else sum(points)
@@ -252,7 +248,7 @@ def earn_stamps():
 
 @app.route("/badges/<badgeid>", methods=['GET', 'POST'])
 @login_required
-def needed_stamps(badgeid):
+def check_badge(badgeid):
     temp = Badge.get_all_badges_id_with_names()
     result, ids = [row.badge_name for row in temp], [row.badge_id for row in temp]
     badge_name = Badge.get_badge_name(badgeid).first()[0]
@@ -262,7 +258,8 @@ def needed_stamps(badgeid):
         unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
     points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
     pt = 0 if not points else sum(points)
-    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt)
+    current_level, to_next_lv = Badge.get_level_related_info(badgeid, pt)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv)
 	
 # Generates a random 3 digit code. Returns the code as a 3 character long string
 def random_code():
@@ -375,6 +372,3 @@ username has been generated and it is '''+username+'''
 please keep this email handy as you will need that username every time you
 login to the app. '''
     mail.send(msg)
-
-
-
