@@ -56,7 +56,7 @@
                     <a class="nav-link waves-effect"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Inbox</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link waves-effect" href="https://calendar.google.com/calendar/embed?src=pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com&ctz=America%2FLos_Angeles">
+                    <a class="nav-link waves-effect" href="https://calendar.google.com/calendar/embed?src=bartlett%40pdx.edu&ctz=America%2FLos_Angeles">
                         <i class="fa fa-calendar"></i>
                         <span class="clearfix d-none d-sm-inline-block">Calendar</span>
                     </a>
@@ -192,10 +192,11 @@
                         </div>
                         <div class="card-body">
                             <table>
+                                <tr><td>--Events--</td></tr>
                                 {% for event in events[:10] %}
                                     <tr>
                                         <table>
-                                            {% if event['remain_days'] < 8 %} 
+                                            {% if event['remain_days'] < 15 %} 
                                                 <tr>
                                                     <td>{{event['summary']}} in {{event['remain_days']}} days ({{event['calColor']}} : {{event['mesaColor']}})</td>
                                                 </tr>
@@ -203,7 +204,7 @@
                                                     <td>on {{event['start_string']}}</td>
                                                </tr>
                                                 <tr>
-                                                    <td>on {{event['date_string']}}</td>
+                                                    <td>or {{event['date_string']}}</td>
                                                 </tr>
                                                <tr>
                                                     <td>at {{event['location']}}</td>
@@ -215,6 +216,25 @@
                                         </table>
                                     </tr>
                                 {% endfor %}
+                                <tr>--Events--</tr>
+                                <div></div>
+                                <tr>--Mesa Events--</tr>
+                                {% for event in mesa_days %}
+                                    <tr>
+                                        <table>
+                                            <tr>
+                                                <td>{{event['summary']}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>on {{event['start_string']}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>--</td>
+                                            </tr>
+                                        </table>
+                                    </tr>
+                                {% endfor %}
+                                <tr>--Mesa Events--</tr>
                             </table>
 
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View

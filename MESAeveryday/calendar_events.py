@@ -260,6 +260,39 @@ def get_event_list():
 
 # --
 
+def searchEvents(events, keywords):
+    """for all words in a given phrase, 
+        search all """
+
+    matches = []
+
+    # # go through all of the passed in events
+    for event in events:
+
+        # # set the notin bool to false
+        # # this will trip if a word isnt
+        # # present in the events name
+        notin = False
+        
+        # # go through all words and check
+        # # them against the events name
+        for word in keywords:
+            if word.lower() not in event['summary'].lower():
+                notin = True
+
+        # # if we havent tripped the bit,
+        # # add the event to the set
+        if not notin:
+            matches += [event]
+        
+    # # return all events that have matched
+    return matches                
+
+# --
+
+
+# --
+
 def main():
     """
       Shows basic usage of get_event_list.
@@ -283,6 +316,11 @@ def main():
         if 'start_string' in event: 
             print('time:', event['start_string'],'to',event['end_string'])
         print('Days Left:',event['remain_days'],'\n')
+    
+    MesaDays = searchEvents(events, ['Mesa','Day'])
+
+    for day in MesaDays:
+        print("match:", day['start_string'])
 
 # --
 

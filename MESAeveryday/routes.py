@@ -9,7 +9,7 @@ from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, User
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
-from MESAeveryday.calendar_events import get_event_list 
+from MESAeveryday.calendar_events import get_event_list, searchEvents
 
 @app.route("/", methods=['GET', 'POST'])
 # Millen's Added code for a merged landing page
@@ -61,13 +61,21 @@ def login():
 def dashboard():
     session = loadSession()
     result = [row.badge_name for row in session.query(Badge.badge_name)]
+
+    # # call the google api and pull all upcoming events
     events = get_event_list()
+    # # parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
+
     return render_template('dashboard.html',
                            events=events,
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
-                           result=result)
+                           result=result,
+                           mesa_days=mesa_days,
+                           other_days=other_days,)
     return render_template('dashboard.html', result=result)
 
 @app.route("/logout")
