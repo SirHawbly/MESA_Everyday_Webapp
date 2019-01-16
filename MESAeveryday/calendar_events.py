@@ -262,7 +262,9 @@ def get_event_list():
 
 def searchEvents(events, keywords):
     """for all words in a given phrase, 
-        search all """
+        search all events for those words,
+        and add all matching phrases to the 
+        set."""
 
     matches = []
 

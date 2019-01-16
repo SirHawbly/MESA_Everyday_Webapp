@@ -76,7 +76,6 @@ def dashboard():
                            result=result,
                            mesa_days=mesa_days,
                            other_days=other_days,)
-    return render_template('dashboard.html', result=result)
 
 @app.route("/logout")
 def logout():
