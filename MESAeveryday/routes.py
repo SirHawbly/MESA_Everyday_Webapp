@@ -9,6 +9,7 @@ from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, User
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mail import Message
 
+from MESAeveryday.calendar_events import get_event_list 
 
 @app.route("/", methods=['GET', 'POST'])
 # Millen's Added code for a merged landing page
@@ -58,9 +59,16 @@ def login():
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    result = [row.badge_name for row in Badge.get_all_badges_names()]
+    session = loadSession()
+    result = [row.badge_name for row in session.query(Badge.badge_name)]
+    events = get_event_list()
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    return render_template('dashboard.html',
+                           events=events,
+                           number_upcoming=len(upcoming_events),
+                           upcoming_events=upcoming_events,
+                           result=result)
     return render_template('dashboard.html', result=result)
-
 
 @app.route("/logout")
 def logout():
