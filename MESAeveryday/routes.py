@@ -68,7 +68,7 @@ def dashboard():
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
                            result=result)
-
+    return render_template('dashboard.html', result=result)
 
 @app.route("/logout")
 def logout():
@@ -118,9 +118,16 @@ def reset_token(token):
     if form.validate_on_submit():
         #this is the new password that the user has chosen
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        #updating the password happens here
+        print("Original: ", user.password)
+        #updating the password requires first loading a new session 
         session = loadSession()
-        user.password = hashed_password
+        #once a session is loaded we want to get the row 
+        #where User.id matches the id of the user returned by User.verify_reset_token(token)
+        #this insures that the password for the correct user will be the one changed
+        row = session.query(User).filter(User.id==user.id).first()
+        #Change the password is a simple assign statement
+        row.password = hashed_password
+        #Changes need to be committed in order to make it to the database
         session.commit()
         #send a message to the user telling them that there account has been updated successfully
         flash('Your password has been updated! You are now able to log in', 'success')

@@ -17,8 +17,9 @@ login_manager.login_message_category = 'info'
 app.config['MAIL_SERVER'] = 'smtp.googlemail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = "minhnpcc@gmail.com"
-app.config['MAIL_PASSWORD'] = "sing@p0re"
+app.config['MAIL_USERNAME'] = os.environ['MESAnoreplyemail']
+app.config['MAIL_PASSWORD'] = os.environ['MESAnoreplypass']
+
 mail = Mail(app)
 
 from MESAeveryday import routes

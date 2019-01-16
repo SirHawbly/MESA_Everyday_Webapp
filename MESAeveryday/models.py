@@ -118,6 +118,10 @@ class School(Base):
 	    self.state = state
 	    self.zip_code = zip_code
 
+    def get_all_schools_names():
+        session = loadSession()
+        return session.query(School.school_id, School.school_name)
+
 #Class for the "badges" table
 class Badge(Base):
     __tablename__ = 'badges'
@@ -149,6 +153,10 @@ class Badge(Base):
         self.level8_points = level8_points
         self.level9_points = level9_points
         self.level10_points = level10_points
+
+    def get_all_badges_names():
+        session = loadSession()
+        return session.query(Badge.badge_name)
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
