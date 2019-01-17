@@ -17,7 +17,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
-db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
+db_connection = 'mysql+pymysql://' + 'devmed' + ':' + 'w3c$7aruSp' + '@' + 'db.cecs.pdx.edu' + ':3306/' + 'devmed'
 
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
@@ -342,6 +342,14 @@ class Stamp(Base, UserMixin):
         except:
             session.rollback()
             return None
+
+    def get_earned_stamps_of_badge(user_id, badge_id):
+        try:
+            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
+        except:
+            session.rollback()
+            return None        
     
     def get_earned_points(user_id, badge_id):
         try:
