@@ -26,33 +26,6 @@ metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Check if admin already exists in database
-def admin_exist():
-    try:
-        exist = session.query(User).filter(User.username=="admin").first()
-    except:
-        session.rollback()
-        exist = None
-
-    if exist:
-        flash('Admin already created')
-        return True
-    else:
-        return False
-
-# Hardcode admin addition to database
-def admin_create():
-    if not (admin_exist()):
-        flash('Creating Admin...')
-        try:
-            hard_admin = User("admin", "admin", "admin", "mwan@pdx.edu", bcrypt.generate_password_hash("password").decode('utf-8'), "1")
-            session.add(hard_admin)
-            session.commit()
-            flash('Admin creation successful')
-        except:
-            session.rollback()
-            flash('Failed to create Admin')
-
 # do not delete those until the new loadSession method is proved working
 # def loadSession():
 #     metadata = Base.metadata
@@ -124,12 +97,14 @@ class User(Base, UserMixin):
     last_name = Column(String)
     username = Column(String)
     email = Column(String)
-    picture = Column(String)
+    picture = Column(String) #This needs to be deleted after the picture column in the database is deleted
     school_id = Column(Integer, ForeignKey("schools.school_id"))
+    avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
     last_login = Column(DateTime)
 
     school = relationship("School", foreign_keys=[school_id])
+    avatar = relationship("Avatar", foreign_keys=[avatar_id])
     role = relationship('Role', secondary='user_roles',
                          backref=backref('users', lazy='dynamic'))
 
@@ -137,7 +112,8 @@ class User(Base, UserMixin):
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
         self.email = email
-        self.picture = 'default.jpg'
+        self.picture = 'default.png' #This needs to be deleted after the picture column in the database is deleted
+        self.avatar_id = 1
         self.password = password
         self.first_name = first_name
         self.last_name = last_name
@@ -154,9 +130,15 @@ class User(Base, UserMixin):
             user_id = s.loads(token)['user_id']
         except:
             return None
-
         # with loadSession() as session:
         return session.query(User).filter(User.id==user_id).first()
+        
+    def get_all_username():
+        try:
+            return session.query(User.username)
+        except:
+            session.rollback()
+            return None
 
     def validate_username(username):
         try:
@@ -216,7 +198,54 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
+        
+    def update_last_login(id, new_last_login):     
+        try:
+            row = session.query(User).filter(User.id == id).first()
+            row.last_login = new_last_login
+        except:
+            session.rollback()
+            return False
+        return True
+        
+    def update_name(id, new_first_name, new_last_name):     
+        try:
+            row = session.query(User).filter(User.id == id).first()
+            row.first_name = new_first_name
+            row.last_name = new_last_name
+        except:
+            session.rollback()
+            return False
+        return True
+        
+    def update_email(id, new_email):     
+        try:
+            row = session.query(User).filter(User.id == id).first()
+            row.email = new_email
+        except:
+            session.rollback()
+            return False
+        return True  
 
+    def update_school(id, new_school_id):     
+        try:
+            row = session.query(User).filter(User.id == id).first()
+            row.school_id = new_school_id
+        except:
+            session.rollback()
+            return False
+        return True 
+        
+    def update_avatar(id, new_avatar_id):     
+        try:
+            row = session.query(User).filter(User.id == id).first()
+            row.avatar_id = new_avatar_id
+        except:
+            session.rollback()
+            return False
+        return True 
+        
+        
 #Class for the "schools" table
 class School(Base):
     __tablename__ = 'schools'
@@ -377,7 +406,7 @@ class UserStamp(Base, UserMixin):
         self.stamp_id = stamp_id
         self.log_date = log_date
         self.stamp_date = stamp_date
-
+        
     def get_earned_stamp(user_id):
         try:
             return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
@@ -395,6 +424,25 @@ class UserStamp(Base, UserMixin):
             session.rollback()
             return False
         return True
+
+#Class for the "avatars" table
+class Avatar(Base):
+    __tablename__ = 'avatars'
+
+    id = Column(Integer, primary_key=True)
+    file_name = Column(String)
+
+    def __init__(self, file_name):
+	    self.file_name = feile_name
+        
+    def get_all_avatars():
+        try:
+            return session.query(Avatar)
+        except:
+            session.rollback()
+            return None        
+
+
 
 '''
 class User(UserMixin):
