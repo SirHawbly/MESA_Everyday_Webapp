@@ -254,12 +254,13 @@ def check_badge(badgeid):
     badge_name = Badge.get_badge_name(badgeid).first()[0]
     id = current_user.id    # get the id of current user
     unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badgeid)]   # the unearned stamps of current user
+    earned_stamps = [row.stamp_name for row in Stamp.get_earned_stamps_of_badge(id, badgeid)]
     if not unearned_stamps:
         unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
     points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
     pt = 0 if not points else sum(points)
     current_level, to_next_lv = Badge.get_level_related_info(badgeid, pt)
-    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv)
 	
 # Generates a random 3 digit code. Returns the code as a 3 character long string
 def random_code():

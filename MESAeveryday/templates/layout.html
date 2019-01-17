@@ -22,6 +22,7 @@
     <!-- Bootstrap 4 DatePicker-->  
     <link href="../static/css/gijgo.min.css" rel="stylesheet" type="text/css" />
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"> -->
+    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
 </head>
 
     {% block content %}{% endblock %}
@@ -41,10 +42,15 @@
         <script type="text/javascript" src="../static/js/mdbdashboard2.min.js"></script>
         <!-- Gijgo Datepicker -->
         <script type="text/javascript" src="../static/js/gijgo.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script> -->
+        <!-- <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script> -->
         <!--Custom scripts-->
         <script>
             // SideNav Initialization
             $(".button-collapse").sideNav();
+            // Data Picker Initialization
+            $('.datepicker').pickadate();
 
             var container = document.querySelector('.custom-scrollbar');
             Ps.initialize(container, {
@@ -52,6 +58,10 @@
                 wheelPropagation: true,
                 minScrollbarLength: 20
             });
+            $(document).ready( function () {
+                $('#unearnedTable').DataTable();
+                $('#earnedTable').DataTable();
+            } );
         </script>
         <script>
           // Image Picker Initialization

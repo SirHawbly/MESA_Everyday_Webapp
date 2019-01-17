@@ -5,4 +5,4 @@ flask_wtf
 sqlalchemy
 pymysql
 flask-mail
-Pillow
+flask_admin
