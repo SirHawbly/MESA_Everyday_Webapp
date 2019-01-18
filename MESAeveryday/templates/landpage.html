@@ -40,7 +40,7 @@
                 <a href="{{ url_for('reset_request') }}">Forgot Password?</a>
             </small>
             <small class="text-muted ml-2">
-                <a href="#">Forgot Username?</a>
+                <a href="{{url_for('reset_user') }}">Forgot Username?</a>
             </small>
         </div>
       </form>
@@ -98,19 +98,7 @@
                               {% endif %}
                       </div>
                     </div>
-                  </div>
-                <div class="form-group">
-                        {% if form_r.username.errors %}
-                            {{ form_r.username(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form_r.username.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form_r.username(class="form-control", placeholder="User Name") }}
-                        {% endif %}
-                </div>
+                  </div>       
                 <div class="form-group">
                     {% if form_r.email.errors %}
                         {{ form_r.email(class="form-control form-control-lg is-invalid") }}

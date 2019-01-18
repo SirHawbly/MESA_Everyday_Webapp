@@ -5,3 +5,5 @@ flask_wtf
 sqlalchemy
 pymysql
 flask-mail
+google-api-python-client
+oauth2client 

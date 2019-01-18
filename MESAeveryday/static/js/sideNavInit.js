@@ -8,4 +8,5 @@ Ps.initialize(container, {
 		minScrollbarLength: 20
 });
 
-
+ // Image Picker Initialization
+$("select").imagepicker();
