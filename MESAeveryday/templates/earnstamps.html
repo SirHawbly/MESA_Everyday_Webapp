@@ -13,7 +13,7 @@
             </div>
             <!-- Breadcrumb-->
             <div class="breadcrumb-dn mr-auto">
-                <p>MESA Everyday</p>
+                
             </div>
 
             <!--Navbar links-->
@@ -45,9 +45,6 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link waves-effect"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Inbox</span></a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link waves-effect"><i class="fa fa-calendar"></i> <span class="clearfix d-none d-sm-inline-block">Calendar</span></a>
                 </li>
                 <li class="nav-item dropdown">
@@ -55,8 +52,17 @@
                         <i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">Profile</span></a>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
-                        <a class="dropdown-item" href="#">My account</a>
+                        <div class="navbar-login">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <img src="https://mdbootstrap.com/img/Photos/Others/img (38).jpg" class="img-fluid" alt="First sample image">
+                                </div>
+                                <div class="col-lg-8">
+                                    <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
+                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </li>
 
@@ -76,16 +82,6 @@
                 </div>
             </li>
             <!--/. Logo -->
-
-            <!--Search Form-->
-            <li>
-                <form class="search-form" role="search">
-                    <div class="form-group md-form mt-0 pt-1 waves-light">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                </form>
-            </li>
-            <!--/.Search Form-->
             <!-- Side navigation links -->
             <li>
                 <ul class="collapsible collapsible-accordion">
@@ -115,40 +111,118 @@
 
     <!--Main layout-->
     <main>
-        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-            <fieldset class="form-group">
-                {% set t = 0 %}
-                {% for f in forms %}
-                    <form name="earn_stamps" method="POSt" action="{{ url_for('earn_stamps')}}" class="text-center p-5">
-                        {{ f.hidden_tag() }}
-                        <p class="h4 mb-4">{{ f.badge_name }}</p>
-                        <div class="form-row mb-0">
-                            <div class="col">
-                                <div class="form-group">
-                                    {{ f.stamps(class="form-control", placeholder="stamps") }}
+        <div class="container-fluid">
+
+            <!-- First row -->
+
+            <div class="row">
+
+                <!-- First column -->
+
+                <div class="col-lg-8 col-md-12">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header white-text primary-color">
+                                    Countdown
                                 </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    {{ f.time_finished(class="form-control") }}
-                                    <!-- <input id="date" width="270"/> -->
-                                    
+                                <div class="card-body">
                                 </div>
-                            </div>
-                            <div class="col">
-                                {{ f.submit(class="btn btn-outline-info") }}
-                            </div>
-                            
+                            </div>    
                         </div>
-                    </form>
-                {% endfor %}
-            </fieldset>
+                        <div class="col-lg-4 col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header white-text primary-color">
+                                    Countdown
+                                </div>
+                                <div class="card-body">
+                                </div>
+                            </div>    
+                        </div>
+                        <div class="col-lg-4 col-md-8">
+                            <div class="card mb-4">
+                                <div class="card-header white-text primary-color">
+                                    Countdown
+                                </div>
+                                <div class="card-body">
+                                </div>
+                            </div>    
+                        </div>
+                    </div>   
 
+                    <!--Panel-->
+                    <div class="card mb-4">
+                        <div class="card-header white-text primary-color">
+                           Badge Information
+                        </div>
+                        <div class="card-body">
+                            <fieldset class="form-group">
+                                {% set t = 0 %}
+                                {% for f in forms %}
+                                    <form name="earn_stamps" method="POSt" action="{{ url_for('earn_stamps')}}" class="text-center p-5">
+                                        {{ f.hidden_tag() }}
+                                        <h4><span class="badge big-badge primary-color">{{ f.badge_name }}</span></h4>
+                                        <div class="row">
+                                            <div class="col-lg-4 col-md-8">
+                                                <div class="md-form">
+                                                    {{ f.stamps(class="form-control", placeholder="stamps") }}
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-md-8">
+                                                <div class="md-form">
+                                                    {{ f.time_finished(class="form-control") }}
+                                                    <!-- <input id="date" width="270"/> -->
+                                                    <!-- <input placeholder="Selected date" type="text" id="time_finished" name="time_finished" class="form-control datepicker"> -->
+                                                </div>
+                                            </div> 
+                                            <div class="col-lg-4 col-md-8">
+                                                <div class="md-form">
+                                                    {{ f.submit(class="btn btn-outline-info") }}
+                                                </div>
+                                            </div>
+                                            
+                                        </div>
+                                    </form>
+                                    <br>
+                                {% endfor %}
+                            </fieldset>    
+                        </div>
+                    </div>
+                    <!--/.Panel-->
+                </div>
 
-        </div>
+                <!-- Second column -->
 
+                <div class="col-lg-4 col-md-12">
 
+                    <!--Panel-->
+                    <div class="card mb-4">
+                        <div class="card-header white-text primary-color">
+                            Calendar
+                        </div>
+                        <div class="card-body">
+                                                        <div style="overflow-x:auto;">
+                                                                        <iframe src="https://calendar.google.com/calendar/embed?height=300&amp;wkst=1&amp;bgcolor=%23FFFFFF&amp;src=pdx.edu_nl0ch7aidsj6hdmsc02toe684s%40group.calendar.google.com&amp;color=%23AB8B00&amp;ctz=America%2FLos_Angeles" style="border-width:1" width="500" height="300" frameborder="0" scrolling="no"></iframe>  
+                                    <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full calendar</button>
+                                </div>
+                        </div>
+                    </div>
+                    <!--/.Panel-->
 
+                    <!--Panel-->
+                    <div class="card mb-4">
+                        <div class="card-header white-text primary-color">
+                            Upcoming Events
+                        </div>
+                        <div class="card-body">
+                            Upcoming events goes here
+                            <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View full upcoming events</button>
+                        </div>
+                    </div>
+                    <!--/.Panel-->
+                </div>
+                <!-- /.Second row -->
+            </div>
     </main>
     <!--Main layout-->
 

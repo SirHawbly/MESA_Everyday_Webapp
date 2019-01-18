@@ -371,6 +371,14 @@ class Stamp(Base, UserMixin):
         except:
             session.rollback()
             return None
+
+    def get_earned_stamps_of_badge(user_id, badge_id):
+        try:
+            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
+        except:
+            session.rollback()
+            return None        
     
     def get_earned_points(user_id, badge_id):
         try:

@@ -1,12 +1,20 @@
 // SideNav Initialization
 $(".button-collapse").sideNav();
 
+// Data Picker Initialization
+$('.datepicker').pickadate();
+
+// Image Picker Initialization
+$("select").imagepicker();
+
 var container = document.querySelector('.custom-scrollbar');
 Ps.initialize(container, {
 		wheelSpeed: 2,
 		wheelPropagation: true,
 		minScrollbarLength: 20
 });
-
- // Image Picker Initialization
-$("select").imagepicker();
+$(document).ready( function () {
+    $('#unearnedTable').DataTable();
+    $('#earnedTable').DataTable();
+});
+            
