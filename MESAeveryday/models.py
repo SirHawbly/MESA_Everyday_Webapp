@@ -267,7 +267,10 @@ class School(Base):
     def get_all_schools_names():
         # with loadSession() as session:
         try:
-            return session.query(School.school_id, School.school_name)
+            # The union ensures that the "Other" will always be found at the end
+            results = session.query(School.school_id, School.school_name).filter(School.school_name != 'Other').order_by(School.school_name.asc())\
+                .union(session.query(School.school_id, School.school_name).filter(School.school_name == 'Other'))
+            return results
         except:
             session.rollback()
             return None
