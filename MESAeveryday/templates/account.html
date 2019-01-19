@@ -90,50 +90,51 @@
         </form>
 		
 		<!-- Update Password -->
-        <form name="form_password" method="POST" action="{{ url_for('account') }}" class="text-center p-5">
-              {{ form_password.hidden_tag() }}
-              <fieldset class="form-group">
-                 <p class="h4 mb-4">Update Password</p>
 
-
-
-                <div class="form-row mb-0">
-                  <div class="col">
-                    <div class="form-group">
-                        {% if form_password.password.errors %}
-                            {{ form_password.password(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form_password.password.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form_password.password(class="form-control", placeholder="Password") }}
-                        {% endif %}
-                    </div>
-                  </div>
-                  <div class="col">
-                    <div class="form-group">
-                        {% if form_password.confirm_password.errors %}
-                            {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
-                            <div class="invalid-feedback">
-                                {% for error in form_password.confirm_password.errors %}
-                                    <span>{{ error }}</span>
-                                {% endfor %}
-                            </div>
-                        {% else %}
-                            {{ form_password.confirm_password(class="form-control", placeholder="Confirm Password") }}
-                        {% endif %}
-                    </div>
-                  </div>
+        <form name="form_password" method="POST" action="{{ url_for('account') }}" enctype="multipart/form-data">
+            {{ form_password.hidden_tag() }}
+            <fieldset class="form-group">
+                <p class="h4 mb-4">Update Password</p>
+                <div class="form-group">
+                    {% if form_password.old_password.errors %}
+                        {{ form_password.old_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.old_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.old_password(class="form-control", placeholder="Old Password") }}
+                    {% endif %}
                 </div>
-
-              </fieldset>
-              <div class="form-group">
-                  {{ form_password.submit(class="btn btn-outline-info") }}
-              </div>
-
-
+                <div class="form-group">
+                    {% if form_password.password.errors %}
+                        {{ form_password.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.password(class="form-control", placeholder="New Password") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {% if form_password.confirm_password.errors %}
+                        {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.confirm_password(class="form-control", placeholder="Confirm New Password") }}
+                    {% endif %}
+                </div>        
+            </fieldset>                       
+            <div class="form-group">
+                {{ form_password.submit(class="btn btn-outline-info") }}
+            </div>
           </form>
     </div>
     

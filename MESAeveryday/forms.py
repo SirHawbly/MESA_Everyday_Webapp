@@ -6,6 +6,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
 from MESAeveryday.models import User, School, Badge, Stamp
+from flask_login import current_user
+from MESAeveryday import bcrypt
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -87,6 +89,7 @@ class UpdateSchoolForm(FlaskForm):
     submit = SubmitField('Update School')
 
 class UpdatePasswordForm(FlaskForm):
+    old_password = PasswordField('Password')
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
                                                                             message="your password must be at least %(min)d characters")
         , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
@@ -94,6 +97,11 @@ class UpdatePasswordForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Update Password')
+    
+    def validate_old_password(self, old_password):
+
+        if not bcrypt.check_password_hash(current_user.password, old_password.data):
+            raise ValidationError('Old password is not correct.')
 
 class EarnStampsForm(FlaskForm):
     stamps = SelectField('Stamp', coerce=int)
