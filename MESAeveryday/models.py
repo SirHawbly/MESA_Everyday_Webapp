@@ -64,30 +64,6 @@ def load_user(user_id):
 
 #All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
 
-
-#Class for the "user_roles" table
-class UserRole(Base):
-    __tablename__ = 'user_roles'
-
-    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
-    role_id = Column(Integer, ForeignKey("roles.role_id"))
-
-    def __init__(self, user_id, role_id):
-	    self.user_id = user_id
-	    self.role_id = role_id
-
-#Class for the "roles" table
-class Role(Base):
-    __tablename__ = 'roles'
-
-    id = Column('role_id', Integer, primary_key=True)
-    name = Column('role_name', String)
-    description = Column(String)
-
-    def __init__(self, name, description):
-	    self.name = name
-	    self.description = description
-
 #Class for the "users" table
 class User(Base, UserMixin):
     __tablename__ = 'users'
@@ -102,12 +78,10 @@ class User(Base, UserMixin):
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
     last_login = Column(DateTime)
+    role = Column(String)
 
     school = relationship("School", foreign_keys=[school_id])
     avatar = relationship("Avatar", foreign_keys=[avatar_id])
-    role = relationship('Role', secondary='user_roles',
-                         backref=backref('users', lazy='dynamic'))
-
 
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
@@ -250,7 +224,7 @@ class User(Base, UserMixin):
     def verify_role(id):
         #try:
         target = session.query(User).filter(User.id == id).first()
-        if(target.id == "48"):
+        if(target.role == "admin"):
             return True
         else:
             return False

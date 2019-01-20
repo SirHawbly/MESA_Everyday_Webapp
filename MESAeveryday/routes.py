@@ -5,7 +5,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
-from MESAeveryday.models import User, Role, UserRole, School, Badge, Stamp, UserStamp, Avatar
+from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
@@ -127,8 +127,8 @@ def dashboard():
 @login_required
 def admin():
     # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-    if not User.verify_role(current_user.username):
-        flash('You do not have access to view this page.')
+    if not User.verify_role(current_user.id):
+        flash('You do not have access to view this page.', 'danger')
         return redirect(url_for('dashboard'))
     return render_template('admin.html')
 
