@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="col-lg-8">
                                     <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
-                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item" href="{{ url_for('account') }}">Edit Profile</a>
                                 </div>
                             </div>
                         </div>
@@ -326,7 +326,7 @@
                         <div class="card-header white-text primary-color">
                             Calendar
                         </div>
-                        <div class="embed-responsive embed-responsive-16by9">
+                        <div class="embed-responsive embed-responsive-16by9" style="height: 300px">
                             <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent'
                                 allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
                         </div>
