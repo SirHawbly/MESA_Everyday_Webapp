@@ -132,7 +132,7 @@ class User(Base, UserMixin):
             return None
         # with loadSession() as session:
         return session.query(User).filter(User.id==user_id).first()
-        
+
     def get_all_username():
         try:
             return session.query(User.username)
@@ -198,8 +198,8 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_last_login(id, new_last_login):     
+
+    def update_last_login(id, new_last_login):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.last_login = new_last_login
@@ -207,8 +207,8 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_name(id, new_first_name, new_last_name):     
+
+    def update_name(id, new_first_name, new_last_name):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.first_name = new_first_name
@@ -217,35 +217,47 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_email(id, new_email):     
+
+    def update_email(id, new_email):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.email = new_email
         except:
             session.rollback()
             return False
-        return True  
+        return True
 
-    def update_school(id, new_school_id):     
+    def update_school(id, new_school_id):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.school_id = new_school_id
         except:
             session.rollback()
             return False
-        return True 
-        
-    def update_avatar(id, new_avatar_id):     
+        return True
+
+    def update_avatar(id, new_avatar_id):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.avatar_id = new_avatar_id
         except:
             session.rollback()
             return False
-        return True 
-        
-        
+        return True
+
+    # Added by Millen
+    # Checks if user had an admin role
+    def verify_role(id):
+        #try:
+        target = session.query(User).filter(User.id == id).first()
+        if(target.id == "48"):
+            return True
+        else:
+            return False
+        #except:
+         #   session.rollback()
+          #  return False
+
 #Class for the "schools" table
 class School(Base):
     __tablename__ = 'schools'
@@ -378,8 +390,8 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
         except:
             session.rollback()
-            return None        
-    
+            return None
+
     def get_earned_points(user_id, badge_id):
         try:
             # subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
@@ -406,7 +418,7 @@ class UserStamp(Base, UserMixin):
         self.stamp_id = stamp_id
         self.log_date = log_date
         self.stamp_date = stamp_date
-        
+
     def get_earned_stamp(user_id):
         try:
             return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
@@ -434,13 +446,13 @@ class Avatar(Base):
 
     def __init__(self, file_name):
 	    self.file_name = feile_name
-        
+
     def get_all_avatars():
         try:
             return session.query(Avatar)
         except:
             session.rollback()
-            return None        
+            return None
 
 
 
