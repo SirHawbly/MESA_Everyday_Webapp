@@ -3,7 +3,17 @@
 
 <!-- Added by Millen -->
 <!-- Admin View Placeholder -->
-<p> You are now in admin view </p>
+
+<!--Navbar-->
+<ul class="nav navbar-nav nav-flex-icons ml-auto">
+    <li class = "nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+    </li>
+</ul>
+
+<div class="container-fluid"> 
+    You are now in admin view
+</div>
 
 {% endblock content %}
 
