@@ -282,6 +282,7 @@ class Badge(Base):
     badge_id = Column(Integer, primary_key=True)
     badge_name = Column(String)
     color = Column(String)
+    picture = Column(String)
     level1_points = Column(Integer)
     level2_points = Column(Integer)
     level3_points = Column(Integer)
@@ -324,6 +325,13 @@ class Badge(Base):
     def get_badge_name(badge_id):
         try:
             return session.query(Badge.badge_name).filter(Badge.badge_id == badge_id)
+        except:
+            session.rollback()
+            return None
+
+    def get_badge_picture(badge_id):
+        try:
+            return session.query(Badge.picture).filter(Badge.badge_id == badge_id)
         except:
             session.rollback()
             return None
