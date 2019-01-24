@@ -13,6 +13,7 @@ from datetime import datetime
 import secrets
 import os
 
+
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
@@ -227,6 +228,28 @@ def account():
         schoolform.school.data = current_user.school_id
 
     return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
+
+@app.route("/account_deactivate", methods=['GET', 'POST'])
+@login_required
+def account_deactivate():
+    myaccount = User.get_user_by_username(current_user.username)
+    print(myaccount.id)
+    if current_user.is_authenticated:
+        if request.method=='POST':
+            firstName=request.form.get('FirstName')
+            lastName=request.form.get('LastName')
+            if ((firstName.lower()==current_user.first_name.lower())
+                    and (lastName.lower()==current_user.last_name.lower())):
+                print(request.form.get('FirstName'))
+                User.delete_user_by_id(myaccount.id)
+                logout_user()
+                return redirect(url_for('landpage'))
+            else :
+                flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+        return render_template('account_deactivate.html')
+
+
+
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
