@@ -98,13 +98,15 @@ def dashboard():
         
     badges = Badge.get_all_badges_id_with_names()
     badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
-    # this block for viewing needed stamps
-
-    pts= []
+    
+    all_badge_points = []  
     for badge_id in badge_ids:
-        points = [row.points for row in Stamp.get_earned_points(current_user.id, badge_id)]                  # get earned points of a badge
-        pt = 0 if not points else sum(points)
-        pts.append(pt)
+        badge_progress = User.get_badge_progress(current_user.id, badge_id)
+        if badge_progress:
+            badge_points = badge_progress[0]
+        else:
+            badge_points = 0
+        all_badge_points.append(badge_points)
 
     # # call the google api and pull all upcoming events
     events = get_event_list()
@@ -120,7 +122,7 @@ def dashboard():
                            result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
                            other_days=other_days,
-                           points=zip(badge_names, pts))
+                           points=zip(badge_names, all_badge_points))
 
 @app.route("/logout")
 def logout():
@@ -298,10 +300,18 @@ def check_badge(badgeid):
     earned_stamps = [row.stamp_name for row in Stamp.get_earned_stamps_of_badge(id, badgeid)]
     if not unearned_stamps:
         unearned_stamps = ['All stamps earned'] # if all the stamps for this badge have been earned, print this instead
-    points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
-    pt = 0 if not points else sum(points)
-    current_level, to_next_lv = Badge.get_level_related_info(badgeid, pt)
-    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file)
+    
+    badge_progress = User.get_badge_progress(current_user.id, badgeid)
+    if badge_progress:
+        points = badge_progress[0]
+        current_level = badge_progress[1]
+        to_next_lv = badge_progress[2]
+    else:
+        points = 0
+        current_level = 0
+        to_next_lv = 0
+    
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file)
 	
 # Generates a random 3 digit code. Returns the code as a 3 character long string
 def random_code():
