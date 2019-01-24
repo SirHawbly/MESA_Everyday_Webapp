@@ -16,6 +16,11 @@ import os
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
+    """
+      Default landing page for the website
+      Consists of both the registration form and the login form
+    """
+    
     form_register = RegistrationForm()
     form_login = LoginForm()
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
@@ -23,22 +28,27 @@ def landpage():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    # Registration Form Submitted
+    """
+      Route that processes a registration request
+      After the registration is processes, it renders the landing page
+    """   
+    
     form_register = RegistrationForm()
     form_login = LoginForm()
     
-    if form_register.validate_on_submit():
+    # Registration form is submitted and their are no errors in the form
+    if form_register.validate_on_submit():       
         # Generate username
         new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
         new_username = check_username(new_username, [row.username for row in User.get_all_username()])    
-    
+       
         if new_username == 'ERROR':
             flash('Sorry, we were unable to generate an account for you.', 'danger')
         else:    
             # Generate hashed password
             hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
             
-            # Add user to the databas
+            # Add user to the database
             new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
                             form_register.email.data, hashed_password, form_register.school.data)
             User.add_new_user(new_user)
@@ -51,32 +61,48 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    # Login Form Submitted
+    """
+      Route that processes a login attempt
+      If the login is a success they are taken to either the page they last attempted to visit or the dashboard
+      If the login fails, the landing page is rendered
+    """   
+    
     form_register = RegistrationForm()
     form_login = LoginForm()
+    
+    # Login form is submitted and their are no errors in the form
     if form_login.validate_on_submit():
         user = User.get_user_by_username(form_login.username.data)
+        
+        # User entered the correct credentials
         if user and bcrypt.check_password_hash(user.password, form_login.password.data):
             User.update_last_login(user.id, datetime.now())
             login_user(user, remember=form_login.remember.data)
             next_page = request.args.get('next')
             return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+            
+        # User did not enter the correct credentials
         else:
             flash('Login Unsuccessful. Please check username and password', 'danger')
+            
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 
 @app.route("/dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    # result = [row.badge_name for row in Badge.get_all_badges_names()]
-    temp = Badge.get_all_badges_id_with_names()
-    result, badges = [row.badge_name for row in temp], [row.badge_id for row in temp]
+    """
+        Page that displays summary information about a student's progress
+        This is the default page a user is taken to when they log in
+    """   
+        
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
     # this block for viewing needed stamps
-    id = current_user.id    # get the id of current user
+
     pts= []
-    for badge in badges:
-        points = [row.points for row in Stamp.get_earned_points(id, badge)]                  # get earned points of a badge
+    for badge_id in badge_ids:
+        points = [row.points for row in Stamp.get_earned_points(current_user.id, badge_id)]                  # get earned points of a badge
         pt = 0 if not points else sum(points)
         pts.append(pt)
 
@@ -91,10 +117,10 @@ def dashboard():
                            events=events,
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
-                           result=zip(result, badges),
+                           result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
                            other_days=other_days,
-                           points=zip(result, pts))
+                           points=zip(badge_names, pts))
 
 @app.route("/logout")
 def logout():
