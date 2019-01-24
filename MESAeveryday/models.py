@@ -1,4 +1,8 @@
 """
+This file contains all tables in the database. It uses SQLAlchemy to map the tables to python objects
+All queries and session management is done in this file
+All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
+
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
@@ -7,89 +11,40 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from MESAeveryday import login_manager, app, bcrypt
 from flask_login import UserMixin
 from flask import flash
-#import pymysql
 import os
 from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
-# from contextlib import contextmanager
+# db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
+# Check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 
-#db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
-#check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
+# Credentials for the database are stored as OS variables for security purposes
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 
+# Create a session with the database
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
-
 metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# do not delete those until the new loadSession method is proved working
-# def loadSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine)
-#     session = Session()
-#     return session
-
-# @contextmanager
-# def loadSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine)
-#     session = Session()
-#     try:
-#         yield session
-#         session.commit()
-#     except:
-#         session.rollback()
-#     finally:
-#         session.close()
-
-# need a session that will not be closed to use current_user
-# def loadLoginSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine, expire_on_commit=False)
-#     session = Session()
-#     return session
-
 @login_manager.user_loader
 def load_user(user_id):
-    # with loadSession() as session:
+    """
+        Function used to load a user
+        Used by the login manager to obtain the information of a user who is logged in  
+    """
     try:
         return session.query(User).filter(User.id==user_id).first()
     except:
         session.rollback()
         return None        
         
-#All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
-
-
-#Class for the "user_roles" table
-class UserRole(Base):
-    __tablename__ = 'user_roles'
-
-    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
-    role_id = Column(Integer, ForeignKey("roles.role_id"))
-
-    def __init__(self, user_id, role_id):
-	    self.user_id = user_id
-	    self.role_id = role_id
-
-#Class for the "roles" table
-class Role(Base):
-    __tablename__ = 'roles'
-
-    id = Column('role_id', Integer, primary_key=True)
-    name = Column('role_name', String)
-    description = Column(String)
-
-    def __init__(self, name, description):
-	    self.name = name
-	    self.description = description
 
 #Class for the "users" table
 class User(Base, UserMixin):
+
     __tablename__ = 'users'
 
     id = Column('user_id', Integer, primary_key=True)
@@ -97,7 +52,7 @@ class User(Base, UserMixin):
     last_name = Column(String)
     username = Column(String)
     email = Column(String)
-    picture = Column(String) #This needs to be deleted after the picture column in the database is deleted
+    role = Column(String)
     school_id = Column(Integer, ForeignKey("schools.school_id"))
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
@@ -112,7 +67,6 @@ class User(Base, UserMixin):
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
         self.email = email
-        self.picture = 'default.png' #This needs to be deleted after the picture column in the database is deleted
         self.avatar_id = 1
         self.password = password
         self.first_name = first_name
@@ -128,10 +82,9 @@ class User(Base, UserMixin):
         s = Serializer(app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)['user_id']
+            return session.query(User).filter(User.id==user_id).first()
         except:
-            return None
-        # with loadSession() as session:
-        return session.query(User).filter(User.id==user_id).first()
+            return None      
         
     def get_all_username():
         try:
@@ -158,20 +111,17 @@ class User(Base, UserMixin):
             session.rollback()
             user = None
         if user:
-            # test whether false will be returned
             return True
         else:
             return False
 
     def add_new_user(new_user):
-        # with loadSession() as session:
         try:
             session.add(new_user)
         except:
             session.rollback()
 
     def get_user_by_email(email):
-        # with loadSession() as session:
         try:
             return session.query(User).filter(User.email == email).first()
         except:
@@ -186,13 +136,9 @@ class User(Base, UserMixin):
             return None
 
     def reset_pwd(id, hashed_pwd):
-        # with loadSession() as session:
-        #once a session is loaded we want to get the row
-        #where User.id matches the id of the user returned by User.verify_reset_token(token)
-        #this insures that the password for the correct user will be the one changed
+      
         try:
             row = session.query(User).filter(User.id == id).first()
-        #Change the password is a simple assign statement
             row.password = hashed_pwd
         except:
             session.rollback()
@@ -271,7 +217,6 @@ class School(Base):
 	    self.zip_code = zip_code
 
     def get_all_schools_names():
-        # with loadSession() as session:
         try:
             # The union ensures that the "Other" will always be found at the end
             results = session.query(School.school_id, School.school_name).filter(School.school_name != 'Other').order_by(School.school_name.asc())\
@@ -383,15 +328,6 @@ class Stamp(Base, UserMixin):
         except:
             session.rollback()
             return None        
-    
-    def get_earned_points(user_id, badge_id):
-        try:
-            # subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-            # return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
-            return session.query(UserStamp.stamp_id, Stamp.points).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == Stamp.stamp_id).filter(Stamp.badge_id == badge_id)
-        except:
-            session.rollback()
-            return None
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -419,7 +355,6 @@ class UserStamp(Base, UserMixin):
             return None
 
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
-        # with loadSession() as session:
         new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
         try:
             session.add(new_UserStamp)
@@ -445,56 +380,3 @@ class Avatar(Base):
         except:
             session.rollback()
             return None        
-
-
-
-'''
-class User(UserMixin):
-	def __init__(self, id, username, first_name, last_name, email, password, role, school_id):
-	    self.id = id
-	    self.username = username
-	    self.email = email
-	    self.image_file = 'default.jpg'
-	    self.password = password
-	    self.first_name = first_name
-	    self.last_name = last_name
-	    self.role = role
-	    self.school_id = school_id
-
-class db_model():
-	def __init__(self):
-	    self.conn = pymysql.connect(host=os.environ['MESAhostname'], port=3306, user=os.environ['MESAusername'], passwd=os.environ['MESApassword'], db=os.environ['MESAusername'])
-
-	def get_user_by_id(self, id):
-	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE user_id = %s", (id))
-	    return cur.fetchall()
-
-	def get_user_by_username(self, username):
-		cur = self.conn.cursor()
-		cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE username = %s", (username))
-		return cur.fetchall()
-
-	def get_user_by_email(self, email):
-	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE email = %s", (email))
-	    return cur.fetchall()
-
-	def add_user(self, username, first_name, last_name, email, picture, password, school_id):
-		cur = self.conn.cursor()
-		cur.execute("INSERT INTO users(username, first_name, last_name, email, picture, ssb, school_id) VALUES(%s, %s, %s, %s, %s, %s, 'user', %s)",
-					(username, first_name, last_name, email, picture, password, school_id))
-		self.conn.commit()
-
-	def get_all_school_names(self):
-		cur = self.conn.cursor()
-		cur.execute("SELECT school_id, school_name FROM schools")
-		return cur.fetchall()
-
-	def view_badge(self):
-		cur = self.conn.cursor()
-		cur.execute("SELECT badge_name FROM badges")
-		rows = cur.fetchall()
-		rows=[i[0] for i in rows]
-		return rows
-'''
