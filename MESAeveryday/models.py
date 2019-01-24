@@ -184,6 +184,12 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return None
+    def delete_user_by_id(id):
+        try:
+            session.query(User).filter(User.id == id).delete()
+        except:
+            session.rollback()
+            return None
 
     def reset_pwd(id, hashed_pwd):
         # with loadSession() as session:
@@ -243,7 +249,9 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return False
-        return True 
+        return True
+
+
         
         
 #Class for the "schools" table
