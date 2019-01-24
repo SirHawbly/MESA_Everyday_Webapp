@@ -141,6 +141,10 @@
                                     Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until First Event!!!<td></tr>
+                                        <tr><td><span id="clock" data-date-string={{events[0][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
@@ -150,6 +154,10 @@
                                     Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until Second Event!!!<td></tr>
+                                        <tr><td><span id="clock2" data-date-string-second={{events[1][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
@@ -159,6 +167,10 @@
                                     Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until MESA Event!!!<td></tr>
+                                        <tr><td><span id="clock3" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
@@ -354,8 +366,11 @@
                                                 <tr>
                                                     <td>or {{event['date_string']}}</td>
                                                 </tr>
-                                               <tr>
+                                                <tr>
                                                     <td>at {{event['location']}}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>badge: {{event['badgeColor']}}</td>
                                                 </tr>
                                                 <tr>
                                                     <td>--</td>
@@ -376,6 +391,12 @@
                                             <tr>
                                                 <td>on {{event['start_string']}}</td>
                                             </tr>
+                                            <tr>
+                                                <td>or {{event['date_string']}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>badge: {{event['badgeColor']}}</td>
+                                            </tr>                                        
                                             <tr>
                                                 <td>--</td>
                                             </tr>

@@ -42,14 +42,21 @@ CAL_COLORS = {
              }
 
 MESA_COLORS = {
-               '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'},
-               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'},
-               '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'},
-               '1' : {'r':130,'g':149,'b':177,'hex':'8195b1'},
-               '8' : {'r':114,'g':102,'b':88,'hex':'716558'},
+               '9' : {'r':130,'g':149,'b':177,'hex':'8195b1'}, # blue
+               '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'}, # orange
+               '8' : {'r':114,'g':102,'b':88,'hex':'716558'}, # grey
+               '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'}, # green
+               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'}, # red
                # NOT USED, NO LIGHT GRAY IN G CAL
-               '12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'},
+               # '12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # No light grey
               }
+
+BADGE_COLORS = {
+                '9' : 'College_Knowledge', # Blue
+                '6' : 'MESA_Expert', # Orange
+                '8' : 'Career_Pro', # Grey
+                '10' : 'Professional_Development', # Green
+               }
 
 # --
 
@@ -240,11 +247,15 @@ def get_event_list():
             event['calColor'] = CAL_COLORS[event['colorId']]
             if event['colorId'] in MESA_COLORS: 
                 event['mesaColor'] = MESA_COLORS[event['colorId']]
+                event['badgeColor'] = BADGE_COLORS[event['colorId']]
             else:
                 event['mesaColor'] = 'Not a MESA Color'
+                event['badgeColor'] = 'No MESA Badge'
         else:
             event['calColor'] = 'None'
             event['mesaColor'] = 'None'
+            event['badgeColor'] = 'None'
+
         if 'location' not in event: 
             event['location'] = 'No Location Provided'
  
