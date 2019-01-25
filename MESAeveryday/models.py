@@ -187,6 +187,7 @@ class User(Base, UserMixin):
     def delete_user_by_id(id):
         try:
             session.query(User).filter(User.id == id).delete()
+            session.commit()
         except:
             session.rollback()
             return None
