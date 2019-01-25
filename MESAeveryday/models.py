@@ -222,15 +222,15 @@ class User(Base, UserMixin):
     # Added by Millen
     # Checks if user had an admin role
     def verify_role(id):
-        #try:
-        target = session.query(User).filter(User.id == id).first()
-        if(target.role == "admin"):
-            return True
-        else:
+        try:
+            target = session.query(User).filter(User.id == id).first()
+            if(target.role == "admin"):
+                return True
+            else:
+                return False
+        except:
+            session.rollback()
             return False
-        #except:
-         #   session.rollback()
-          #  return False
 
 #Class for the "schools" table
 class School(Base):
