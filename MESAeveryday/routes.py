@@ -128,7 +128,7 @@ def dashboard():
 def admin():
     # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
     if not User.verify_role(current_user.id):
-        flash('You do not have access to view this page.', 'danger')
+        # flash('You do not have access to view this page.', 'danger')
         return redirect(url_for('dashboard'))
     return render_template('admin.html')
 
