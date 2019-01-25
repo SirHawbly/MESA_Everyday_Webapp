@@ -60,9 +60,6 @@ class User(Base, UserMixin):
 
     school = relationship("School", foreign_keys=[school_id])
     avatar = relationship("Avatar", foreign_keys=[avatar_id])
-    role = relationship('Role', secondary='user_roles',
-                         backref=backref('users', lazy='dynamic'))
-
 
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
