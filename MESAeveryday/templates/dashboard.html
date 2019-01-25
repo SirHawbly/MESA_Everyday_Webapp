@@ -69,11 +69,11 @@
                         <div class="navbar-login">
                             <div class="row">
                                 <div class="col-lg-4">
-                                    <img src="https://mdbootstrap.com/img/Photos/Others/img (38).jpg" class="img-fluid" alt="First sample image">
+                                    <img src="static/avatar/{{ current_user.avatar.file_name }}" class="img-fluid" alt="First sample image">
                                 </div>
                                 <div class="col-lg-8">
                                     <a class="dropdown-item" href="{{ url_for('logout') }}">Log Out</a>
-                                    <a class="dropdown-item" href="#">Edit Profile</a>
+                                    <a class="dropdown-item" href="{{ url_for('account') }}">Edit Profile</a>
                                 </div>
                             </div>
                         </div>
@@ -191,7 +191,7 @@
 
                                     <!--Card Data-->
                                     <div class="admin-up">
-                                        <i class="fa fa-money primary-color"></i>
+                                        <img class="rounded-circle account-img" src="../static/badge_icons/College_Knowledge.png">
                                         <div class="data">
                                             {% for r, p in points %}
                                             {% if r == 'College Knowledge' %}
@@ -225,7 +225,7 @@
 
                                     <!--Card Data-->
                                     <div class="admin-up">
-                                        <i class="fa fa-line-chart warning-color"></i>
+                                        <img class="rounded-circle account-img" src="../static/badge_icons/Career_Pro.png">
                                         <div class="data">
                                             {% elif r == 'Career Pro' %}
                                             <p>{{ r }}</p>
@@ -259,7 +259,7 @@
 
                                     <!--Card Data-->
                                     <div class="admin-up">
-                                        <i class="fa fa-pie-chart light-blue lighten-1"></i>
+                                        <img class="rounded-circle account-img" src="../static/badge_icons/Professional_Development.png">
                                         <div class="data">
                                             {% elif r == 'Professional Development' %}
                                             <p>{{ r }}</p>
@@ -293,7 +293,7 @@
 
                                     <!--Card Data-->
                                     <div class="admin-up">
-                                        <i class="fa fa-bar-chart red accent-2"></i>
+                                        <img class="rounded-circle account-img" src="../static/badge_icons/MESA_Expert.png">
                                         <div class="data">
                                             {% else %}
                                             <p>{{r}}</p>

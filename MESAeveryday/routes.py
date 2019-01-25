@@ -12,28 +12,6 @@ from flask_mail import Message
 from datetime import datetime
 import secrets
 import os
-# Added import for admin_login_required()
-# from functools import wraps
-
-# Added by Millen
-# https://stackoverflow.com/questions/15871391/implementing-flask-login-with-multiple-user-classes
-# https://www.programcreek.com/python/example/107384/flask_login.login_required
-# overwrite login_required functionality with roles
-"""
-def login_required(role="ANY"):
-    def wrapper(fn):
-        @wraps(fn)
-        def decorated_function(*args, **kwargs):
-            if not current_user.is_authenticated:
-               return login_manager.unauthorized()
-            if not User.verify_role(current_user.username):
-                return login_manager.unauthorized()
-
-            return fn(*args, **kwargs)
-        return decorated_function
-        wrapper.__name__ = func.__name__
-    return wrapper
-"""
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
@@ -302,6 +280,7 @@ def check_badge(badgeid):
     temp = Badge.get_all_badges_id_with_names()
     result, ids = [row.badge_name for row in temp], [row.badge_id for row in temp]
     badge_name = Badge.get_badge_name(badgeid).first()[0]
+    picture_file = Badge.get_badge_picture(badgeid).first()[0]
     id = current_user.id    # get the id of current user
     unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(id, badgeid)]   # the unearned stamps of current user
     earned_stamps = [row.stamp_name for row in Stamp.get_earned_stamps_of_badge(id, badgeid)]
@@ -310,7 +289,7 @@ def check_badge(badgeid):
     points = [row.points for row in Stamp.get_earned_points(id, badgeid)]
     pt = 0 if not points else sum(points)
     current_level, to_next_lv = Badge.get_level_related_info(badgeid, pt)
-    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv)
+    return render_template('badges.html', result=zip(result, ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=pt, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file)
 
 # Generates a random 3 digit code. Returns the code as a 3 character long string
 def random_code():
