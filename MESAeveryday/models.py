@@ -64,30 +64,6 @@ def load_user(user_id):
 
 #All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
 
-
-#Class for the "user_roles" table
-class UserRole(Base):
-    __tablename__ = 'user_roles'
-
-    user_id = Column(Integer, ForeignKey("users.user_id"), primary_key=True)
-    role_id = Column(Integer, ForeignKey("roles.role_id"))
-
-    def __init__(self, user_id, role_id):
-	    self.user_id = user_id
-	    self.role_id = role_id
-
-#Class for the "roles" table
-class Role(Base):
-    __tablename__ = 'roles'
-
-    id = Column('role_id', Integer, primary_key=True)
-    name = Column('role_name', String)
-    description = Column(String)
-
-    def __init__(self, name, description):
-	    self.name = name
-	    self.description = description
-
 #Class for the "users" table
 class User(Base, UserMixin):
     __tablename__ = 'users'
@@ -102,12 +78,10 @@ class User(Base, UserMixin):
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
     last_login = Column(DateTime)
+    role = Column(String)
 
     school = relationship("School", foreign_keys=[school_id])
     avatar = relationship("Avatar", foreign_keys=[avatar_id])
-    role = relationship('Role', secondary='user_roles',
-                         backref=backref('users', lazy='dynamic'))
-
 
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
@@ -132,7 +106,7 @@ class User(Base, UserMixin):
             return None
         # with loadSession() as session:
         return session.query(User).filter(User.id==user_id).first()
-        
+
     def get_all_username():
         try:
             return session.query(User.username)
@@ -198,8 +172,8 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_last_login(id, new_last_login):     
+
+    def update_last_login(id, new_last_login):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.last_login = new_last_login
@@ -207,8 +181,8 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_name(id, new_first_name, new_last_name):     
+
+    def update_name(id, new_first_name, new_last_name):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.first_name = new_first_name
@@ -217,35 +191,47 @@ class User(Base, UserMixin):
             session.rollback()
             return False
         return True
-        
-    def update_email(id, new_email):     
+
+    def update_email(id, new_email):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.email = new_email
         except:
             session.rollback()
             return False
-        return True  
+        return True
 
-    def update_school(id, new_school_id):     
+    def update_school(id, new_school_id):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.school_id = new_school_id
         except:
             session.rollback()
             return False
-        return True 
-        
-    def update_avatar(id, new_avatar_id):     
+        return True
+
+    def update_avatar(id, new_avatar_id):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.avatar_id = new_avatar_id
         except:
             session.rollback()
             return False
-        return True 
-        
-        
+        return True
+
+    # Added by Millen
+    # Checks if user had an admin role
+    def verify_role(id):
+        try:
+            target = session.query(User).filter(User.id == id).first()
+            if(target.role == "admin"):
+                return True
+            else:
+                return False
+        except:
+            session.rollback()
+            return False
+
 #Class for the "schools" table
 class School(Base):
     __tablename__ = 'schools'
@@ -389,8 +375,8 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
         except:
             session.rollback()
-            return None        
-    
+            return None
+
     def get_earned_points(user_id, badge_id):
         try:
             # subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
@@ -417,7 +403,7 @@ class UserStamp(Base, UserMixin):
         self.stamp_id = stamp_id
         self.log_date = log_date
         self.stamp_date = stamp_date
-        
+
     def get_earned_stamp(user_id):
         try:
             return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
@@ -445,13 +431,13 @@ class Avatar(Base):
 
     def __init__(self, file_name):
 	    self.file_name = feile_name
-        
+
     def get_all_avatars():
         try:
             return session.query(Avatar)
         except:
             session.rollback()
-            return None        
+            return None
 
 
 
