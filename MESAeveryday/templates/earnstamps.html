@@ -161,26 +161,32 @@
                                 {% for f in forms %}
                                     <form name="earn_stamps" method="POSt" action="{{ url_for('earn_stamps')}}" class="text-center p-5">
                                         {{ f.hidden_tag() }}
-                                        <h4><span class="badge big-badge primary-color">{{ f.badge_name }}</span></h4>
-                                        <div class="row">
-                                            <div class="col-lg-4 col-md-8">
+                                        <div class="card">
+                                        <div class="card-body">
+
+                                            {{ f.badge_name }}
+                                        
+                                        <div class="row" style="text-align: center;">
+                                            <div class="col-lg-4 col-md-12">
                                                 <div class="md-form">
                                                     {{ f.stamps(class="form-control", placeholder="stamps") }}
                                                 </div>
                                             </div>
-                                            <div class="col-lg-4 col-md-8">
+                                            <div class="col-lg-4 col-md-12">
                                                 <div class="md-form">
-                                                    {{ f.time_finished(class="form-control") }}
+                                                    {{ f.time_finished(class="date-custom", placeholder="Selected date") }}
                                                     <!-- <input id="date" width="270"/> -->
                                                     <!-- <input placeholder="Selected date" type="text" id="time_finished" name="time_finished" class="form-control datepicker"> -->
+                                                    <span class="add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar"></i></span>
                                                 </div>
                                             </div> 
-                                            <div class="col-lg-4 col-md-8">
+                                            <div class="col-lg-4 col-md-12">
                                                 <div class="md-form">
-                                                    {{ f.submit(class="btn btn-outline-info") }}
+                                                    {{ f.submit(class="btn-save btn btn-primary btn-sm") }}
                                                 </div>
                                             </div>
-                                            
+                                            </div>
+                                            </div>
                                         </div>
                                     </form>
                                     <br>
@@ -250,7 +256,7 @@
     <script>
         $('#{{ "date" + loop.index|string }}').datepicker({
         uiLibrary: 'bootstrap4'
-    });
+        });
     </script>
     {% endfor %}
 
