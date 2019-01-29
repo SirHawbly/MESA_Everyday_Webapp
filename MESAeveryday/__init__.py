@@ -11,7 +11,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ['MESAkey']
+app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'

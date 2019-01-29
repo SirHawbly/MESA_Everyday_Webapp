@@ -10,11 +10,12 @@ from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
-from flask_login import login_user, current_user, logout_user, login_required
+from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
 from datetime import datetime
 import secrets
 import os
+
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
@@ -40,14 +41,14 @@ def register():
     form_login = LoginForm()
     
     # If the registration form is submitted and their are no errors in the form, try to register the user
-    if form_register.validate_on_submit():       
+    if form_register.validate_on_submit():  
+    
         # Generate username
         new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
-        new_username = check_username(new_username, [row.username for row in User.get_all_username()])    
        
         if new_username == 'ERROR':
             flash('Sorry, we were unable to generate an account for you.', 'danger')
-        else:    
+        else:
             # Generate hashed password
             hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
             
@@ -55,11 +56,11 @@ def register():
             new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
                             form_register.email.data, hashed_password, form_register.school.data)
             User.add_new_user(new_user)
-            
+
             # Tell the user their new username and send them an email with the username
             flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
             send_generate_username(form_register.email.data, new_username)
-           
+
     return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -98,6 +99,10 @@ def dashboard():
         Page that displays summary information about a student's progress
         This is the default page a user is taken to when they log in
     """   
+    
+    # Send admins to the admin page
+    if (User.verify_role(current_user.id)):
+        return redirect(url_for('admin'))
         
     # Get all the badges
     badges = Badge.get_all_badges_id_with_names()
@@ -130,6 +135,17 @@ def dashboard():
                            other_days=other_days,
                            points=zip(badge_names, all_badge_points))
 
+# Added by Millen
+# Load admin page if role is admin
+@app.route("/admin")
+@login_required
+def admin():
+    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('admin.html')
+
 @app.route("/logout")
 def logout():
     """
@@ -138,7 +154,7 @@ def logout():
     """   
     logout_user()
     return redirect(url_for('landpage'))
-	
+
 
 @app.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
@@ -233,28 +249,28 @@ def account():
     passwordform= UpdatePasswordForm()
     avatars = ""
     myaccount = User.get_user_by_username(current_user.username)
-	
+
 	#Update password
-    if passwordform.password.data and passwordform.validate_on_submit():     
+    if passwordform.password.data and passwordform.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
         if User.reset_pwd(myaccount.id, hashed_password) == True:
-            flash('Your account has been successfully updated!', 'success')          
+            flash('Your account has been successfully updated!', 'success')
         else:
             flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
-        
+
 	#Update email
-    if emailform.email.data and emailform.validate_on_submit():      
+    if emailform.email.data and emailform.validate_on_submit():
         if User.update_email(myaccount.id, emailform.email.data) == True:
-            flash('Your account has been successfully updated!', 'success')          
+            flash('Your account has been successfully updated!', 'success')
         else:
             flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
-	
+
 	#Update name
     if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
         if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
-            flash('Your account has been successfully updated!', 'success')          
+            flash('Your account has been successfully updated!', 'success')
         else:
             flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
@@ -262,7 +278,7 @@ def account():
     #Update school
     if schoolform.school.data and schoolform.validate_on_submit():
         if User.update_school(myaccount.id, schoolform.school.data) == True:
-            flash('Your account has been successfully updated!', 'success')          
+            flash('Your account has been successfully updated!', 'success')
         else:
             flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('account'))
@@ -272,7 +288,7 @@ def account():
         avatarSelect = request.form.get('avatarSelect')
         if avatarSelect:
             if User.update_avatar(myaccount.id, avatarSelect) == True:
-                flash('Your account has been successfully updated!', 'success')          
+                flash('Your account has been successfully updated!', 'success')
             else:
                 flash('Sorry, we were unable to update your account', 'danger')
             return redirect(url_for('account'))
@@ -285,6 +301,28 @@ def account():
         schoolform.school.data = current_user.school_id
 
     return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
+
+@app.route("/account_deactivate", methods=['GET', 'POST'])
+@login_required
+def account_deactivate():
+    myaccount = User.get_user_by_username(current_user.username)
+    print(myaccount.id)
+    if current_user.is_authenticated:
+        if request.method=='POST':
+            firstName=request.form.get('FirstName')
+            lastName=request.form.get('LastName')
+            if ((firstName.lower()==current_user.first_name.lower())
+                    and (lastName.lower()==current_user.last_name.lower())):
+                print(request.form.get('FirstName'))
+                User.delete_user_by_id(myaccount.id)
+                logout_user()
+                return redirect(url_for('landpage'))
+            else :
+                flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+        return render_template('account_deactivate.html')
+
+
+
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
@@ -366,7 +404,8 @@ def check_badge(badge_id):
         to_next_lv = 0
     
     return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file)
-	
+
+
 def random_code():
     """
         Generates a random 3 digit code 
@@ -403,7 +442,7 @@ def generate_username(first_name, last_name, random_code):
             else:
                 generated_name =  first_name+last_name+str(random_code)
                     
-    check_username(generated_name)
+    generated_name = check_username(generated_name)
     return generated_name
     
 def check_username(generated_username):
@@ -425,23 +464,23 @@ def check_username(generated_username):
         if username == generated_username:
             match = True
             break
-            
+
     # If the username is taken, generate a new code
     if match:
         randnumberstring = new_username[(len(new_username) - 3):(len(new_username) + 1)]
         randnumber = int(randnumberstring)
         number_of_matches = 1
-        
+
         # Add 1 to the 3 digit code until we find an unused code
         while match:
-        
+
                 # If we've tried every possible code, return 'ERROR'
                 if number_of_matches == 1000:
                     return 'ERROR'
-        
+
                 # Loop back to 000 if the code is 999
                 if randnumber == 999:
-                    randnumberstring = '000'              
+                    randnumberstring = '000'
                 # Otherwise add 1 to the code
                 else:
                     randnumber = randnumber + 1
@@ -450,11 +489,11 @@ def check_username(generated_username):
                         randnumberstring = '00' + str(randnumber)
                     if (randnumber >= 10) and (randnumber < 100):
                         randnumberstring = '0' + str(randnumber)
-                        
+
                 #Create the new username
                 new_username = (new_username[0:len(new_username) - 3]+ str(randnumberstring))
                 match = False
-                
+
                 # Check to make sure the new username isn't already in use
                 for username in all_usernames:
                     if username == new_username:
