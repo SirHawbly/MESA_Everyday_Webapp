@@ -422,15 +422,15 @@ def generate_username(first_name, last_name, random_code):
             random_code : string    
     """      
     if len(first_name) > 8 and len(last_name)>8:
-        generated_name = first_name[0:8] + last_name[0:8] + str(random_code)
+        generated_name = first_name[0:8].lower() + last_name[0:8].lower() + str(random_code)
     else:
         if len(first_name)>8:
-            generated_name = first_name[0:8] + last_name +str(random_code)
+            generated_name = first_name[0:8].lower() + last_name.lower() +str(random_code)
         else:
             if len(last_name)>8:
-                generated_name =  first_name + last_name[0:8] +str(random_code)
+                generated_name =  first_name.lower() + last_name[0:8].lower() +str(random_code)
             else:
-                generated_name =  first_name+last_name+str(random_code)
+                generated_name =  first_name.lower()+last_name.lower()+str(random_code)
                     
     generated_name = check_username(generated_name)
     return generated_name
