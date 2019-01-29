@@ -420,9 +420,6 @@ def check_username(generated_username):
     new_username = generated_username
     all_usernames = [row.username for row in User.get_all_username()]
     
-    
-    if all_usernames
-    
     # Check if username is taken
     for username in all_usernames:
         if username == generated_username:
