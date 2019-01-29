@@ -391,33 +391,38 @@ def generate_username(first_name, last_name, random_code):
             first_name : string
             last_name : string
             random_code : string    
-    """  
+    """      
     if len(first_name) > 8 and len(last_name)>8:
-        return first_name[0:8] + last_name[0:8] + str(random_code)
+        generated_name = first_name[0:8] + last_name[0:8] + str(random_code)
     else:
         if len(first_name)>8:
-            return first_name[0:8] + last_name +str(random_code)
+            generated_name = first_name[0:8] + last_name +str(random_code)
         else:
             if len(last_name)>8:
-                return first_name + last_name[0:8] +str(random_code)
+                generated_name =  first_name + last_name[0:8] +str(random_code)
             else:
-                return first_name+last_name+str(random_code)
-
-
-def check_username(generated_username, all_usernames):
+                generated_name =  first_name+last_name+str(random_code)
+                    
+    check_username(generated_name)
+    return generated_name
+    
+def check_username(generated_username):
     """
         Checks to see if the username is already taken. If it is, add 1 to the 3 digit code (it repeats this until it finds an unused code)
         It returns the original username if it is not taken, and returns the new username if it is taken
         If all 1000 possible usernames are taken, it will return 'ERROR'
         
         input:
-            generated_username : string
-            all_usernames : Query object         
+            generated_username : string         
     """  
     global match
     match = False
     new_username = generated_username
-
+    all_usernames = [row.username for row in User.get_all_username()]
+    
+    
+    if all_usernames
+    
     # Check if username is taken
     for username in all_usernames:
         if username == generated_username:
