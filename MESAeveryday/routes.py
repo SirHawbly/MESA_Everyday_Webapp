@@ -487,7 +487,7 @@ def send_forgot_username(user):
         input:
             user : User Object
     """
-    msg = Message('Username Request',
+    msg = Message('Username Reminder',
                   sender='noreply@demo.com',
                   recipients=[user.email])
     msg.body = f'''Hi '''+user.first_name+'''\nYour username is ''' + user.username
@@ -501,7 +501,7 @@ def send_generate_username(user_email, username):
             user_email : string
             username : string
     """
-    msg = Message('Username Generation',
+    msg = Message('Account Created',
                   sender='noreply@demo.com',
                   recipients=[user_email])
     msg.body = f'''Thank you for registering an account with Oregon MESA your unique
