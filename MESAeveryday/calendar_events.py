@@ -30,7 +30,7 @@ MONTHS = ['None', 'January', 'February', 'March',
 CAL_COLORS = {
               '1' : 'PALE_BLUE',
               '2' : 'PALE_GREEN',
-              '3' : 'MAUVE',
+              '3' : 'PURPLE',
               '4' : 'PALE_RED',
               '5' : 'YELLOW',
               '6' : 'ORANGE',
@@ -39,23 +39,28 @@ CAL_COLORS = {
               '9' : 'BLUE',
               '10': 'GREEN',
               '11': 'RED',
+              # '12' : 'LIGHT GRAY',
              }
 
 MESA_COLORS = {
-               '9' : {'r':130,'g':149,'b':177,'hex':'8195b1'}, # blue
+               '3' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # purple (!MESA)
                '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'}, # orange
                '8' : {'r':114,'g':102,'b':88,'hex':'716558'}, # grey
+               '9' : {'r':130,'g':149,'b':177,'hex':'8195b1'}, # blue
                '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'}, # green
                '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'}, # red
                # NOT USED, NO LIGHT GRAY IN G CAL
-               # '12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # No light grey
+               #'12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # No light grey
               }
 
 BADGE_COLORS = {
-                '9' : 'College_Knowledge', # Blue
+                '3' : 'mauve un-named badge', # Purple (!MESA)
                 '6' : 'MESA_Expert', # Orange
                 '8' : 'Career_Pro', # Grey
+                '9' : 'College_Knowledge', # Blue
                 '10' : 'Professional_Development', # Green
+                '11' : 'red un-named badge', # Red
+                # '12' : 'light grey un-named badge', # Light Grey
                }
 
 # --
