@@ -135,17 +135,6 @@ def dashboard():
                            other_days=other_days,
                            points=zip(badge_names, all_badge_points))
 
-# Added by Millen
-# Load admin page if role is admin
-@app.route("/admin")
-@login_required
-def admin():
-    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-    if not User.verify_role(current_user.id):
-        # flash('You do not have access to view this page.', 'danger')
-        return redirect(url_for('dashboard'))
-    return render_template('admin.html')
-
 @app.route("/logout")
 def logout():
     """
@@ -551,3 +540,32 @@ username has been generated and it is '''+username+'''
 please keep this email handy as you will need that username every time you
 login to the app. '''
     mail.send(msg)
+
+# Added by Millen
+# Load admin page if role is admin
+@app.route("/admin")
+@login_required
+def admin():
+    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('admin.html')
+
+@app.route("/admin_control")
+@login_required    
+def admin_control():
+    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('admin_control.html')
+
+@app.route("/admin_settings")
+@login_required
+def admin_settings():
+    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    return render_template('admin_settings.html')
