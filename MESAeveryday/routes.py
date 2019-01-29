@@ -238,6 +238,7 @@ def account_deactivate():
         if request.method=='POST':
             firstName=request.form.get('FirstName')
             lastName=request.form.get('LastName')
+
             if ((firstName.lower()==current_user.first_name.lower())
                     and (lastName.lower()==current_user.last_name.lower())):
                 print(request.form.get('FirstName'))
