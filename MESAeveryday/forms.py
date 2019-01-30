@@ -88,6 +88,18 @@ class UpdateSchoolForm(FlaskForm):
 
     submit = SubmitField('Update School')
 
+class AddSchoolForm(FlaskForm):
+
+    schoolName = StringField('SchoolName')
+
+    submit = SubmitField('Add School')
+
+class DeleteSchoolForm(FlaskForm):
+
+    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
+
+    submit = SubmitField('Delete School')
+
 class UpdatePasswordForm(FlaskForm):
     old_password = PasswordField('Password')
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
