@@ -370,7 +370,16 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
         except:
             session.rollback()
-            return None        
+            return None
+
+    def add_stamp(new_stamp):
+        try:
+            session.add(new_stamp)
+            session.commit()
+        except:
+            session.rollback()
+            return None
+
 
 
 #Class for the "user_stamps" table
@@ -407,6 +416,9 @@ class UserStamp(Base, UserMixin):
             session.rollback()
             return False
         return True
+
+
+
 
 #Class for the "avatars" table
 class Avatar(Base):
