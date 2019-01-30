@@ -246,6 +246,28 @@ class School(Base):
         except:
             session.rollback()
             return None
+    def get_school():
+        try:
+            results=session.query(School.school_name).all()
+            return results
+        except:
+            session.rollback()
+            return None
+
+    def add_new_school(new_school):
+        try:
+            session.add(new_school)
+            session.commit()
+        except:
+            session.rollback()
+
+    def delete_school_by_id(id):
+        try:
+            session.query(School).filter(School.school_id == id).delete()
+            session.commit()
+        except:
+            session.rollback()
+            return None
 
 #Class for the "badges" table
 class Badge(Base):
