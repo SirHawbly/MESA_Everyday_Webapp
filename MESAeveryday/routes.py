@@ -7,7 +7,8 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
+    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
@@ -357,7 +358,22 @@ def delete_school():
 
 
 
+@app.route("/add_stamp", methods=['GET','POST'])
+@login_required
+def add_stamp():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = AddStampForm()
+    if form.validate_on_submit():
+        badgeId=form.badge.data
+        stampName= request.form.get('badgeName')
+        newStamp=Stamp(stampName,badgeId,'','')
+        Stamp.add_stamp(newStamp)
+        print(Stamp.get_stamps_of_badge(badgeId))
+        flash('New Stamp has been created!', 'success')
 
+    return render_template('add_stamp.html',form_stamp=form)
 
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
