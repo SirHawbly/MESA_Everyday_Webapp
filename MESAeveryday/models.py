@@ -340,16 +340,7 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
         except:
             session.rollback()
-            return None
-
-    def get_earned_stamps_of_badge(user_id, badge_id):
-        try:
-            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-            return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
-        except:
-            session.rollback()
-            return None        
-
+            return None  
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -386,6 +377,26 @@ class UserStamp(Base, UserMixin):
             return False
         return True
 
+    def get_earned_stamps_of_badge(user_id, badge_id):
+        try:
+            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(UserStamp.user_id == user_id).filter(Stamp.stamp_id == UserStamp.stamp_id)
+        except:
+            session.rollback()
+            return None
+
+    def delete_stamp(user_id, stamp_id, stamp_date, log_date):
+        try:
+            # Query = UserStamp.query.filter_by(user_id == user_id, stamp_id == stamp_id, stamp_date == stamp_date, log_date == log_date).first()
+            Query = session.query(UserStamp).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == stamp_id).filter(UserStamp.stamp_date == stamp_date).filter(UserStamp.log_date == log_date).first()
+            if not Query:
+                return False
+            session.delete(Query)
+            session.commit()
+        except:
+            session.rollback()
+            return False
+        return True
+
 #Class for the "avatars" table
 class Avatar(Base):
     __tablename__ = 'avatars'
@@ -394,7 +405,7 @@ class Avatar(Base):
     file_name = Column(String)
 
     def __init__(self, file_name):
-	    self.file_name = feile_name
+	    self.file_name = file_name
 
     def get_all_avatars():
         try:

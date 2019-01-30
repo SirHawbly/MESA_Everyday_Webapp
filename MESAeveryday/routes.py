@@ -357,7 +357,7 @@ def earn_stamps():
                 return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
     return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=badge_names)
 
-@app.route("/badges/<badgeid>", methods=['GET', 'POST'])
+@app.route("/badges/<badge_id>", methods=['GET', 'POST'])
 @login_required
 def check_badge(badge_id):
     """
@@ -376,7 +376,7 @@ def check_badge(badge_id):
     # Get the id of current user and separate the stamps that they have earned from the one's they have not earned
     user_id = current_user.id    
     unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(user_id, badge_id)]     
-    earned_stamps = [row.stamp_name for row in Stamp.get_earned_stamps_of_badge(user_id, badge_id)]
+    earned_stamps = [row for row in UserStamp.get_earned_stamps_of_badge(user_id, badge_id)]
     
     # If all the stamps for this badge have been earned, print this instead
     if not unearned_stamps:
@@ -392,8 +392,20 @@ def check_badge(badge_id):
         points = 0
         current_level = 0
         to_next_lv = 0
+
+    # process on deleting stamp
+    if request.method == 'POST':
+        stamp_id = request.form.get('stamp_id')
+        time_finished = datetime.strptime(request.form.get('time_finished'), '%Y-%m-%d').date()
+        log_date = datetime.strptime(request.form.get('log_date'), '%Y-%m-%d %H:%M:%S')
+        if stamp_id and time_finished and log_date:
+            if UserStamp.delete_stamp(user_id, stamp_id, time_finished, log_date):
+                print('deleted:\nid: ' + str(stamp_id) + '\ntime finished: ' +  str(time_finished) + '\nlog_date: ' + str(log_date))
+            else:
+                print('error when deleting user earned stamp')
+        return redirect('/badges/' + str(badge_id))
     
-    return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file)
+    return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file, badge_id=badge_id)
 
 
 def random_code():
