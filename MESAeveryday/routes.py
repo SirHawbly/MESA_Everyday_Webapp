@@ -7,7 +7,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
@@ -306,7 +306,6 @@ def account():
 @login_required
 def account_deactivate():
     myaccount = User.get_user_by_username(current_user.username)
-    print(myaccount.id)
     if current_user.is_authenticated:
         if request.method=='POST':
             firstName=request.form.get('FirstName')
@@ -314,13 +313,49 @@ def account_deactivate():
 
             if ((firstName.lower()==current_user.first_name.lower())
                     and (lastName.lower()==current_user.last_name.lower())):
-                print(request.form.get('FirstName'))
                 User.delete_user_by_id(myaccount.id)
                 logout_user()
                 return redirect(url_for('landpage'))
             else :
                 flash('Account does not match. Please check First Name and Last Name!!', 'danger')
         return render_template('account_deactivate.html')
+
+
+
+@app.route("/add_school", methods=['GET','POST'])
+@login_required
+def add_school():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = AddSchoolForm()
+
+    if form.validate_on_submit():
+        schoolName=request.form.get('schoolName')
+        # Add school to the database
+        new_school = School(schoolName, '','','','')
+        School.add_new_school(new_school)
+        rows = School.get_school()
+        flash('New school has been created!' , 'success')
+
+    return render_template('add_school.html',form_school=form)
+
+
+@app.route("/delete_school", methods=['GET','POST'])
+@login_required
+def delete_school():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = DeleteSchoolForm()
+    if form.validate_on_submit():
+        school_id=form.school.data
+        School.delete_school_by_id(school_id)
+        flash('Succesfully Delete  !!!', 'success')
+
+    return render_template('delete_school.html',form_school=form)
+
+
 
 
 
