@@ -122,3 +122,10 @@ class EarnStampsForm(FlaskForm):
     def __init__(self, badge_name, *args, **kwargs):
         super(EarnStampsForm, self).__init__(*args, **kwargs)
         self.badge_name = badge_name
+
+
+class AddStampForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    badgeName = StringField('badgeName')
+    submit = SubmitField('Add Stamp')
