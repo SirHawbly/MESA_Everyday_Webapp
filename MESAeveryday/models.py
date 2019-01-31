@@ -71,7 +71,7 @@ class User(Base, UserMixin):
         self.first_name = first_name
         self.last_name = last_name
         self.school_id = school_id
-        self.role = 'admin'
+        self.role = 'user'
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
