@@ -7,7 +7,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
@@ -570,7 +570,8 @@ def admin_control():
         return redirect(url_for('dashboard'))
         
     emailform = UpdateEmailForm()
-    passwordform= UpdatePasswordForm()
+    passwordform = UpdatePasswordForm()
+    oldaccountsform = RemoveOldAccountsForm()
     admin_account = User.get_user_by_username(current_user.username)
 
 	#Update password
@@ -589,12 +590,22 @@ def admin_control():
         else:
             flash('Sorry, we were unable to update your account', 'danger')
         return redirect(url_for('admin_control'))
+        
+    #Remove old accounts
+    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():
+     
+        results = User.delete_innactive_accounts(oldaccountsform.years.data)
+        if results:
+            flash('Successfully removed ' + str(results) + '!', 'success')
+        else:
+            flash('No accounts were deleted', 'success')
+        return redirect(url_for('admin_control'))
 
     #Load page
     if request.method =='GET':
         emailform.email.data = current_user.email
       
-    return render_template('admin_control.html', form_email=emailform, form_password=passwordform,)    
+    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform)    
         
 
 

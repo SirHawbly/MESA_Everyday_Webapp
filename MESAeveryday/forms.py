@@ -110,3 +110,7 @@ class EarnStampsForm(FlaskForm):
     def __init__(self, badge_name, *args, **kwargs):
         super(EarnStampsForm, self).__init__(*args, **kwargs)
         self.badge_name = badge_name
+
+class RemoveOldAccountsForm(FlaskForm):
+    years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
+    submit = SubmitField('Delete Old Accounts')

@@ -6,13 +6,14 @@ All classes here are based on a table in the database. If a change is made to th
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from datetime import datetime
+import datetime
+from dateutil.relativedelta import relativedelta
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from MESAeveryday import login_manager, app, bcrypt
 from flask_login import UserMixin
 from flask import flash
 import os
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -219,6 +220,14 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return False
+            
+    def delete_innactive_accounts(years_innactive):
+        try:            
+            return session.query(User).filter(and_(User.last_login < datetime.datetime.now() - relativedelta(years=years_innactive)), (User.last_login != None)).delete()
+       
+        except:
+            session.rollback()
+            return None
             
 #Class for the "schools" table
 class School(Base):
