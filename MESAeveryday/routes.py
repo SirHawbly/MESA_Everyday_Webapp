@@ -563,17 +563,42 @@ def admin():
         return redirect(url_for('dashboard'))
     return render_template('admin.html')
 
-@app.route("/admin_control")
+@app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
     if not User.verify_role(current_user.id):
         return redirect(url_for('dashboard'))
         
-        
-        
-    return render_template('admin_control.html')
+    emailform = UpdateEmailForm()
+    passwordform= UpdatePasswordForm()
+    admin_account = User.get_user_by_username(current_user.username)
 
-@app.route("/admin_settings")
+	#Update password
+    if passwordform.password.data and passwordform.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+        if User.reset_pwd(admin_account.id, hashed_password) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('admin_control'))
+
+	#Update email
+    if emailform.email.data and emailform.validate_on_submit():
+        if User.update_email(admin_account.id, emailform.email.data) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('admin_control'))
+
+    #Load page
+    if request.method =='GET':
+        emailform.email.data = current_user.email
+      
+    return render_template('admin_control.html', form_email=emailform, form_password=passwordform,)    
+        
+
+
+@app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
 def admin_settings():
     """
@@ -585,29 +610,4 @@ def admin_settings():
     if not User.verify_role(current_user.id):     
         return redirect(url_for('dashboard'))
 
-    emailform = UpdateEmailForm()
-    passwordform= UpdatePasswordForm()
-    admin_account = User.get_user_by_username(current_user.username)
-
-	#Update password
-    if passwordform.password.data and passwordform.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-        if User.reset_pwd(myaccount.id, hashed_password) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('admin_settings'))
-
-	#Update email
-    if emailform.email.data and emailform.validate_on_submit():
-        if User.update_email(myaccount.id, emailform.email.data) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('admin_settings'))
-
-    #Load page
-    if request.method =='GET':
-        emailform.email.data = current_user.email
-      
-    return render_template('admin_settings.html', form_email=emailform, form_password=passwordform,)
+    return render_template('admin_settings.html')
