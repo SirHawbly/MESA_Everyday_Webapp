@@ -560,24 +560,54 @@ login to the app. '''
 def admin():
     # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
     if not User.verify_role(current_user.id):
-        # flash('You do not have access to view this page.', 'danger')
         return redirect(url_for('dashboard'))
     return render_template('admin.html')
 
 @app.route("/admin_control")
 @login_required    
 def admin_control():
-    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
     if not User.verify_role(current_user.id):
-        # flash('You do not have access to view this page.', 'danger')
         return redirect(url_for('dashboard'))
+        
+        
+        
     return render_template('admin_control.html')
 
 @app.route("/admin_settings")
 @login_required
 def admin_settings():
-    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-    if not User.verify_role(current_user.id):
-        # flash('You do not have access to view this page.', 'danger')
+    """
+        Page for admin to control various parts of the application
+        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
+        Only those will a valid admin account can view this page
+    """    
+
+    if not User.verify_role(current_user.id):     
         return redirect(url_for('dashboard'))
-    return render_template('admin_settings.html')
+
+    emailform = UpdateEmailForm()
+    passwordform= UpdatePasswordForm()
+    admin_account = User.get_user_by_username(current_user.username)
+
+	#Update password
+    if passwordform.password.data and passwordform.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+        if User.reset_pwd(myaccount.id, hashed_password) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('admin_settings'))
+
+	#Update email
+    if emailform.email.data and emailform.validate_on_submit():
+        if User.update_email(myaccount.id, emailform.email.data) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('admin_settings'))
+
+    #Load page
+    if request.method =='GET':
+        emailform.email.data = current_user.email
+      
+    return render_template('admin_settings.html', form_email=emailform, form_password=passwordform,)

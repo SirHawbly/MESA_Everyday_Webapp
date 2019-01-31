@@ -16,6 +16,81 @@
     <li><a href="{{ url_for('admin_control') }}">Control</a></li>
 </div>
 
+<div class="content-section">
+
+		<!-- Update Email -->
+        <form name ="form_email" method="POST" action="" enctype="multipart/form-data">
+            {{ form_email.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Account Info</legend>
+                <div class="form-group">
+                    {{ form_email.email.label(class="form-control-label") }}
+                    {% if form_email.email.errors %}
+                        {{ form_email.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_email.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_email.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>          
+            </fieldset>
+            <div class="form-group">
+                {{ form_email.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+	 
+		
+		<!-- Update Password -->
+        <form name="form_password" method="POST" action="{{ url_for('account') }}" enctype="multipart/form-data">
+            {{ form_password.hidden_tag() }}
+            <fieldset class="form-group">
+                <p class="h4 mb-4">Update Password</p>
+                <div class="form-group">
+                    {% if form_password.old_password.errors %}
+                        {{ form_password.old_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.old_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.old_password(class="form-control", placeholder="Old Password") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {% if form_password.password.errors %}
+                        {{ form_password.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.password(class="form-control", placeholder="New Password") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {% if form_password.confirm_password.errors %}
+                        {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_password.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_password.confirm_password(class="form-control", placeholder="Confirm New Password") }}
+                    {% endif %}
+                </div>        
+            </fieldset>                       
+            <div class="form-group">
+                {{ form_password.submit(class="btn btn-outline-info") }}
+            </div>
+          </form>
+    </div>
+
 {% endblock content %}
 
 {% block scripts %}
