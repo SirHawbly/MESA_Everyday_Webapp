@@ -158,6 +158,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.last_login = new_last_login
+            session.commit()
         except:
             session.rollback()
             return False
@@ -168,6 +169,7 @@ class User(Base, UserMixin):
             row = session.query(User).filter(User.id == id).first()
             row.first_name = new_first_name
             row.last_name = new_last_name
+            session.commit()
         except:
             session.rollback()
             return False
@@ -177,6 +179,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.email = new_email
+            session.commit()
         except:
             session.rollback()
             return False
@@ -186,6 +189,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.school_id = new_school_id
+            session.commit()
         except:
             session.rollback()
             return False
@@ -195,6 +199,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.avatar_id = new_avatar_id
+            session.commit()
         except:
             session.rollback()
             return False
@@ -223,8 +228,9 @@ class User(Base, UserMixin):
             
     def delete_innactive_accounts(years_innactive):
         try:            
-            return session.query(User).filter(and_(User.last_login < datetime.datetime.now() - relativedelta(years=years_innactive)), (User.last_login != None)).delete()
-       
+            results = session.query(User).filter(and_(User.last_login < datetime.datetime.now() - relativedelta(years=years_innactive)), (User.last_login != None)).delete()
+            session.commit()
+            return results
         except:
             session.rollback()
             return None
