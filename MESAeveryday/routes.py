@@ -596,7 +596,7 @@ def admin_control():
      
         results = User.delete_innactive_accounts(oldaccountsform.years.data)
         if results:
-            flash('Successfully removed ' + str(results) + '!', 'success')
+            flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
         else:
             flash('No accounts were deleted', 'success')
         return redirect(url_for('admin_control'))
