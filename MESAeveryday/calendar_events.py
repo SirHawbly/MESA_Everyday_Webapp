@@ -55,13 +55,14 @@ MESA_COLORS = {
 
 BADGE_COLORS = {
                 '3' : 'mauve un-named badge', # Purple (!MESA)
-                '6' : 'MESA_Expert', # Orange
-                '8' : 'Career_Pro', # Grey
-                '9' : 'College_Knowledge', # Blue
-                '10' : 'Professional_Development', # Green
-                '11' : 'red un-named badge', # Red
-                # '12' : 'light grey un-named badge', # Light Grey
+                '6' : 'MESA Expert', # Orange
+                '8' : 'Career Pro', # Grey
+                '9' : 'College Knowledge', # Blue
+                '10' : 'Professional Development', # Green
+                '11' : 'red un-named badge', # Red (!MESA)
+                # '12' : 'light grey un-named badge', # No Light Grey
                }
+
 
 # --
 
@@ -304,7 +305,39 @@ def searchEvents(events, keywords):
             matches += [event]
         
     # # return all events that have matched
-    return matches                
+    return matches          
+
+# --
+
+
+# --
+
+def get_mesa_events(events):
+    """
+    parses a list of events and pulls any events that 
+    are a mesa badge color into a list of the different
+    types of badges. 
+        input:
+            [[event], [event1], [event2]]
+            * event1['colorId'] = 9 *
+            * CAL_COLORS[9] = Blue *
+            * BADGE_COLORS[9] = College Knowledge *
+
+        output:
+            [College Knowledge:[event1], MESA Expert:[], ...]
+    """
+
+    MESA_EVENTS = {}
+
+    for key in BADGE_COLORS:
+        MESA_EVENTS[BADGE_COLORS[key]] = []
+
+    for event in events:
+        if event['colorId'] in BADGE_COLORS:        
+            etype = BADGE_COLORS[event['colorId']]
+            MESA_EVENTS[etype] += [event]
+
+    return MESA_EVENTS
 
 # --
 
@@ -340,6 +373,12 @@ def main():
     for day in MesaDays:
         print("match:", day['start_string'])
 
+    print('')
+
+    mesa_events = get_mesa_events(events)
+    for event_type in mesa_events:
+        print(event_type, ":", mesa_events[event_type])
+
 # --
 
 
@@ -349,23 +388,4 @@ if __name__ == '__main__':
     main()
 
 # --
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

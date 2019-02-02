@@ -9,7 +9,7 @@ from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
-from MESAeveryday.calendar_events import get_event_list, searchEvents
+from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
 from datetime import datetime
@@ -126,7 +126,7 @@ def dashboard():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
 
-    return render_template('dashboard.html',
+    return render_template('events.html',
                            events=events,
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
@@ -134,6 +134,53 @@ def dashboard():
                            mesa_days=mesa_days,
                            other_days=other_days,
                            points=zip(badge_names, all_badge_points))
+
+
+@app.route("/events", methods=['GET', 'POST'])
+# @login_required
+def events():
+    """
+        Page that displays summary information about a student's progress
+        This is the default page a user is taken to when they log in
+    """   
+    
+    # Send admins to the admin page
+    if (User.verify_role(current_user.id)):
+        return redirect(url_for('admin'))
+        
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+    
+    # Get the total amount of points the user has for each badge
+    all_badge_points = []  
+    for badge_id in badge_ids:
+        badge_progress = User.get_badge_progress(current_user.id, badge_id)
+        if badge_progress:
+            badge_points = badge_progress[0]
+        else:
+            badge_points = 0
+        all_badge_points.append(badge_points)
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    mesa_events = get_mesa_events(events)
+
+    return render_template('events.html',
+                           events=events,
+                           number_upcoming=len(upcoming_events),
+                           upcoming_events=upcoming_events,
+                           result=zip(badge_names, badge_ids),
+                           mesa_days=mesa_days,
+                           mesa_events=mesa_events,
+                           other_days=other_days,
+                           points=zip(badge_names, all_badge_points))
+
 
 @app.route("/logout")
 def logout():
