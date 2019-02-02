@@ -278,10 +278,12 @@ def get_event_list():
 # --
 
 def searchEvents(events, keywords):
-    """for all words in a given phrase, 
+    """
+        for all words in a given phrase, 
         search all events for those words,
         and add all matching phrases to the 
-        set."""
+        set.
+    """
 
     matches = []
 
@@ -327,16 +329,22 @@ def get_mesa_events(events):
             [College Knowledge:[event1], MESA Expert:[], ...]
     """
 
+    # # make a empty dictionary
     MESA_EVENTS = {}
 
+    # # fill it with empty lists under the different
+    # # badge names (ie. {'MESA Expert'=[], } )
     for key in BADGE_COLORS:
         MESA_EVENTS[BADGE_COLORS[key]] = []
 
+    # # tie the different events with their colors
+    # # to their different badges in the dictionary
     for event in events:
         if event['colorId'] in BADGE_COLORS:        
             etype = BADGE_COLORS[event['colorId']]
             MESA_EVENTS[etype] += [event]
 
+    # # return the dictionary
     return MESA_EVENTS
 
 # --
