@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Admin Settings Placeholder -->
+
+<!--Navbar-->
+<ul class="nav navbar-nav nav-flex-icons ml-auto">
+    <li class = "nav-item">
+        <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
+    </li>
+</ul>
+
+<div class="container-fluid"> 
+    You are now in the admin settings page
+    <li><a href="{{ url_for('admin') }}">Dashboard</a></li>
+    <li><a href="{{ url_for('admin_control') }}">Control</a></li>
+</div>
+
+
+
+{% endblock content %}
+
+{% block scripts %}
+    {{ super() }}
+{% endblock scripts %}

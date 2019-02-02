@@ -1,4 +1,8 @@
 """
+This file contains all the forms used throughout the application
+The application uses the flask_wtf library for creating forms
+Each class only needs to describe what fields are in the form and how the fields should be validated
+
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
@@ -23,8 +27,6 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
-        # session = loadSession()
-        # user = session.query(User).filter(User.email == email.data).first()
         if User.get_user_by_email(email.data):
             raise ValidationError('That email is taken. Please choose a different one.')
 
@@ -41,8 +43,6 @@ class RequestResetForm(FlaskForm):
     submit = SubmitField('Request Password Reset')
 
     def validate_email(self, email):
-        # session = loadSession()
-        # user = session.query(User).filter(User.email == email.data).first()
         user = User.validate_email(email)
         if user == False:
             raise ValidationError('There is no account with that email. You must regester first.')
@@ -110,3 +110,7 @@ class EarnStampsForm(FlaskForm):
     def __init__(self, badge_name, *args, **kwargs):
         super(EarnStampsForm, self).__init__(*args, **kwargs)
         self.badge_name = badge_name
+
+class RemoveOldAccountsForm(FlaskForm):
+    years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
+    submit = SubmitField('Delete Old Accounts')
