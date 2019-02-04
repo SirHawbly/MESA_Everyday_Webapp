@@ -30,7 +30,7 @@ MONTHS = ['None', 'January', 'February', 'March',
 CAL_COLORS = {
               '1' : 'PALE_BLUE',
               '2' : 'PALE_GREEN',
-              '3' : 'MAUVE',
+              '3' : 'PURPLE',
               '4' : 'PALE_RED',
               '5' : 'YELLOW',
               '6' : 'ORANGE',
@@ -39,17 +39,30 @@ CAL_COLORS = {
               '9' : 'BLUE',
               '10': 'GREEN',
               '11': 'RED',
+              # '12' : 'LIGHT GRAY',
              }
 
 MESA_COLORS = {
-               '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'},
-               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'},
-               '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'},
-               '1' : {'r':130,'g':149,'b':177,'hex':'8195b1'},
-               '8' : {'r':114,'g':102,'b':88,'hex':'716558'},
+               '3' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # purple (!MESA)
+               '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'}, # orange
+               '8' : {'r':114,'g':102,'b':88,'hex':'716558'}, # grey
+               '9' : {'r':130,'g':149,'b':177,'hex':'8195b1'}, # blue
+               '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'}, # green
+               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'}, # red
                # NOT USED, NO LIGHT GRAY IN G CAL
-               '12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'},
+               #'12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # No light grey
               }
+
+BADGE_COLORS = {
+                '3' : 'mauve un-named badge', # Purple (!MESA)
+                '6' : 'MESA Expert', # Orange
+                '8' : 'Career Pro', # Grey
+                '9' : 'College Knowledge', # Blue
+                '10' : 'Professional Development', # Green
+                '11' : 'red un-named badge', # Red (!MESA)
+                # '12' : 'light grey un-named badge', # No Light Grey
+               }
+
 
 # --
 
@@ -240,11 +253,15 @@ def get_event_list():
             event['calColor'] = CAL_COLORS[event['colorId']]
             if event['colorId'] in MESA_COLORS: 
                 event['mesaColor'] = MESA_COLORS[event['colorId']]
+                event['badgeColor'] = BADGE_COLORS[event['colorId']]
             else:
                 event['mesaColor'] = 'Not a MESA Color'
+                event['badgeColor'] = 'No MESA Badge'
         else:
             event['calColor'] = 'None'
             event['mesaColor'] = 'None'
+            event['badgeColor'] = 'None'
+
         if 'location' not in event: 
             event['location'] = 'No Location Provided'
  
@@ -261,10 +278,12 @@ def get_event_list():
 # --
 
 def searchEvents(events, keywords):
-    """for all words in a given phrase, 
+    """
+        for all words in a given phrase, 
         search all events for those words,
         and add all matching phrases to the 
-        set."""
+        set.
+    """
 
     matches = []
 
@@ -288,7 +307,45 @@ def searchEvents(events, keywords):
             matches += [event]
         
     # # return all events that have matched
-    return matches                
+    return matches          
+
+# --
+
+
+# --
+
+def get_mesa_events(events):
+    """
+    parses a list of events and pulls any events that 
+    are a mesa badge color into a list of the different
+    types of badges. 
+        input:
+            [[event], [event1], [event2]]
+            * event1['colorId'] = 9 *
+            * CAL_COLORS[9] = Blue *
+            * BADGE_COLORS[9] = College Knowledge *
+
+        output:
+            [College Knowledge:[event1], MESA Expert:[], ...]
+    """
+
+    # # make a empty dictionary
+    MESA_EVENTS = {}
+
+    # # fill it with empty lists under the different
+    # # badge names (ie. {'MESA Expert'=[], } )
+    for key in BADGE_COLORS:
+        MESA_EVENTS[BADGE_COLORS[key]] = []
+
+    # # tie the different events with their colors
+    # # to their different badges in the dictionary
+    for event in events:
+        if event['colorId'] in BADGE_COLORS:        
+            etype = BADGE_COLORS[event['colorId']]
+            MESA_EVENTS[etype] += [event]
+
+    # # return the dictionary
+    return MESA_EVENTS
 
 # --
 
@@ -324,6 +381,12 @@ def main():
     for day in MesaDays:
         print("match:", day['start_string'])
 
+    print('')
+
+    mesa_events = get_mesa_events(events)
+    for event_type in mesa_events:
+        print(event_type, ":", mesa_events[event_type])
+
 # --
 
 
@@ -333,23 +396,4 @@ if __name__ == '__main__':
     main()
 
 # --
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

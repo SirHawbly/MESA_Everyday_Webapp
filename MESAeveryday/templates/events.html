@@ -220,7 +220,34 @@
                                         </div>
                                         <!--Text-->
                                         <p class="card-text">Need {{ 100 - p }} Stamps</p>
-                                        <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Add More Stamp</button>
+                                        <table>
+                                            {% for event in mesa_events['College Knowledge'][:5] %}
+                                                <tr>
+                                                    <td>
+                                                        {{ event['summary'] }}
+                                                        - in {{ event['remain_days'] }} days
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {{ event['start_string'] }} 
+                                                        at {{ event['location'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        badge: {{event['badgeColor']}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href={{ event['htmlLink'] }}> Event Link </a>
+                                                    </td>                                              
+                                                </tr>                                                
+                                                <tr><td> -- </td></tr>
+                                            {% endfor %}
+                                        </table>
+
                                     </div>
                                     <!--/.Card content-->
                                 </div>
@@ -253,7 +280,35 @@
                                         </div>
                                         <!--Text-->
                                         <p class="card-text">Need {{ 100 - p }} Stamps</p>
-                                        <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Add More Stamp</button>
+
+                                        <table>
+                                            {% for event in mesa_events['Career Pro'][:5] %}
+                                                <tr>
+                                                    <td>
+                                                        {{ event['summary'] }}
+                                                        - in {{ event['remain_days'] }} days
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {{ event['start_string'] }} 
+                                                        at {{ event['location'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        badge: {{event['badgeColor']}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href={{ event['htmlLink'] }}> Event Link </a>
+                                                    </td>                                                
+                                                </tr>                                  
+                                                <tr><td> -- </td></tr>
+                                            {% endfor %}
+                                        </table>
+
                                     </div>
                                     <!--/.Card content-->
 
@@ -287,7 +342,35 @@
                                         </div>
                                         <!--Text-->
                                         <p class="card-text">Need {{ 100 - p }} Stamps</p>
-                                        <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Add More Stamp</button>
+
+                                        <table>
+                                            {% for event in mesa_events['Professional Development'][:5] %}
+                                                <tr>
+                                                    <td>
+                                                        {{ event['summary'] }}
+                                                        - in {{ event['remain_days'] }} days
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {{ event['start_string'] }} 
+                                                        at {{ event['location'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        badge: {{event['badgeColor']}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href={{ event['htmlLink'] }}> Event Link </a>
+                                                    </td>                                         
+                                                </tr>                                  
+                                                <tr><td> -- </td></tr>
+                                            {% endfor %}
+                                        </table>
+
                                     </div>
                                     <!--/.Card content-->
 
@@ -321,9 +404,38 @@
                                         </div>
                                         <!--Text-->
                                         <p class="card-text">Need {{ 100 - p }} Stamps</p>
+
+                                        <table>
+                                            {% for event in mesa_events['MESA Expert'][:5] %}
+                                                <tr>
+                                                    <td>
+                                                        {{ event['summary'] }}
+                                                        - in {{ event['remain_days'] }} days
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        {{ event['start_string'] }} 
+                                                        at {{ event['location'] }}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        badge: {{event['badgeColor']}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <a href={{ event['htmlLink'] }}> Event Link </a>
+                                                    </td>
+                                                </tr>                                  
+                                                <tr><td> -- </td></tr>
+                                            {% endfor %}
+                                        </table>
+
                                         {% endif %}
                                         {% endfor %}
-                                        <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Add More Stamp</button>
+
                                     </div>
                                     <!--/.Card content-->
 
@@ -392,29 +504,7 @@
                                 {% endfor %}
                                 <tr>--Events--</tr>
                                 <div></div>
-                                <tr>--Mesa Events--</tr>
-                                {% for event in mesa_days %}
-                                    <tr>
-                                        <table>
-                                            <tr>
-                                                <td>{{event['summary']}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>on {{event['start_string']}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>or {{event['date_string']}}</td>
-                                            </tr>
-                                            <tr>
-                                                <td>badge: {{event['badgeColor']}}</td>
-                                            </tr>                                        
-                                            <tr>
-                                                <td>--</td>
-                                            </tr>
-                                        </table>
-                                    </tr>
-                                {% endfor %}
-                                <tr>--Mesa Events--</tr>
+
                             </table>
 
                             <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View
