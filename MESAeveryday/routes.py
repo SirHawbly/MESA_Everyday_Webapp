@@ -561,7 +561,32 @@ def admin():
     # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
     if not User.verify_role(current_user.id):
         return redirect(url_for('dashboard'))
-    return render_template('admin.html')
+        
+    # Top scores will be a dictionary of arrays. 
+    # Each array holds all the users and top scores for a specific badge
+    # The dictionary will be for each badge and is indexed based on the badge id
+    top_scores = {}    
+        
+    # Get all badges
+    badges = Badge.get_all_badges()
+    
+    # Get all the top scores/users for each badge
+    for badge in badges:
+        # Find out what the top three scores are
+        top_badge_scores = Badge.get_top_scores(badge.badge_id)
+        record_holders = []
+        
+        # For each top score, get all the users that have that score        
+        for top_score in top_badge_scores:
+            # Add each user with a top score to and array of users/top scores
+            users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+            for user in users_with_top_score:
+                record_holders.append(user)
+        # Add the array of users/top scores to the total list of scores (indexed by the badge id)
+        top_scores[badge.badge_id] = record_holders
+    
+    
+    return render_template('admin.html', badges=badges, top_scores=top_scores)
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    

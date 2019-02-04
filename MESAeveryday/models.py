@@ -211,7 +211,14 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return None
-        return True
+        
+    def get_record_holders(badge_id, top_score):
+        try:
+            return session.execute("SELECT u.first_name, u.last_name, s.school_name, ug.total_points, ug.current_level FROM user_aggregate ug JOIN users u ON ug.user_id = u.user_id JOIN schools s ON u.school_id = s.school_id WHERE ug.badge_id = :badge_id AND ug.total_points = :top_score", {'badge_id':badge_id, 'top_score':top_score})
+        except:
+            session.rollback()
+            return None
+
 
     # Added by Millen
     # Checks if user had an admin role
@@ -296,6 +303,14 @@ class Badge(Base):
         self.level9_points = level9_points
         self.level10_points = level10_points
 
+        
+    def get_all_badges():
+        try:
+            return session.query(Badge.badge_id, Badge.badge_name, Badge.picture)
+        except:
+            session.rollback()
+            return None    
+        
     def get_all_badges_names():
         try:
             return session.query(Badge.badge_name)
@@ -309,7 +324,7 @@ class Badge(Base):
         except:
             session.rollback()
             return None
-
+                     
     def get_badge_name(badge_id):
         try:
             return session.query(Badge.badge_name).filter(Badge.badge_id == badge_id)
@@ -324,6 +339,13 @@ class Badge(Base):
             session.rollback()
             return None
 
+    def get_top_scores(badge_id):
+        try:
+            return session.execute("SELECT total_points FROM user_aggregate WHERE badge_id = :badge_id AND total_points != 0 GROUP BY total_points ORDER BY total_points DESC LIMIT 3", {'badge_id':badge_id})
+        except:
+            session.rollback()
+            return None
+        return True
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
