@@ -379,7 +379,27 @@ class Stamp(Base, UserMixin):
         except:
             session.rollback()
             return None
+    def get_all_stampid_stampname():
+        try:
+            return session.query(Stamp.stamp_id, Stamp.stamp_name).all()
+        except:
+            session.rollback()
+            return None
 
+    def get_stamp_by_stamp_id(stamp_id):
+        try:
+            return session.query(Stamp.stamp_name).filter(Stamp.stamp_id == stamp_id).first()
+        except:
+            session.rollback()
+            return None
+
+    def delete_stamp_by_id(id):
+        try:
+            session.query(Stamp).filter(Stamp.stamp_id == id).delete()
+            session.commit()
+        except:
+            session.rollback()
+            return None
 
 
 #Class for the "user_stamps" table
