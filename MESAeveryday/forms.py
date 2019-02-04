@@ -129,3 +129,11 @@ class AddStampForm(FlaskForm):
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
     badgeName = StringField('badgeName')
     submit = SubmitField('Add Stamp')
+
+
+
+class DeleteStampForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    stamp = SelectField('Stamp', choices=[])
+    submit = SubmitField('Delete Stamp')
