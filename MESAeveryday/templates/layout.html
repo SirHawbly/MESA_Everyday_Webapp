@@ -30,6 +30,49 @@
 
     {% block content %}{% endblock %}
 
+
+    <!-- Footer -->
+    <footer class="footer bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+          <ul class="list-inline mb-2">
+            <li class="list-inline-item">
+              <a href="#">Phone Number</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Email</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Location</a>
+            </li>
+          </ul>
+          <p class="text-muted small mb-4 mb-lg-0">&copy; MESA Website 2018. All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fa fa-facebook fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fa fa-twitter-square fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-instagram fa-2x fa-fw"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </footer>
     <!--JavaScript -->
     <!-- SCRIPTS -->
     <!-- JQuery -->
@@ -64,6 +107,30 @@
     {% endfor %}
     <script type="text/javascript">
         $(".date-custom").attr("autocomplete", "off");
+        document.getElementById("button_1").onclick = function () {
+        location.href = "{{ url_for('earn_stamps') }}";
+        };
+        document.getElementById("button_2").onclick = function () {
+        location.href = "{{ url_for('earn_stamps') }}";
+        };
+        document.getElementById("button_3").onclick = function () {
+        location.href = "{{ url_for('earn_stamps') }}";
+        };
+        document.getElementById("button_4").onclick = function () {
+        location.href = "{{ url_for('earn_stamps') }}";
+        };
+        document.getElementById("pbutton_1").onclick = function () {
+        location.href = "/badges/1";
+        };
+        document.getElementById("pbutton_2").onclick = function () {
+        location.href = "/badges/2";
+        };
+        document.getElementById("pbutton_3").onclick = function () {
+        location.href = "/badges/3";
+        };
+        document.getElementById("pbutton_4").onclick = function () {
+        location.href = "/badges/4";
+        };
     </script>
 
     <!--Custom scripts-->
