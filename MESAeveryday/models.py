@@ -268,6 +268,14 @@ class School(Base):
         except:
             session.rollback()
             return None
+    def get_school_by_id(id):
+        try:
+           return session.query(School.school_name).filter(School.school_id == id).first()
+
+        except:
+            session.rollback()
+            return None
+
 
 #Class for the "badges" table
 class Badge(Base):
