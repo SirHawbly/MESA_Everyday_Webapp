@@ -125,6 +125,7 @@ def dashboard():
     mesa_days = searchEvents(events, ['Mesa','Day'])
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
+    mesa_events = get_mesa_events(events)
 
     return render_template('events.html',
                            events=events,
@@ -132,6 +133,7 @@ def dashboard():
                            upcoming_events=upcoming_events,
                            result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
+                           mesa_events=mesa_events,
                            other_days=other_days,
                            points=zip(badge_names, all_badge_points))
 
