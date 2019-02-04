@@ -351,6 +351,10 @@ def delete_school():
     form = DeleteSchoolForm()
     if form.validate_on_submit():
         school_id=form.school.data
+        if 'Other' in School.get_school_by_id(school_id) :
+            flash('Not allow to delete this item', 'success')
+            return redirect(url_for('delete_school'))
+
         School.delete_school_by_id(school_id)
         flash('Succesfully Delete  !!!', 'success')
         return redirect(url_for('delete_school'))
