@@ -1,4 +1,6 @@
 """
+This file initializes the application then imports all the routes from routes.py 
+
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """

@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<!-- Added by Millen -->
-<!-- Admin View Placeholder -->
+<!-- Admin Settings Placeholder -->
 
 <!--Navbar-->
 <ul class="nav navbar-nav nav-flex-icons ml-auto">
@@ -12,10 +11,12 @@
 </ul>
 
 <div class="container-fluid"> 
-    You are now in admin view   
+    You are now in the admin settings page
+    <li><a href="{{ url_for('admin') }}">Dashboard</a></li>
     <li><a href="{{ url_for('admin_control') }}">Control</a></li>
-    <li><a href="{{ url_for('admin_settings') }}">Settings</a></li>
 </div>
+
+
 
 {% endblock content %}
 

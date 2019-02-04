@@ -1,61 +1,42 @@
 """
+This file contains all tables in the database. It uses SQLAlchemy to map the tables to python objects
+All queries and session management is done in this file
+All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
+
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from datetime import datetime
+import datetime
+from dateutil.relativedelta import relativedelta
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from MESAeveryday import login_manager, app, bcrypt
 from flask_login import UserMixin
 from flask import flash
-#import pymysql
 import os
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
-# from contextlib import contextmanager
+# db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
+# Check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 db_connection = 'mysql+pymysql://' + 'devmed' + ':' + 'w3c$7aruSp' + '@' + 'db.cecs.pdx.edu' + ':3306/' + 'devmed'
 
+# Create a session with the database
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
-
 metadata = Base.metadata
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# do not delete those until the new loadSession method is proved working
-# def loadSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine)
-#     session = Session()
-#     return session
-
-# @contextmanager
-# def loadSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine)
-#     session = Session()
-#     try:
-#         yield session
-#         session.commit()
-#     except:
-#         session.rollback()
-#     finally:
-#         session.close()
-
-# need a session that will not be closed to use current_user
-# def loadLoginSession():
-#     metadata = Base.metadata
-#     Session = sessionmaker(bind=engine, expire_on_commit=False)
-#     session = Session()
-#     return session
-
 @login_manager.user_loader
 def load_user(user_id):
-    # with loadSession() as session:
+    """
+        Function used to load a user
+        Used by the login manager to obtain the information of a user who is logged in  
+    """
     try:
         return session.query(User).filter(User.id==user_id).first()
     except:
@@ -66,6 +47,7 @@ def load_user(user_id):
 
 #Class for the "users" table
 class User(Base, UserMixin):
+
     __tablename__ = 'users'
 
     id = Column('user_id', Integer, primary_key=True)
@@ -73,7 +55,7 @@ class User(Base, UserMixin):
     last_name = Column(String)
     username = Column(String)
     email = Column(String)
-    picture = Column(String) #This needs to be deleted after the picture column in the database is deleted
+    role = Column(String)
     school_id = Column(Integer, ForeignKey("schools.school_id"))
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
@@ -86,12 +68,12 @@ class User(Base, UserMixin):
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
         self.email = email
-        self.picture = 'default.png' #This needs to be deleted after the picture column in the database is deleted
         self.avatar_id = 1
         self.password = password
         self.first_name = first_name
         self.last_name = last_name
         self.school_id = school_id
+        self.role = 'user'
 
     def get_reset_token(self, expires_sec=1800):
         s = Serializer(app.config['SECRET_KEY'], expires_sec)
@@ -102,11 +84,10 @@ class User(Base, UserMixin):
         s = Serializer(app.config['SECRET_KEY'])
         try:
             user_id = s.loads(token)['user_id']
+            return session.query(User).filter(User.id==user_id).first()
         except:
             return None
-        # with loadSession() as session:
-        return session.query(User).filter(User.id==user_id).first()
-
+   
     def get_all_username():
         try:
             return session.query(User.username)
@@ -132,20 +113,18 @@ class User(Base, UserMixin):
             session.rollback()
             user = None
         if user:
-            # test whether false will be returned
             return True
         else:
             return False
 
     def add_new_user(new_user):
-        # with loadSession() as session:
         try:
             session.add(new_user)
+            session.commit()
         except:
             session.rollback()
 
     def get_user_by_email(email):
-        # with loadSession() as session:
         try:
             return session.query(User).filter(User.email == email).first()
         except:
@@ -158,15 +137,18 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return None
+    def delete_user_by_id(id):
+        try:
+            session.query(User).filter(User.id == id).delete()
+            session.commit()
+        except:
+            session.rollback()
+            return None
 
     def reset_pwd(id, hashed_pwd):
-        # with loadSession() as session:
-        #once a session is loaded we want to get the row
-        #where User.id matches the id of the user returned by User.verify_reset_token(token)
-        #this insures that the password for the correct user will be the one changed
+      
         try:
             row = session.query(User).filter(User.id == id).first()
-        #Change the password is a simple assign statement
             row.password = hashed_pwd
         except:
             session.rollback()
@@ -177,6 +159,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.last_login = new_last_login
+            session.commit()
         except:
             session.rollback()
             return False
@@ -187,6 +170,7 @@ class User(Base, UserMixin):
             row = session.query(User).filter(User.id == id).first()
             row.first_name = new_first_name
             row.last_name = new_last_name
+            session.commit()
         except:
             session.rollback()
             return False
@@ -196,6 +180,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.email = new_email
+            session.commit()
         except:
             session.rollback()
             return False
@@ -205,6 +190,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.school_id = new_school_id
+            session.commit()
         except:
             session.rollback()
             return False
@@ -214,9 +200,18 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.avatar_id = new_avatar_id
+            session.commit()
         except:
             session.rollback()
             return False
+        return True 
+    
+    def get_badge_progress(user_id, badge_id):
+        try:
+            return session.execute("SELECT total_points, current_level, to_next_level FROM user_aggregate WHERE user_id = :user_id AND badge_id = :badge_id", {'user_id':user_id, 'badge_id':badge_id}).first()
+        except:
+            session.rollback()
+            return None
         return True
 
     # Added by Millen
@@ -231,7 +226,16 @@ class User(Base, UserMixin):
         except:
             session.rollback()
             return False
-
+            
+    def delete_innactive_accounts(years_innactive):
+        try:            
+            results = session.query(User).filter(and_(User.last_login < datetime.datetime.now() - relativedelta(years=years_innactive)), (User.last_login != None)).delete()
+            session.commit()
+            return results
+        except:
+            session.rollback()
+            return None
+            
 #Class for the "schools" table
 class School(Base):
     __tablename__ = 'schools'
@@ -251,7 +255,6 @@ class School(Base):
 	    self.zip_code = zip_code
 
     def get_all_schools_names():
-        # with loadSession() as session:
         try:
             # The union ensures that the "Other" will always be found at the end
             results = session.query(School.school_id, School.school_name).filter(School.school_name != 'Other').order_by(School.school_name.asc())\
@@ -322,19 +325,6 @@ class Badge(Base):
             session.rollback()
             return None
 
-    def get_level_related_info(badge_id, points):
-        try:
-            target_badge = session.query(Badge.level1_points, Badge.level2_points, Badge.level3_points, Badge.level4_points,Badge.level5_points, Badge.level6_points, Badge.level7_points, Badge.level8_points, Badge.level9_points, Badge.level10_points).filter(Badge.badge_id == badge_id).first()
-            # target_badge = session.query(Badge).filter(Badge.badge_id == badge_id).first()
-            for level in range(11):
-                if not target_badge[level]:
-                    return level, 0
-                if points < target_badge[level]:
-                    return level, target_badge[level] - points
-            return 10, 0
-        except:
-            session.rollback()
-            return None, None
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
@@ -367,24 +357,7 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
         except:
             session.rollback()
-            return None
-
-    def get_earned_stamps_of_badge(user_id, badge_id):
-        try:
-            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-            return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
-        except:
-            session.rollback()
-            return None
-
-    def get_earned_points(user_id, badge_id):
-        try:
-            # subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-            # return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.in_(subquery))
-            return session.query(UserStamp.stamp_id, Stamp.points).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == Stamp.stamp_id).filter(Stamp.badge_id == badge_id)
-        except:
-            session.rollback()
-            return None
+            return None  
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
@@ -412,10 +385,29 @@ class UserStamp(Base, UserMixin):
             return None
 
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
-        # with loadSession() as session:
         new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
         try:
             session.add(new_UserStamp)
+            session.commit()
+        except:
+            session.rollback()
+            return False
+        return True
+
+    def get_earned_stamps_of_badge(user_id, badge_id):
+        try:
+            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(UserStamp.user_id == user_id).filter(Stamp.stamp_id == UserStamp.stamp_id)
+        except:
+            session.rollback()
+            return None
+
+    def delete_stamp(user_id, stamp_id, stamp_date, log_date):
+        try:
+            # Query = UserStamp.query.filter_by(user_id == user_id, stamp_id == stamp_id, stamp_date == stamp_date, log_date == log_date).first()
+            Query = session.query(UserStamp).filter(UserStamp.user_id == user_id).filter(UserStamp.stamp_id == stamp_id).filter(UserStamp.stamp_date == stamp_date).filter(UserStamp.log_date == log_date).first()
+            if not Query:
+                return False
+            session.delete(Query)
             session.commit()
         except:
             session.rollback()
@@ -430,64 +422,11 @@ class Avatar(Base):
     file_name = Column(String)
 
     def __init__(self, file_name):
-	    self.file_name = feile_name
+	    self.file_name = file_name
 
     def get_all_avatars():
         try:
             return session.query(Avatar)
         except:
             session.rollback()
-            return None
-
-
-
-'''
-class User(UserMixin):
-	def __init__(self, id, username, first_name, last_name, email, password, role, school_id):
-	    self.id = id
-	    self.username = username
-	    self.email = email
-	    self.image_file = 'default.jpg'
-	    self.password = password
-	    self.first_name = first_name
-	    self.last_name = last_name
-	    self.role = role
-	    self.school_id = school_id
-
-class db_model():
-	def __init__(self):
-	    self.conn = pymysql.connect(host=os.environ['MESAhostname'], port=3306, user=os.environ['MESAusername'], passwd=os.environ['MESApassword'], db=os.environ['MESAusername'])
-
-	def get_user_by_id(self, id):
-	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE user_id = %s", (id))
-	    return cur.fetchall()
-
-	def get_user_by_username(self, username):
-		cur = self.conn.cursor()
-		cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE username = %s", (username))
-		return cur.fetchall()
-
-	def get_user_by_email(self, email):
-	    cur = self.conn.cursor()
-	    cur.execute("SELECT user_id, username, first_name, last_name, email, picture, ssb, school_id FROM users WHERE email = %s", (email))
-	    return cur.fetchall()
-
-	def add_user(self, username, first_name, last_name, email, picture, password, school_id):
-		cur = self.conn.cursor()
-		cur.execute("INSERT INTO users(username, first_name, last_name, email, picture, ssb, school_id) VALUES(%s, %s, %s, %s, %s, %s, 'user', %s)",
-					(username, first_name, last_name, email, picture, password, school_id))
-		self.conn.commit()
-
-	def get_all_school_names(self):
-		cur = self.conn.cursor()
-		cur.execute("SELECT school_id, school_name FROM schools")
-		return cur.fetchall()
-
-	def view_badge(self):
-		cur = self.conn.cursor()
-		cur.execute("SELECT badge_name FROM badges")
-		rows = cur.fetchall()
-		rows=[i[0] for i in rows]
-		return rows
-'''
+            return None        
