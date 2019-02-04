@@ -5,10 +5,10 @@ Each route selects the proper forms for each page, calculates the data to put in
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request,jsonify
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
-    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm
+    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
 from MESAeveryday.calendar_events import get_event_list, searchEvents
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
@@ -353,6 +353,7 @@ def delete_school():
         school_id=form.school.data
         School.delete_school_by_id(school_id)
         flash('Succesfully Delete  !!!', 'success')
+        return redirect(url_for('delete_school'))
 
     return render_template('delete_school.html',form_school=form)
 
@@ -368,13 +369,42 @@ def add_stamp():
     if form.validate_on_submit():
         badgeId=form.badge.data
         stampName= request.form.get('badgeName')
-        newStamp=Stamp(stampName,badgeId,'','')
+        newStamp=Stamp(stampName,badgeId,0,0)
         Stamp.add_stamp(newStamp)
-        print(Stamp.get_stamps_of_badge(badgeId))
         flash('New Stamp has been created!', 'success')
 
     return render_template('add_stamp.html',form_stamp=form)
 
+
+@app.route("/delete_stamp", methods=['GET','POST'])
+@login_required
+def delete_stamp():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = DeleteStampForm()
+    form.stamp.choices = Stamp.get_stamps_of_badge(1)
+
+    if request.method == 'POST':
+        stampName=Stamp.get_stamp_by_stamp_id(form.stamp.data)
+        print(form.stamp.data)
+        Stamp.delete_stamp_by_id(form.stamp.data)
+        flash('Delete successfully!', 'success')
+        #return redirect(url_for('delete_stamp'))
+
+    return render_template('delete_stamp.html',form_stamp=form)
+
+@app.route('/stamp/<badgeid>')
+def stamp(badgeid):
+    stamps = Stamp.get_stamps_of_badge(badgeid)
+    stampArray = []
+    for stamp in stamps:
+        stampObj = {}
+        stampObj['id'] = stamp.stamp_id
+        stampObj['name'] = stamp.stamp_name
+        stampArray.append(stampObj)
+
+    return jsonify({'stamps' : stampArray})
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
