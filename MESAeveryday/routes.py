@@ -351,6 +351,7 @@ def delete_school():
     form = DeleteSchoolForm()
     if form.validate_on_submit():
         school_id=form.school.data
+        """ Need better solution for this but accept this for now"""
         if 'Other' in School.get_school_by_id(school_id) :
             flash('Not allow to delete this item', 'success')
             return redirect(url_for('delete_school'))
