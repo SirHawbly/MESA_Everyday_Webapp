@@ -36,10 +36,10 @@
                                 <p class="card-text" style="font-size: 150%">Point until next level: {{ progress[badge.badge_id].to_next_level }} points</p>
                                 <div class="row">
                                     <div class="col-lg-5">
-                                        <button id="button_1" class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Earn Stamp</a></button>
+                                        <button id="earn_button{{ badge.badge_id }}" class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Earn Stamp</a></button>
                                     </div>
                                     <div class="col-lg-7">
-                                        <button id="pbutton_1" class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">Detailed Progress</button>
+                                        <button id="progress_button{{ badge.badge_id }}" class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">Detailed Progress</button>
                                     </div>
                                 </div>
                             </div>
@@ -63,3 +63,17 @@
 </div>
 <!--/.Panel-->
 {% endblock main %}
+
+{% block scripts %}
+    {{ super() }}
+    {% for badge in badges %}
+        <script type="text/javascript">           
+            document.getElementById("earn_button{{ badge.badge_id }}").onclick = function () {
+            location.href = "{{ url_for('earn_stamps') }}";
+            };
+            document.getElementById("progress_button{{ badge.badge_id }}").onclick = function () {
+            location.href = "/badges/{{ badge.badge_id }}";
+            };
+        </script>
+    {% endfor %}
+{% endblock scripts %}

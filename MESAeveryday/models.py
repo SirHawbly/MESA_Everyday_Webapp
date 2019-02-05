@@ -313,7 +313,14 @@ class Badge(Base):
             return session.query(Badge)
         except:
             session.rollback()
-            return None    
+            return None 
+
+    def get_badge_by_id(badge_id):
+        try:
+            return session.query(Badge).filter(Badge.badge_id == badge_id).first()
+        except:
+            session.rollback()
+            return None   
         
     def get_all_badges_names():
         try:
@@ -332,13 +339,6 @@ class Badge(Base):
     def get_badge_name(badge_id):
         try:
             return session.query(Badge.badge_name).filter(Badge.badge_id == badge_id)
-        except:
-            session.rollback()
-            return None
-
-    def get_badge_picture(badge_id):
-        try:
-            return session.query(Badge.icon.file_name).filter(Badge.badge_id == badge_id)
         except:
             session.rollback()
             return None
@@ -472,3 +472,26 @@ class Icon(Base):
         except:
             session.rollback()
             return None                  
+
+class Reset_Date(Base):
+    __tablename__ = 'reset_date'
+    
+    reset_date = Column(Date, primary_key=True)
+    
+    def get_reset_date():
+        try:
+            return session.query(Reset_Date).first()
+        except:
+            session.rollback()
+            return None
+    
+    def change_date(new_date):
+        try:
+            date = session.query(Reset_Date).first()
+            date.reset_date = new_date
+            session.commit()
+            return True
+        except:
+            session.rollback()
+            return False
+            

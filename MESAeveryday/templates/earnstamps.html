@@ -46,3 +46,14 @@
 </div>
 <!--/.Panel-->
 {% endblock main %}
+
+{% block scripts %}
+    {{ super() }}
+    {% for f in forms %}
+        <script>
+            $('#{{ "date" + loop.index|string }}').datepicker({
+
+            });
+        </script>
+    {% endfor %}
+{% endblock scripts %}

@@ -7,8 +7,8 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm
-from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm
+from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
@@ -412,8 +412,7 @@ def earn_stamps():
                 return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
 
     # Get all the badges
-    badges = Badge.get_all_badges_id_with_names()
-    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+    badges = Badge.get_all_badges()
 
     # Call the google api and pull all upcoming events
     events = get_event_list()
@@ -423,7 +422,7 @@ def earn_stamps():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
 
-    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=zip(badge_names, badge_ids), events=events,
+    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
                            number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
                            other_days=other_days)
 
@@ -434,34 +433,24 @@ def check_badge(badge_id):
         Page for checking a user's progress on an individual badge
         The particular badge being view is passed in through the route
     """  
-    
-    # Get all badges 
-    badges = Badge.get_all_badges_id_with_names()
-    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
 
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    
-    # Get the name and picture of the page currently being viewed
-    badge_name = Badge.get_badge_name(badge_id).first()[0]
-    picture_file = Badge.get_badge_picture(badge_id).first()[0]
-    
+    # Get all the badges
+    badges = Badge.get_all_badges()
+
+    # Get the current badge being viewed
+    badge = Badge.get_badge_by_id(badge_id)
+      
     # Get the id of current user and separate the stamps that they have earned from the one's they have not earned
     user_id = current_user.id    
-    unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(user_id, badge_id)]     
-    earned_stamps = [row for row in UserStamp.get_earned_stamps_of_badge(user_id, badge_id)]
+    unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(user_id, badge.badge_id)]     
+    earned_stamps = [row for row in UserStamp.get_earned_stamps_of_badge(user_id, badge.badge_id)]
     
     # If all the stamps for this badge have been earned, print this instead
     if not unearned_stamps:
         unearned_stamps = ['All stamps earned'] 
     
     # Get the user's progress on the badge
-    badge_progress = User.get_badge_progress(user_id, badge_id)
+    badge_progress = User.get_badge_progress(user_id, badge.badge_id)
     if badge_progress:
         points = badge_progress[0]
         current_level = badge_progress[1]
@@ -483,9 +472,16 @@ def check_badge(badge_id):
                 print('error when deleting user earned stamp')
         return redirect('/badges/' + str(badge_id))
     
-    return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file, badge_id=badge_id, events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                           other_days=other_days)
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    
+    return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
+                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days)
 
 
 def random_code():
@@ -677,6 +673,8 @@ def admin_control():
     emailform = UpdateEmailForm()
     passwordform = UpdatePasswordForm()
     oldaccountsform = RemoveOldAccountsForm()
+    resetdateform = ResetDateForm()
+    resetdateform.reset_date.id = 'reset_date'
     admin_account = User.get_user_by_username(current_user.username)
 
 	#Update password
@@ -697,20 +695,29 @@ def admin_control():
         return redirect(url_for('admin_control'))
         
     #Remove old accounts
-    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():
-     
+    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
         results = User.delete_innactive_accounts(oldaccountsform.years.data)
         if results:
             flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
         else:
             flash('No accounts were deleted', 'success')
         return redirect(url_for('admin_control'))
+        
+    #Change reset date    
+    if resetdateform.reset_date.data and resetdateform.validate_on_submit():
+        if Reset_Date.change_date(resetdateform.reset_date.data):
+            flash('Successfully changed reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
+        else:
+            flash('Sorry, we were not able to change the date', 'danger')
+        return redirect(url_for('admin_control'))
+        
 
     #Load page
     if request.method =='GET':
+        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
       
-    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform)    
+    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
         
 
 
