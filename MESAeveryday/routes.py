@@ -122,34 +122,7 @@ def dashboard():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
     mesa_events = get_mesa_events(events)
-        
     
-    '''
-    # Get the total amount of points the user has for each badge
-    all_badge_points = []  
-    for badge_id in badge_ids:
-        badge_progress = User.get_badge_progress(current_user.id, badge_id)
-        if badge_progress:
-            badge_points = badge_progress[0]
-        else:
-            badge_points = 0
-        all_badge_points.append(badge_points)
-
-   
-
-    user_id = current_user.id 
-    # Get the user's progress on the badge
-    badge_progress = User.get_badge_progress(user_id, badge_id)
-    if badge_progress:
-        points = badge_progress[0]
-        current_level = badge_progress[1]
-        to_next_lv = badge_progress[2]
-    else:
-        points = 0
-        current_level = 0
-        to_next_lv = 0
-    '''
-        
     return render_template('dashboard.html',
                            badges=badges,
                            progress=all_progress,
