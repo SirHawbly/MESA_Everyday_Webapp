@@ -127,7 +127,7 @@ def dashboard():
     upcoming_events = [event for event in events if event['remain_days'] < 7]
     mesa_events = get_mesa_events(events)
 
-    return render_template('events.html',
+    return render_template('dashboard.html',
                            events=events,
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
