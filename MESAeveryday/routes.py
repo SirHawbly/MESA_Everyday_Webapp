@@ -9,7 +9,7 @@ from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
-from MESAeveryday.calendar_events import get_event_list, searchEvents
+from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
 from datetime import datetime
@@ -125,6 +125,7 @@ def dashboard():
     mesa_days = searchEvents(events, ['Mesa','Day'])
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
+    mesa_events = get_mesa_events(events)
 
     user_id = current_user.id 
     # Get the user's progress on the badge
@@ -144,11 +145,59 @@ def dashboard():
                            upcoming_events=upcoming_events,
                            result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
+                           mesa_events=mesa_events,
                            other_days=other_days,
                            points=zip(badge_names, all_badge_points),
                            pt=points, 
                            lv=current_level, 
                            to_next_lv=to_next_lv)
+
+
+@app.route("/events", methods=['GET', 'POST'])
+# @login_required
+def events():
+    """
+        Page that displays summary information about a student's progress
+        This is the default page a user is taken to when they log in
+    """   
+    
+    # Send admins to the admin page
+    if (User.verify_role(current_user.id)):
+        return redirect(url_for('admin'))
+        
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+    
+    # Get the total amount of points the user has for each badge
+    all_badge_points = []  
+    for badge_id in badge_ids:
+        badge_progress = User.get_badge_progress(current_user.id, badge_id)
+        if badge_progress:
+            badge_points = badge_progress[0]
+        else:
+            badge_points = 0
+        all_badge_points.append(badge_points)
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    mesa_events = get_mesa_events(events)
+
+    return render_template('events.html',
+                           events=events,
+                           number_upcoming=len(upcoming_events),
+                           upcoming_events=upcoming_events,
+                           result=zip(badge_names, badge_ids),
+                           mesa_days=mesa_days,
+                           mesa_events=mesa_events,
+                           other_days=other_days,
+                           points=zip(badge_names, all_badge_points))
+
 
 @app.route("/logout")
 def logout():
@@ -615,7 +664,32 @@ def admin():
     # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
     if not User.verify_role(current_user.id):
         return redirect(url_for('dashboard'))
-    return render_template('admin.html')
+        
+    # Top scores will be a dictionary of arrays. 
+    # Each array holds all the users and top scores for a specific badge
+    # The dictionary will be for each badge and is indexed based on the badge id
+    top_scores = {}    
+        
+    # Get all badges
+    badges = Badge.get_all_badges()
+    
+    # Get all the top scores/users for each badge
+    for badge in badges:
+        # Find out what the top three scores are
+        top_badge_scores = Badge.get_top_scores(badge.badge_id)
+        record_holders = []
+        
+        # For each top score, get all the users that have that score        
+        for top_score in top_badge_scores:
+            # Add each user with a top score to and array of users/top scores
+            users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+            for user in users_with_top_score:
+                record_holders.append(user)
+        # Add the array of users/top scores to the total list of scores (indexed by the badge id)
+        top_scores[badge.badge_id] = record_holders
+    
+    
+    return render_template('admin.html', badges=badges, top_scores=top_scores)
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    

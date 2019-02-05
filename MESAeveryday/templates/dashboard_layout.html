@@ -155,27 +155,39 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Countdown
+                                    First Event Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until First Event<td></tr>
+                                        <tr><td><span id="clock" data-date-string={{events[0][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Countdown
+                                    Last Event Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until Last Event<td></tr>
+                                        <tr><td><span id="clock2" data-date-string-second={{events[-1][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Countdown
+                                     MESA Day Countdown
                                 </div>
                                 <div class="card-body">
+                                    <table>
+                                        <tr><td>Time Until MESA Day<td></tr>
+                                        <tr><td><span id="clock3" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
+                                    </table>
                                 </div>
                             </div>    
                         </div>
