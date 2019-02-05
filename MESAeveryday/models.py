@@ -313,7 +313,14 @@ class Badge(Base):
             return session.query(Badge)
         except:
             session.rollback()
-            return None    
+            return None 
+
+    def get_badge_by_id(badge_id):
+        try:
+            return session.query(Badge).filter(Badge.badge_id == badge_id).first()
+        except:
+            session.rollback()
+            return None   
         
     def get_all_badges_names():
         try:
@@ -332,13 +339,6 @@ class Badge(Base):
     def get_badge_name(badge_id):
         try:
             return session.query(Badge.badge_name).filter(Badge.badge_id == badge_id)
-        except:
-            session.rollback()
-            return None
-
-    def get_badge_picture(badge_id):
-        try:
-            return session.query(Badge.icon.file_name).filter(Badge.badge_id == badge_id)
         except:
             session.rollback()
             return None
