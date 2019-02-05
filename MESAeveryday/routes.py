@@ -126,6 +126,18 @@ def dashboard():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
 
+    user_id = current_user.id 
+    # Get the user's progress on the badge
+    badge_progress = User.get_badge_progress(user_id, badge_id)
+    if badge_progress:
+        points = badge_progress[0]
+        current_level = badge_progress[1]
+        to_next_lv = badge_progress[2]
+    else:
+        points = 0
+        current_level = 0
+        to_next_lv = 0
+
     return render_template('dashboard.html',
                            events=events,
                            number_upcoming=len(upcoming_events),
@@ -133,7 +145,10 @@ def dashboard():
                            result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
                            other_days=other_days,
-                           points=zip(badge_names, all_badge_points))
+                           points=zip(badge_names, all_badge_points),
+                           pt=points, 
+                           lv=current_level, 
+                           to_next_lv=to_next_lv)
 
 @app.route("/logout")
 def logout():
@@ -289,7 +304,21 @@ def account():
         nameform.lastname.data = current_user.last_name
         schoolform.school.data = current_user.school_id
 
-    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform)
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+        
+    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform, result=zip(badge_names, badge_ids), events=events,
+                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                           other_days=other_days)
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
 @login_required
@@ -355,7 +384,22 @@ def earn_stamps():
                     # flash('Failed adding stamp', 'warning')
                     # some message should be shown here, flash doesnt work
                 return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
-    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=badge_names)
+
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+
+    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, result=zip(badge_names, badge_ids), events=events,
+                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                           other_days=other_days)
 
 @app.route("/badges/<badge_id>", methods=['GET', 'POST'])
 @login_required
@@ -368,6 +412,14 @@ def check_badge(badge_id):
     # Get all badges 
     badges = Badge.get_all_badges_id_with_names()
     badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
     
     # Get the name and picture of the page currently being viewed
     badge_name = Badge.get_badge_name(badge_id).first()[0]
@@ -405,7 +457,9 @@ def check_badge(badge_id):
                 print('error when deleting user earned stamp')
         return redirect('/badges/' + str(badge_id))
     
-    return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file, badge_id=badge_id)
+    return render_template('badges.html', result=zip(badge_names, badge_ids), badge_name=badge_name, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, picture_file=picture_file, badge_id=badge_id, events=events,
+                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                           other_days=other_days)
 
 
 def random_code():

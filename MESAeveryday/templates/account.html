@@ -1,366 +1,250 @@
-{% extends "layout.html" %}
-{% block content %}
+{% extends "dashboard_layout.html" %}
+{% block main %}
+<style>
+    .mdb-color.lighten-3 {
+        background-color: #716558 !important;
+    }
+</style>
 
-<!-- Code start here -->
+ <!-- First row -->
+<div class="row">
+    <!-- First column -->
+    <div class="col-lg-4 mb-4">
 
-<body class="fixed-sn white-skin">
-    <!--Main Navigation-->
-    <header>
+        <!--Card-->
+        <div class="card card-cascade narrower">
 
-        <!--Navbar-->
-        <nav class="navbar fixed-top navbar-expand-lg scrolling-navbar double-nav">
-            <!-- SideNav slide-out button -->
-            <div class="float-left">
-                <a href="#" data-activates="slide-out" class="button-collapse black-text"><i class="fa fa-bars"></i></a>
+            <!--Card image-->
+            <div class="view gradient-card-header mdb-color lighten-3">
+                <h5 class="mb-0 font-weight-bold">{{ current_user.username }}</h5>
             </div>
-            <!-- Breadcrumb-->
-            <div class="breadcrumb-dn mr-auto">
-                
+            <!--/Card image-->
+
+            <!-- Card content -->
+            <div class="card-body text-center">
+                <img class="rounded-circle account-img" src="static/avatar/{{ current_user.avatar.file_name }}"width="75" height="75">
+
+                <p class="text-muted"><medium>{{ current_user.email }}</medium></p>
+                <div class="row flex-center">
+                    <div class="form-group">           
+                        <button type="button" class="btn btn-info btn-rounded btn-sm" data-toggle="modal" data-target="#avatarModal">
+                          Change Profile Picture
+                        </button>  
+                    </div>
+                    <div class="form-group">
+                        <button class="btn btn-danger btn-rounded btn-sm">Deactivate Account</button>
+                    </div>
+                </div>
             </div>
+            <!-- /.Card content -->
 
-            <!--Navbar links-->
-            <ul class="nav navbar-nav nav-flex-icons ml-auto">
+        </div>
+        <!--/.Card-->
 
-                <!-- Dropdown -->
-                <li class="nav-item dropdown notifications-nav">
-                    <a class="nav-link dropdown-toggle waves-effect" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="badge red"></span> <i class="fa fa-bell"></i>
-                        <span class="d-none d-md-inline-block">Notifications</span>
-                    </a>
+    </div>
+    <!-- /.First column -->
+    <!-- Second column -->
+    <div class="col-lg-8 mb-4">
 
-                    <div class="dropdown-menu dropdown-info" aria-labelledby="navbarDropdownMenuLink">
-                        
-                                <a class="dropdown-item" href="#">
-                                    <i class="fa fa-times-rectangle mr-2" aria-hidden="true"></i>
-                                    <span>  </span>
-                                    <span class="float-right"><i class="fa fa-clock-o" aria-hidden="true"></i>
-                                         days
-                                    </span>
-                                </a>
-                           
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link waves-effect"><i class="fa fa-envelope"></i> <span class="clearfix d-none d-sm-inline-block">Inbox</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link waves-effect" href="https://calendar.google.com/calendar/embed?src=bartlett%40pdx.edu&ctz=America%2FLos_Angeles">
-                        <i class="fa fa-calendar"></i>
-                        <span class="clearfix d-none d-sm-inline-block">Calendar</span>
-                    </a>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle waves-effect" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">{{ current_user.username }} </span></a>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                        <div class="navbar-login">
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <img src="static/avatar/{{ current_user.avatar.file_name }}" class="rounded-circle account-img" alt="First sample image">
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-12">
-                                    <a class="dropdown-item text-center" href="{{ url_for('account') }}">Edit Profile</a>
-                                    <a class="dropdown-item text-center" href="{{ url_for('logout') }}">Log Out</a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
+        <!--Card-->
+        <div class="card card-cascade narrower">
 
-            </ul>
-            <!--/Navbar links-->
-        </nav>
-        <!--/.Navbar-->
+            <!--Card image-->
+            <div class="view gradient-card-header mdb-color lighten-3">
+                <h5 class="mb-0 font-weight-bold">Edit Account</h5>
+            </div>
+            <!--/Card image-->
 
-         <!-- Sidebar navigation -->
-        <div id="slide-out" class="side-nav sn-bg-4 fixed">
-            <ul class="custom-scrollbar">
-            <!-- Logo -->
-            <li class="logo-sn waves-effect">
-                <div class="text-center">
-                    <a href="#" class="pl-0"><img src="../static/img/mesa.png" class=""></a>
+            <!-- Card content -->
+            <div class="card-body text-center">
+                <div class="card-body text-center">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                      {% if messages %}
+                        {% for category, message in messages %}
+                          <div class="alert alert-{{ category }}">
+                            {{ message }}
+                          </div>
+                        {% endfor %}
+                      {% endif %}
+                    {% endwith %}
                 </div>
-            </li>
-            <!--/. Logo -->
-            <!-- Side navigation links -->
-            <li>
-                <ul class="collapsible collapsible-accordion">
-                    <li><a href="{{ url_for('dashboard') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboards</a>
-                    </li>
-                    <li><a href="{{ url_for('earn_stamps') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
-                    </li>
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
-                        <div class="collapsible-body">
-                            <ul>
-                                {% for r, i in result %}
-                                    <li><a href="/badges/{{ i }}" class="waves-effect">{{ r }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </li>
-                </ul>
-            </li>
-            <!--/. Side navigation links -->
-            </ul>
-            <div class="sidenav-bg mask-strong"></div>
-        </div>
-        <!--/. Sidebar navigation -->
-    </header>
-    <!--Main Navigation-->
-
-    <!--Main layout-->
-    <main>
-        <div class="container-fluid">
-
-            <!-- Section: Edit Account -->
-            <section class="section">
-                <!-- First row -->
-                <div class="row">
-                    <!-- First column -->
-                    <div class="col-lg-4 mb-4">
-
-                        <!--Card-->
-                        <div class="card card-cascade narrower">
-
-                            <!--Card image-->
-                            <div class="view gradient-card-header mdb-color lighten-3">
-                                <h5 class="mb-0 font-weight-bold">{{ current_user.username }}</h5>
-                            </div>
-                            <!--/Card image-->
-
-                            <!-- Card content -->
-                            <div class="card-body text-center">
-                                <img class="rounded-circle account-img" src="static/avatar/{{ current_user.avatar.file_name }}"width="75" height="75">
-
-                                <p class="text-muted"><medium>{{ current_user.email }}</medium></p>
-                                <div class="row flex-center">
-                                    <div class="form-group">           
-                                        <button type="button" class="btn btn-info btn-rounded btn-sm" data-toggle="modal" data-target="#avatarModal">
-                                          Change Profile Picture
-                                        </button>  
-                                    </div>
+                <!-- Update Email -->
+                <form name ="form_email" method="POST" action="" enctype="multipart/form-data">
+                    {{ form_email.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="md-form mb-0">
                                     <div class="form-group">
-                                        <button class="btn btn-danger btn-rounded btn-sm">Deactivate Account</button>
+                                        {{ form_email.email.label(class="form-control-label") }}
+                                        {% if form_email.email.errors %}
+                                            {{ form_email.email(class="form-control form-control-lg is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form_email.email.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form_email.email(class="form-control form-control-lg") }}
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.Card content -->
-
-                        </div>
-                        <!--/.Card-->
-
+                        </div>          
+                    </fieldset>
+                    <div class="form-group">
+                        {{ form_email.submit(class="btn btn-outline-info") }}
                     </div>
-                    <!-- /.First column -->
-                    <!-- Second column -->
-                    <div class="col-lg-8 mb-4">
-
-                        <!--Card-->
-                        <div class="card card-cascade narrower">
-
-                            <!--Card image-->
-                            <div class="view gradient-card-header mdb-color lighten-3">
-                                <h5 class="mb-0 font-weight-bold">Edit Account</h5>
-                            </div>
-                            <!--/Card image-->
-
-                            <!-- Card content -->
-                            <div class="card-body text-center">
-                                <div class="card-body text-center">
-                                    {% with messages = get_flashed_messages(with_categories=true) %}
-                                      {% if messages %}
-                                        {% for category, message in messages %}
-                                          <div class="alert alert-{{ category }}">
-                                            {{ message }}
-                                          </div>
-                                        {% endfor %}
-                                      {% endif %}
-                                    {% endwith %}
+                </form>
+              
+                <!-- Update Name -->
+                <form name ="form_name" method="POST" action="" enctype="multipart/form-data">
+                    {{ form_name.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="md-form mb-0">
+                                    <div class="form-group">
+                                        {{ form_name.firstname(class="form-control", placeholder="First Name") }}
+                                    </div>
                                 </div>
-                                <!-- Update Email -->
-                                <form name ="form_email" method="POST" action="" enctype="multipart/form-data">
-                                    {{ form_email.hidden_tag() }}
-                                    <fieldset class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {{ form_email.email.label(class="form-control-label") }}
-                                                        {% if form_email.email.errors %}
-                                                            {{ form_email.email(class="form-control form-control-lg is-invalid") }}
-                                                            <div class="invalid-feedback">
-                                                                {% for error in form_email.email.errors %}
-                                                                    <span>{{ error }}</span>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            {{ form_email.email(class="form-control form-control-lg") }}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>          
-                                    </fieldset>
-                                    <div class="form-group">
-                                        {{ form_email.submit(class="btn btn-outline-info") }}
-                                    </div>
-                                </form>
-                              
-                                <!-- Update Name -->
-                                <form name ="form_name" method="POST" action="" enctype="multipart/form-data">
-                                    {{ form_name.hidden_tag() }}
-                                    <fieldset class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {{ form_name.firstname(class="form-control", placeholder="First Name") }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {{ form_name.lastname(class="form-control", placeholder="Last Name") }}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>        
-                                    </fieldset>
-                                    <div class="form-group">
-                                        {{ form_name.submit(class="btn btn-outline-info") }}
-                                    </div>
-                                </form>
-                                <!-- Update Password -->
-                                <form name="form_password" method="POST" action="{{ url_for('account') }}" enctype="multipart/form-data">
-                                    {{ form_password.hidden_tag() }}
-                                    <fieldset class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {% if form_password.old_password.errors %}
-                                                            {{ form_password.old_password(class="form-control form-control-lg is-invalid") }}
-                                                            <div class="invalid-feedback">
-                                                                {% for error in form_password.old_password.errors %}
-                                                                    <span>{{ error }}</span>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            {{ form_password.old_password(class="form-control", placeholder="Old Password") }}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="md-form mb-0">       
-                                                    <div class="form-group">
-                                                        {% if form_password.password.errors %}
-                                                            {{ form_password.password(class="form-control form-control-lg is-invalid") }}
-                                                            <div class="invalid-feedback">
-                                                                {% for error in form_password.password.errors %}
-                                                                    <span>{{ error }}</span>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            {{ form_password.password(class="form-control", placeholder="New Password") }}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {% if form_password.confirm_password.errors %}
-                                                            {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
-                                                            <div class="invalid-feedback">
-                                                                {% for error in form_password.confirm_password.errors %}
-                                                                    <span>{{ error }}</span>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            {{ form_password.confirm_password(class="form-control", placeholder="Confirm Password") }}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>                
-                                    </fieldset>                       
-                                    <div class="form-group">
-                                        {{ form_password.submit(class="btn btn-outline-info") }}
-                                    </div>
-                                </form>
-                                <!-- Update School -->
-                                <form name="form_school" method="POST" action="" enctype="multipart/form-data">
-                                    {{ form_school.hidden_tag() }}
-                                    <fieldset class="form-group">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <div class="md-form mb-0">
-                                                    <div class="form-group">
-                                                        {% if form_school.school.errors %}
-                                                            {{ form_school.school(class="form-control form-control-lg is-invalid") }}
-                                                            <div class="invalid-feedback">
-                                                                {% for error in form_school.school.errors %}
-                                                                    <span>{{ error }}</span>
-                                                                {% endfor %}
-                                                            </div>
-                                                        {% else %}
-                                                            {{ form_school.school(class="form-control", placeholder="School") }}
-                                                        {% endif %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>        
-                                    </fieldset>
-                                    <div class="form-group">
-                                        {{ form_school.submit(class="btn btn-outline-info") }}
-                                    </div>
-                                </form>
                             </div>
-                            <!-- /.Card content -->
-
-                        </div>
-                        <!--/.Card-->
+                            <div class="col-md-6">
+                                <div class="md-form mb-0">
+                                    <div class="form-group">
+                                        {{ form_name.lastname(class="form-control", placeholder="Last Name") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>        
+                    </fieldset>
+                    <div class="form-group">
+                        {{ form_name.submit(class="btn btn-outline-info") }}
                     </div>
-                    <!-- /.Second column -->
-                </div>
-                <!-- /.First row -->
-            </section>
-            <!-- /.Section: Edit Account -->
+                </form>
+                <!-- Update Password -->
+                <form name="form_password" method="POST" action="{{ url_for('account') }}" enctype="multipart/form-data">
+                    {{ form_password.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="md-form mb-0">
+                                    <div class="form-group">
+                                        {% if form_password.old_password.errors %}
+                                            {{ form_password.old_password(class="form-control form-control-lg is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form_password.old_password.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form_password.old_password(class="form-control", placeholder="Old Password") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="md-form mb-0">       
+                                    <div class="form-group">
+                                        {% if form_password.password.errors %}
+                                            {{ form_password.password(class="form-control form-control-lg is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form_password.password.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form_password.password(class="form-control", placeholder="New Password") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="md-form mb-0">
+                                    <div class="form-group">
+                                        {% if form_password.confirm_password.errors %}
+                                            {{ form_password.confirm_password(class="form-control form-control-lg is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form_password.confirm_password.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form_password.confirm_password(class="form-control", placeholder="Confirm Password") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                
+                    </fieldset>                       
+                    <div class="form-group">
+                        {{ form_password.submit(class="btn btn-outline-info") }}
+                    </div>
+                </form>
+                <!-- Update School -->
+                <form name="form_school" method="POST" action="" enctype="multipart/form-data">
+                    {{ form_school.hidden_tag() }}
+                    <fieldset class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="md-form mb-0">
+                                    <div class="form-group">
+                                        {% if form_school.school.errors %}
+                                            {{ form_school.school(class="form-control form-control-lg is-invalid") }}
+                                            <div class="invalid-feedback">
+                                                {% for error in form_school.school.errors %}
+                                                    <span>{{ error }}</span>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            {{ form_school.school(class="form-control", placeholder="School") }}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>        
+                    </fieldset>
+                    <div class="form-group">
+                        {{ form_school.submit(class="btn btn-outline-info") }}
+                    </div>
+                </form>
+            </div>
+            <!-- /.Card content -->
 
         </div>
-    </main>
-    <!--Main layout-->
-    <!-- Avater Popup Modal -->
+        <!--/.Card-->
+    </div>
+    <!-- /.Second column -->
+</div>
+<!-- /.First row -->
+            
+<!-- Avater Popup Modal -->
 
-    <div class="modal fade" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-xl" role="document" >
-      <form  method="POST" action="{{ url_for('account') }}">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="avatarModalLabel">Select an Avatar</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <select class="image-picker" id="avatarSelect" name="avatarSelect">
-                  {% for file in avatar_files %}
-                  <option data-img-src="static/avatar/{{ file.file_name }}" value="{{ file.id }}"></option>
-                  {% endfor %}  
-            </select>
-                
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-            <button class="btn btn-default" type="submit">Update Avatar</button>
-          </div>
-        </div>
-        </form>
+<div class="modal fade" id="avatarModal" tabindex="-1" role="dialog" aria-labelledby="avatarModalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document" >
+  <form  method="POST" action="{{ url_for('account') }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="avatarModalLabel">Select an Avatar</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <select class="image-picker" id="avatarSelect" name="avatarSelect">
+              {% for file in avatar_files %}
+              <option data-img-src="static/avatar/{{ file.file_name }}" value="{{ file.id }}"></option>
+              {% endfor %}  
+        </select>
+            
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-default" type="submit">Update Avatar</button>
       </div>
     </div>
+    </form>
+  </div>
+</div>
 
-{% endblock content %} 
+{% endblock main %} 
