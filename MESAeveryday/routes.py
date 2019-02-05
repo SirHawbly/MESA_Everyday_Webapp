@@ -69,7 +69,7 @@ def login():
       Route that processes a login attempt
       If the login is a success they are taken to either the page they last attempted to visit or the dashboard
       If the login fails, the landing page is rendered
-    """   
+    """
     
     form_register = RegistrationForm()
     form_login = LoginForm()
