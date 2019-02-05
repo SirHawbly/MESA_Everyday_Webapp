@@ -20,7 +20,8 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 # db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 # Check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 
-# Credentials for the database are stored as OS variables for security purposes
+#db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
+#check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 
 # Create a session with the database

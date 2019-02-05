@@ -2,7 +2,9 @@
 $(".button-collapse").sideNav();
 
 // Data Picker Initialization
-$('.datepicker').pickadate();
+$('.datepicker').pickadate({
+	format: 'dd/mm/yyyy'
+});
 
 // Image Picker Initialization
 $("select").imagepicker();
