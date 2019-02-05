@@ -14,7 +14,7 @@ from MESAeveryday.models import User
 
 # # test the user's name when logging in
 def test_username(app, username, password):
-    return app.post('/login', user=[], follow_redirects=True)
+    return app.post('/login', user=[username, password], follow_redirects=True)
     
 
 # # run all of the tests having to do with logging in
