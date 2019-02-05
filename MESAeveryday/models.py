@@ -472,3 +472,26 @@ class Icon(Base):
         except:
             session.rollback()
             return None                  
+
+class Reset_Date(Base):
+    __tablename__ = 'reset_date'
+    
+    reset_date = Column(Date, primary_key=True)
+    
+    def get_reset_date():
+        try:
+            return session.query(Reset_Date).first()
+        except:
+            session.rollback()
+            return None
+    
+    def change_date(new_date):
+        #try:
+            date = session.query(Reset_Date).first()
+            date.reset_date = new_date
+            session.commit()
+            return True
+        #except:
+            session.rollback()
+            return False
+            

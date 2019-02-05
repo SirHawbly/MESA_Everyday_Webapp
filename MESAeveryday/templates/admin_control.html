@@ -123,11 +123,41 @@
             {{ form_old_accounts.submit(class="btn btn-outline-info") }}
         </div>
     </form>
+    
+    <!-- Setting Reset Date -->
+    <form name ="form_reset_date" method="POST" action="" enctype="multipart/form-data">
+        {{ form_reset_date.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Set Reset Day  </legend>
+            This date determines what day of the year everyone's score will reset <br/><br/>
+            <div class="form-group">
+                <div class="col-lg-4 col-md-12">
+                    <div class="md-form">
+                        {{ form_reset_date.reset_date(class="date-custom", placeholder="Selected date") }}               
+                        <span class="add-on"><i data-time-icon="icon-time" data-date-icon="icon-calendar"></i></span>
+                    </div>
+                </div> 
+            </div>          
+        </fieldset>
+        <div class="form-group">
+            {{ form_reset_date.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
 
 </div>
 
 {% endblock content %}
 
+
+
 {% block scripts %}
     {{ super() }}
+    <script>
+        $('#{{ "reset_date" }}').datepicker({
+            changeYear: false, 
+            dateFormat: 'mm-dd',
+        }).focus(function () {
+            $(".ui-datepicker-year").hide();
+        });
+    </script>
 {% endblock scripts %}

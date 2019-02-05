@@ -7,8 +7,8 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm
-from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm
+from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
@@ -673,6 +673,8 @@ def admin_control():
     emailform = UpdateEmailForm()
     passwordform = UpdatePasswordForm()
     oldaccountsform = RemoveOldAccountsForm()
+    resetdateform = ResetDateForm()
+    resetdateform.reset_date.id = 'reset_date'
     admin_account = User.get_user_by_username(current_user.username)
 
 	#Update password
@@ -693,20 +695,29 @@ def admin_control():
         return redirect(url_for('admin_control'))
         
     #Remove old accounts
-    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():
-     
+    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
         results = User.delete_innactive_accounts(oldaccountsform.years.data)
         if results:
             flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
         else:
             flash('No accounts were deleted', 'success')
         return redirect(url_for('admin_control'))
+        
+    #Change reset date    
+    if resetdateform.reset_date.data and resetdateform.validate_on_submit():
+        if Reset_Date.change_date(resetdateform.reset_date.data):
+            flash('Successfully changed reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
+        else:
+            flash('Sorry, we were not able to change the date', 'danger')
+        return redirect(url_for('admin_control'))
+        
 
     #Load page
     if request.method =='GET':
+        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
       
-    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform)    
+    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
         
 
 
