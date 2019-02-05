@@ -1,0 +1,22 @@
+Sign In 
+(items shouldnt need to be tested for validity, they should already be vetted by the registration process)
+- Name - just needs to match an account, should be valid 
+- Password - just needs to match the account, should be valid
+- Account - should be the account owned by the inputted name
+- Logged In User - Logging in should open the correct account
+- Logged In User - This account should also be pulled correctly
+- 
+
+Sign Out
+- No Personal Info should be released?
+- Logged in user should be reset to none
+- 
+
+
+Registering
+- Name - Alpha only (caps dont matter?)
+- School - choice should be on the list of options only
+- Password - alphanumeric, 8 chars, one symbol, one number
+- Matching Password - should match the first password
+- Email - Should not be accepted if already present
+- 
