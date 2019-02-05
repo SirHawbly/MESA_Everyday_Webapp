@@ -138,7 +138,7 @@ def dashboard():
         points = 0
         current_level = 0
         to_next_lv = 0
-
+        
     return render_template('dashboard.html',
                            events=events,
                            number_upcoming=len(upcoming_events),
