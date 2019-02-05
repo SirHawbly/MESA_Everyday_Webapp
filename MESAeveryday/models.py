@@ -486,12 +486,12 @@ class Reset_Date(Base):
             return None
     
     def change_date(new_date):
-        #try:
+        try:
             date = session.query(Reset_Date).first()
             date.reset_date = new_date
             session.commit()
             return True
-        #except:
+        except:
             session.rollback()
             return False
             
