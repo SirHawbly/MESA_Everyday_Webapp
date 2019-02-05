@@ -20,7 +20,8 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 # db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 # Check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 
-# Credentials for the database are stored as OS variables for security purposes
+#db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
+#check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 
 # Create a session with the database
@@ -277,7 +278,8 @@ class Badge(Base):
     badge_id = Column(Integer, primary_key=True)
     badge_name = Column(String)
     color = Column(String)
-    picture = Column(String)
+    icon_id = Column(Integer, ForeignKey("badge_icons.id"))
+
     level1_points = Column(Integer)
     level2_points = Column(Integer)
     level3_points = Column(Integer)
@@ -288,6 +290,8 @@ class Badge(Base):
     level8_points = Column(Integer)
     level9_points = Column(Integer)
     level10_points = Column(Integer)
+    
+    icon = relationship("Icon", foreign_keys=[icon_id])
 
     def __init__(self, badge_name, color, level1_points, level2_points, level3_points, level4_points,
                     level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
@@ -306,7 +310,7 @@ class Badge(Base):
         
     def get_all_badges():
         try:
-            return session.query(Badge.badge_id, Badge.badge_name, Badge.picture)
+            return session.query(Badge)
         except:
             session.rollback()
             return None    
@@ -334,7 +338,7 @@ class Badge(Base):
 
     def get_badge_picture(badge_id):
         try:
-            return session.query(Badge.picture).filter(Badge.badge_id == badge_id)
+            return session.query(Badge.icon.file_name).filter(Badge.badge_id == badge_id)
         except:
             session.rollback()
             return None
@@ -450,4 +454,21 @@ class Avatar(Base):
             return session.query(Avatar)
         except:
             session.rollback()
-            return None        
+            return None       
+
+#Class for the "badge_icons" table
+class Icon(Base):
+    __tablename__ = 'badge_icons'
+
+    id = Column(Integer, primary_key=True)
+    file_name = Column(String)
+
+    def __init__(self, file_name):
+	    self.file_name = file_name
+
+    def get_all_icons():
+        try:
+            return session.query(Icon)
+        except:
+            session.rollback()
+            return None                  

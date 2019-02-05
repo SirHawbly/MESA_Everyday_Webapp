@@ -43,7 +43,7 @@
                 </div>
                 <div class="card-body">
                     {% for badge in badges %}
-                        <img class="rounded-circle account-img" src="../static/badge_icons/{{ badge.picture }}"> {{ badge.badge_name }} 
+                        <img class="rounded-circle account-img" src="../static/badge_icons/{{ badge.icon.file_name }}"> {{ badge.badge_name }} 
                         <br> First Name | Last Name | School | Points | Level <br>
                         {% for user in top_scores[badge.badge_id] %}
                             {{ user.first_name }} | {{ user.last_name }} | {{ user.school_name }} | {{ user.total_points }} | {{ user.current_level }} <br>
