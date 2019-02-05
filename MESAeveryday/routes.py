@@ -147,19 +147,15 @@ def events():
         return redirect(url_for('admin'))
         
     # Get all the badges
-    badges = Badge.get_all_badges_id_with_names()
-    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+    badges = Badge.get_all_badges()
+    #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
     
-    # Get the total amount of points the user has for each badge
-    all_badge_points = []  
-    for badge_id in badge_ids:
-        badge_progress = User.get_badge_progress(current_user.id, badge_id)
-        if badge_progress:
-            badge_points = badge_progress[0]
-        else:
-            badge_points = 0
-        all_badge_points.append(badge_points)
-
+    # Get Badge Progress
+    all_progress = {}    
+    for badge in badges:
+        progress = User.get_badge_progress(current_user.id, badge.badge_id)
+        all_progress[badge.badge_id] = progress
+        
     # Call the google api and pull all upcoming events
     events = get_event_list()
     
@@ -168,16 +164,17 @@ def events():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
     mesa_events = get_mesa_events(events)
-
+    
     return render_template('events.html',
+                           badges=badges,
+                           progress=all_progress,
                            events=events,
                            number_upcoming=len(upcoming_events),
                            upcoming_events=upcoming_events,
-                           result=zip(badge_names, badge_ids),
                            mesa_days=mesa_days,
                            mesa_events=mesa_events,
-                           other_days=other_days,
-                           points=zip(badge_names, all_badge_points))
+                           other_days=other_days)
+
 
 
 @app.route("/logout")
