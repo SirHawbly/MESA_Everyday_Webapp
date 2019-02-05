@@ -106,7 +106,6 @@ def dashboard():
         
     # Get all the badges
     badges = Badge.get_all_badges()
-    #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
     
     # Get Badge Progress
     all_progress = {}    
