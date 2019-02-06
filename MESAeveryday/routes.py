@@ -706,7 +706,7 @@ def admin_control():
     #Change reset date    
     if resetdateform.reset_date.data and resetdateform.validate_on_submit():
         if Reset_Date.change_date(resetdateform.reset_date.data):
-            flash('Successfully changed reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
+            flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
         else:
             flash('Sorry, we were not able to change the date', 'danger')
         return redirect(url_for('admin_control'))
