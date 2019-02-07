@@ -324,11 +324,11 @@ def account():
             return redirect(url_for('account'))
 
     #Load page
-    if request.method =='GET':
-        emailform.email.data = current_user.email
-        nameform.firstname.data = current_user.first_name
-        nameform.lastname.data = current_user.last_name
-        schoolform.school.data = current_user.school_id
+
+    emailform.email.data = current_user.email
+    nameform.firstname.data = current_user.first_name
+    nameform.lastname.data = current_user.last_name
+    schoolform.school.data = current_user.school_id
 
     # Get all the badges
     badges = Badge.get_all_badges_id_with_names()
@@ -670,6 +670,11 @@ def admin():
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
+    """
+        Page for admin to control various parts of the application
+        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
+        Only those will a valid admin account can view this page
+    """  
     if not User.verify_role(current_user.id):
         return redirect(url_for('dashboard'))
         
@@ -716,9 +721,8 @@ def admin_control():
         
 
     #Load page
-    if request.method =='GET':
-        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
-        emailform.email.data = current_user.email
+    resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
+    emailform.email.data = current_user.email
       
     return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
         
@@ -727,11 +731,7 @@ def admin_control():
 @app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
 def admin_settings():
-    """
-        Page for admin to control various parts of the application
-        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
-        Only those will a valid admin account can view this page
-    """    
+  
 
     if not User.verify_role(current_user.id):     
         return redirect(url_for('dashboard'))
