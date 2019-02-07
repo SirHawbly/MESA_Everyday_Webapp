@@ -111,8 +111,8 @@
                     <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
                         <div class="collapsible-body">
                             <ul>
-                                {% for r, i in result %}
-                                    <li><a href="/badges/{{ i }}" class="waves-effect">{{ r }}</a></li>
+                                {% for badge in badges %}
+                                    <li><a href="/badges/{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>

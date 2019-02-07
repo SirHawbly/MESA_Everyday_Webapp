@@ -103,43 +103,16 @@
     <script type="text/javascript" src="../static/js/calendar.resize.js"></script>
     <script type="text/javascript" src="../static/js/sideNavInit.js"></script>
     <script type="text/javascript" src="../static/js/jquery-ui.min.js"></script>
-    {% for f in forms %}
-    <script>
-        $('#{{ "date" + loop.index|string }}').datepicker({
 
-        });
-    </script>
-    {% endfor %}
+
     <script type="text/javascript">
+        
         $(".date-custom").attr("autocomplete", "off");
-        document.getElementById("button_1").onclick = function () {
-        location.href = "{{ url_for('earn_stamps') }}";
-        };
-        document.getElementById("button_2").onclick = function () {
-        location.href = "{{ url_for('earn_stamps') }}";
-        };
-        document.getElementById("button_3").onclick = function () {
-        location.href = "{{ url_for('earn_stamps') }}";
-        };
-        document.getElementById("button_4").onclick = function () {
-        location.href = "{{ url_for('earn_stamps') }}";
-        };
-        document.getElementById("pbutton_1").onclick = function () {
-        location.href = "/badges/1";
-        };
-        document.getElementById("pbutton_2").onclick = function () {
-        location.href = "/badges/2";
-        };
-        document.getElementById("pbutton_3").onclick = function () {
-        location.href = "/badges/3";
-        };
-        document.getElementById("pbutton_4").onclick = function () {
-        location.href = "/badges/4";
-        };
+        
         $('#upEvent').DataTable();
         $('#mesaEvent').DataTable();
     </script>
-
+    {% block scripts %}{% endblock scripts %}
     <!--Custom scripts-->
     </body>
 
