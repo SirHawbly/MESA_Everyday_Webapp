@@ -349,8 +349,26 @@ class Badge(Base):
         except:
             session.rollback()
             return None
-        return True
-
+            
+    def change_points(badge_id, level1_points, level2_points, level3_points, level4_points, level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
+        try: 
+            badge = session.query(Badge).filter(Badge.badge_id == badge_id).first()        
+            badge.level1_points = level1_points         
+            badge.level2_points = level2_points            
+            badge.level3_points = level3_points            
+            badge.level4_points = level4_points
+            badge.level5_points = level5_points
+            badge.level6_points = level6_points
+            badge.level7_points = level7_points
+            badge.level8_points = level8_points
+            badge.level9_points = level9_points
+            badge.level10_points = level10_points
+            session.commit()
+            return True
+        except:
+            session.rollback()
+            return False
+            
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
     __tablename__ = 'stamps'

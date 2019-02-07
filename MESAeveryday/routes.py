@@ -7,7 +7,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from flask import render_template, url_for, flash, redirect, request
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm, BadgePointsForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
@@ -652,15 +652,18 @@ def admin():
         top_badge_scores = Badge.get_top_scores(badge.badge_id)
         record_holders = []
         
-        # For each top score, get all the users that have that score        
-        for top_score in top_badge_scores:
-            # Add each user with a top score to and array of users/top scores
-            users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
-            for user in users_with_top_score:
-                record_holders.append(user)
+        if top_badge_scores:
+            # For each top score, get all the users that have that score        
+            for top_score in top_badge_scores:
+                # Add each user with a top score to and array of users/top scores
+                users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+                for user in users_with_top_score:
+                    record_holders.append(user)
         # Add the array of users/top scores to the total list of scores (indexed by the badge id)
         top_scores[badge.badge_id] = record_holders
-    
+        
+        
+        
     
     return render_template('admin.html', badges=badges, top_scores=top_scores)
 
@@ -732,5 +735,38 @@ def admin_settings():
 
     if not User.verify_role(current_user.id):     
         return redirect(url_for('dashboard'))
+        
+    badges = Badge.get_all_badges()
+    badge_forms = {}
+    
 
-    return render_template('admin_settings.html')
+    for badge in badges:
+        form = BadgePointsForm(prefix=str(badge.badge_id)) 
+        if form.submit.data and form.validate_on_submit():
+            if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
+                flash('Successfully changed badge points', 'success')
+            else:
+                flash('Sorry, we were not able to change the badge points', 'danger')
+            return redirect(url_for('admin_settings'))        
+        form.level1_points.data = badge.level1_points    
+        form.level2_points.data = badge.level2_points            
+        form.level3_points.data = badge.level3_points           
+        form.level4_points.data = badge.level4_points            
+        form.level5_points.data = badge.level5_points          
+        form.level6_points.data = badge.level6_points            
+        form.level7_points.data = badge.level7_points            
+        form.level8_points.data = badge.level8_points           
+        form.level9_points.data = badge.level9_points           
+        form.level10_points.data = badge.level10_points                    
+        badge_forms[badge.badge_id] = form 
+   
+   
+
+       
+    
+
+    
+    
+        
+
+    return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
