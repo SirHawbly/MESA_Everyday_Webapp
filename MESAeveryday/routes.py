@@ -73,7 +73,7 @@ def login():
     
     form_register = RegistrationForm()
     form_login = LoginForm()
-    
+
     # If the login form is submitted and their are no errors in the form, try to log them in
     if form_login.validate_on_submit():
         user = User.get_user_by_username(form_login.username.data)
@@ -134,7 +134,7 @@ def dashboard():
 
 
 @app.route("/events", methods=['GET', 'POST'])
-# @login_required
+@login_required
 def events():
     """
         Page that displays summary information about a student's progress
