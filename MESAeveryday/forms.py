@@ -147,3 +147,8 @@ class ResetDateForm(FlaskForm):
  
     reset_date = DateField('reset date', format='%m-%d', validators=[DataRequired()])
     submit = SubmitField('Change Reset Date')
+class EditBadgeForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    badgeName = StringField('badgeName')
+    submit = SubmitField('Update Badge')
