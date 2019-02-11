@@ -1,14 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
-
+<style>
+  h1,h2,h3,h4,h5,h6{font-family:Lato,'Helvetica Neue',Helvetica,Arial,sans-serif;
+font-weight:700}header.masthead{
+  position:relative;
+  background-color:#343a40;
+  background:url(../static/img/PIC_002.jpg) no-repeat center center;
+  background-size:cover;padding-top:14rem;
+  padding-bottom:14rem
+}
+</style>
 <body>
   <!-- Start your project here-->
   <!-- Navigation -->
   <nav class="navbar navbar-light bg-light static-top">
     <div class="container">
       <!-- Navbar brand -->
-      <a class="navbar-brand" href="#">MESA</a>
-      
+      <a class="navbar-brand" href="#"><img src="../static/img/mesa.png" class="" style="width: 150px; height: 75px;"></a>
+      <form action="../landpage" method="get">
+          <input type="submit" value="Login" class="btn btn-outline-info" />
+      </form>
     </div>
   </nav>
 
@@ -66,48 +77,5 @@
             </form>
         </div>
     </div>
-  </header>
-
-  <!-- Footer -->
-  <footer class="footer bg-light">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
-          <ul class="list-inline mb-2">
-            <li class="list-inline-item">
-              <a href="#">Phone Number</a>
-            </li>
-            <li class="list-inline-item">&sdot;</li>
-            <li class="list-inline-item">
-              <a href="#">Email</a>
-            </li>
-            <li class="list-inline-item">&sdot;</li>
-            <li class="list-inline-item">
-              <a href="#">Location</a>
-            </li>
-          </ul>
-          <p class="text-muted small mb-4 mb-lg-0">&copy; MESA Website 2018. All Rights Reserved.</p>
-        </div>
-        <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
-          <ul class="list-inline mb-0">
-            <li class="list-inline-item mr-3">
-              <a href="#">
-                <i class="fa fa-facebook fa-2x fa-fw"></i>
-              </a>
-            </li>
-            <li class="list-inline-item mr-3">
-              <a href="#">
-                <i class="fa fa-twitter-square fa-2x fa-fw"></i>
-              </a>
-            </li>
-            <li class="list-inline-item">
-              <a href="#">
-                <i class="fa fa-instagram fa-2x fa-fw"></i>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </footer>    
+  </header>   
 {% endblock content %}

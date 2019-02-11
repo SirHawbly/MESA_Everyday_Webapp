@@ -9,9 +9,10 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
-from MESAeveryday.models import User, School, Badge, Stamp
+from MESAeveryday.models import User, School, Badge, Stamp, Reset_Date
 from flask_login import current_user
 from MESAeveryday import bcrypt
+from datetime import datetime
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -137,3 +138,12 @@ class DeleteStampForm(FlaskForm):
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
     stamp = SelectField('Stamp', choices=[])
     submit = SubmitField('Delete Stamp')
+
+class RemoveOldAccountsForm(FlaskForm):
+    years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
+    submit = SubmitField('Delete Old Accounts')
+
+class ResetDateForm(FlaskForm):
+ 
+    reset_date = DateField('reset date', format='%m-%d', validators=[DataRequired()])
+    submit = SubmitField('Change Reset Date')

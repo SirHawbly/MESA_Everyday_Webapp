@@ -21,12 +21,63 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
     <!-- Bootstrap 4 DatePicker-->  
     <link href="../static/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+    <link href="../static/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"> -->
     <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link type="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
+    <link href="../static/css/css-circular-prog-bar.css" media="all" rel="stylesheet" type="text/css"/>
+    <style>
+        body {
+            font-family: Merriweather;
+        }
+    </style>
 </head>
 
     {% block content %}{% endblock %}
 
+
+    <!-- Footer -->
+    <footer class="footer bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
+          <ul class="list-inline mb-2">
+            <li class="list-inline-item">
+              <a href="#">Phone Number</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Email</a>
+            </li>
+            <li class="list-inline-item">&sdot;</li>
+            <li class="list-inline-item">
+              <a href="#">Location</a>
+            </li>
+          </ul>
+          <p class="text-muted small mb-4 mb-lg-0">&copy; MESA Website 2018. All Rights Reserved.</p>
+        </div>
+        <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
+          <ul class="list-inline mb-0">
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fa fa-facebook fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item mr-3">
+              <a href="#">
+                <i class="fa fa-twitter-square fa-2x fa-fw"></i>
+              </a>
+            </li>
+            <li class="list-inline-item">
+              <a href="#">
+                <i class="fa fa-instagram fa-2x fa-fw"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    </footer>
     <!--JavaScript -->
     <!-- SCRIPTS -->
     <!-- JQuery -->
@@ -51,6 +102,17 @@
     <!--Calendar Resize-->
     <script type="text/javascript" src="../static/js/calendar.resize.js"></script>
     <script type="text/javascript" src="../static/js/sideNavInit.js"></script>
+    <script type="text/javascript" src="../static/js/jquery-ui.min.js"></script>
+
+
+    <script type="text/javascript">
+        
+        $(".date-custom").attr("autocomplete", "off");
+        
+        $('#upEvent').DataTable();
+        $('#mesaEvent').DataTable();
+    </script>
+    {% block scripts %}{% endblock scripts %}
     <!--Custom scripts-->
     </body>
 
