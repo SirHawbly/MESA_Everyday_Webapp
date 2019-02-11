@@ -17,6 +17,15 @@ import secrets
 import os
     
 
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            Universal Routes
+                These routes are used by both admins and users
+                   Typically, they involve account management
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
 def landpage():
@@ -100,95 +109,6 @@ def login():
     except:
         flash('Sorry, we could not process that request.', 'warning')
         return render_template('error.html')
-
-
-@app.route("/dashboard", methods=['GET', 'POST'])
-@login_required
-def dashboard():
-    """
-        Page that displays summary information about a student's progress
-        This is the default page a user is taken to when they log in
-    """   
-    try:
-        # Send admins to the admin page
-        if (User.verify_role(current_user.id)):
-            return redirect(url_for('admin'))
-
-        # Get all the badges
-        badges = Badge.get_all_badges()
-        
-        # Get Badge Progress
-        all_progress = {}    
-        for badge in badges:
-            progress = User.get_badge_progress(current_user.id, badge.badge_id)
-            all_progress[badge.badge_id] = progress
-            
-        # Call the google api and pull all upcoming events
-        events = get_event_list()
-        
-        # Parse the events into incoming and special groups
-        mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
-        mesa_events = get_mesa_events(events)
-        
-        return render_template('dashboard.html',
-                               badges=badges,
-                               progress=all_progress,
-                               events=events,
-                               number_upcoming=len(upcoming_events),
-                               upcoming_events=upcoming_events,
-                               mesa_days=mesa_days,
-                               mesa_events=mesa_events,
-                               other_days=other_days)
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html')
-
-@app.route("/events", methods=['GET', 'POST'])
-# @login_required
-def events():
-    """
-        Page that displays summary information about a student's progress
-        This is the default page a user is taken to when they log in
-    """   
-    try:
-        # Send admins to the admin page
-        if (User.verify_role(current_user.id)):
-            return redirect(url_for('admin'))
-            
-        # Get all the badges
-        badges = Badge.get_all_badges()
-        #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
-
-        # Get Badge Progress
-        all_progress = {}    
-        for badge in badges:
-            progress = User.get_badge_progress(current_user.id, badge.badge_id)
-            all_progress[badge.badge_id] = progress
-            
-        # Call the google api and pull all upcoming events
-        events = get_event_list()
-
-        # Parse the events into incoming and special groups
-        mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
-        mesa_events = get_mesa_events(events)
-
-        return render_template('events.html',
-                               badges=badges,
-                               progress=all_progress,
-                               events=events,
-                               number_upcoming=len(upcoming_events),
-                               upcoming_events=upcoming_events,
-                               mesa_days=mesa_days,
-                               mesa_events=mesa_events,
-                               other_days=other_days)
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html')
-
 
 @app.route("/logout")
 def logout():
@@ -292,6 +212,104 @@ def forgot_username():
     except:
         flash('Sorry, we could not process that request.', 'warning')
         return render_template('error.html')    
+        
+        
+        
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            User Routes
+                These routes are used by the users of the game
+    Typically, these routes involve the various features of the game
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        
+@app.route("/dashboard", methods=['GET', 'POST'])
+@login_required
+def dashboard():
+    """
+        Page that displays summary information about a student's progress
+        This is the default page a user is taken to when they log in
+    """   
+    try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+
+        # Get all the badges
+        badges = Badge.get_all_badges()
+        
+        # Get Badge Progress
+        all_progress = {}    
+        for badge in badges:
+            progress = User.get_badge_progress(current_user.id, badge.badge_id)
+            all_progress[badge.badge_id] = progress
+            
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        mesa_events = get_mesa_events(events)
+        
+        return render_template('dashboard.html',
+                               badges=badges,
+                               progress=all_progress,
+                               events=events,
+                               number_upcoming=len(upcoming_events),
+                               upcoming_events=upcoming_events,
+                               mesa_days=mesa_days,
+                               mesa_events=mesa_events,
+                               other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html')
+
+@app.route("/events", methods=['GET', 'POST'])
+# @login_required
+def events():
+    """
+        Page that displays summary information about a student's progress
+        This is the default page a user is taken to when they log in
+    """   
+    try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+            
+        # Get all the badges
+        badges = Badge.get_all_badges()
+        #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+        # Get Badge Progress
+        all_progress = {}    
+        for badge in badges:
+            progress = User.get_badge_progress(current_user.id, badge.badge_id)
+            all_progress[badge.badge_id] = progress
+            
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        mesa_events = get_mesa_events(events)
+
+        return render_template('events.html',
+                               badges=badges,
+                               progress=all_progress,
+                               events=events,
+                               number_upcoming=len(upcoming_events),
+                               upcoming_events=upcoming_events,
+                               mesa_days=mesa_days,
+                               mesa_events=mesa_events,
+                               other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html')
+
+
+
    
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
@@ -522,6 +540,161 @@ def check_badge(badge_id):
         flash('Sorry, we could not process that request.', 'warning')
         return render_template('error_user.html') 
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            Admin Routes
+                These routes are used by the admins
+    Typically, these routes involve ways to change the rules/settings
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+# Added by Millen
+# Load admin page if role is admin
+@app.route("/admin")
+@login_required
+def admin():
+
+    try:
+        # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+        if not User.verify_role(current_user.id):
+            return redirect(url_for('dashboard'))
+            
+        # Top scores will be a dictionary of arrays. 
+        # Each array holds all the users and top scores for a specific badge
+        # The dictionary will be for each badge and is indexed based on the badge id
+        top_scores = {}    
+            
+        # Get all badges
+        badges = Badge.get_all_badges()
+        
+        # Get all the top scores/users for each badge
+        for badge in badges:
+            # Find out what the top three scores are
+            top_badge_scores = Badge.get_top_scores(badge.badge_id)
+            record_holders = []
+            
+            if top_badge_scores:
+                # For each top score, get all the users that have that score        
+                for top_score in top_badge_scores:
+                    # Add each user with a top score to and array of users/top scores
+                    users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+                    for user in users_with_top_score:
+                        record_holders.append(user)
+            # Add the array of users/top scores to the total list of scores (indexed by the badge id)
+            top_scores[badge.badge_id] = record_holders
+           
+        return render_template('admin.html', badges=badges, top_scores=top_scores)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
+
+@app.route("/admin_control", methods=['GET', 'POST'])
+@login_required    
+def admin_control():
+    """
+        Page for admin to control various parts of the application
+        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
+        Only those will a valid admin account can view this page
+    """ 
+    try:    
+        if not User.verify_role(current_user.id):
+            return redirect(url_for('dashboard'))
+            
+        emailform = UpdateEmailForm()
+        passwordform = UpdatePasswordForm()
+        oldaccountsform = RemoveOldAccountsForm()
+        resetdateform = ResetDateForm()
+        resetdateform.reset_date.id = 'reset_date'
+        admin_account = User.get_user_by_username(current_user.username)
+
+        #Update password
+        if passwordform.password.data and passwordform.validate_on_submit():
+            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+            if User.reset_pwd(admin_account.id, hashed_password) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('admin_control'))
+
+        #Update email
+        if emailform.email.data and emailform.validate_on_submit():
+            if User.update_email(admin_account.id, emailform.email.data) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('admin_control'))
+            
+        #Remove old accounts
+        if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
+            results = User.delete_innactive_accounts(oldaccountsform.years.data)
+            if results:
+                flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
+            else:
+                flash('No accounts were deleted', 'success')
+            return redirect(url_for('admin_control'))
+            
+        #Change reset date    
+        if resetdateform.reset_date.data and resetdateform.validate_on_submit():
+            if Reset_Date.change_date(resetdateform.reset_date.data):
+                flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
+            else:
+                flash('Sorry, we were not able to change the date', 'danger')
+            return redirect(url_for('admin_control'))
+            
+
+        #Load page
+        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
+        emailform.email.data = current_user.email
+          
+        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
+        
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
+
+@app.route("/admin_settings", methods=['GET', 'POST'])
+@login_required
+def admin_settings():
+  
+    try: 
+        if not User.verify_role(current_user.id):     
+            return redirect(url_for('dashboard'))
+            
+        badges = Badge.get_all_badges()
+        badge_forms = {}
+
+
+        for badge in badges:
+            form = BadgePointsForm(prefix=str(badge.badge_id)) 
+            if form.submit.data and form.validate_on_submit():
+                if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
+                    flash('Successfully changed badge points', 'success')
+                else:
+                    flash('Sorry, we were not able to change the badge points', 'danger')
+                return redirect(url_for('admin_settings'))        
+            form.level1_points.data = badge.level1_points    
+            form.level2_points.data = badge.level2_points            
+            form.level3_points.data = badge.level3_points           
+            form.level4_points.data = badge.level4_points            
+            form.level5_points.data = badge.level5_points          
+            form.level6_points.data = badge.level6_points            
+            form.level7_points.data = badge.level7_points            
+            form.level8_points.data = badge.level8_points           
+            form.level9_points.data = badge.level9_points           
+            form.level10_points.data = badge.level10_points                    
+            badge_forms[badge.badge_id] = form 
+
+        return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
+        
+ 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                        Routes Functions
+       Supporting functions used throughout the various routes
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+ 
 def random_code():
     """
         Generates a random 3 digit code 
@@ -666,144 +839,3 @@ username has been generated and it is '''+username+'''
 please keep this email handy as you will need that username every time you
 login to the app. '''
     mail.send(msg)
-
-# Added by Millen
-# Load admin page if role is admin
-@app.route("/admin")
-@login_required
-def admin():
-
-    try:
-        # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-        if not User.verify_role(current_user.id):
-            return redirect(url_for('dashboard'))
-            
-        # Top scores will be a dictionary of arrays. 
-        # Each array holds all the users and top scores for a specific badge
-        # The dictionary will be for each badge and is indexed based on the badge id
-        top_scores = {}    
-            
-        # Get all badges
-        badges = Badge.get_all_badges()
-        
-        # Get all the top scores/users for each badge
-        for badge in badges:
-            # Find out what the top three scores are
-            top_badge_scores = Badge.get_top_scores(badge.badge_id)
-            record_holders = []
-            
-            if top_badge_scores:
-                # For each top score, get all the users that have that score        
-                for top_score in top_badge_scores:
-                    # Add each user with a top score to and array of users/top scores
-                    users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
-                    for user in users_with_top_score:
-                        record_holders.append(user)
-            # Add the array of users/top scores to the total list of scores (indexed by the badge id)
-            top_scores[badge.badge_id] = record_holders
-           
-        return render_template('admin.html', badges=badges, top_scores=top_scores)
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
-
-@app.route("/admin_control", methods=['GET', 'POST'])
-@login_required    
-def admin_control():
-    """
-        Page for admin to control various parts of the application
-        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
-        Only those will a valid admin account can view this page
-    """ 
-    try:    
-        if not User.verify_role(current_user.id):
-            return redirect(url_for('dashboard'))
-            
-        emailform = UpdateEmailForm()
-        passwordform = UpdatePasswordForm()
-        oldaccountsform = RemoveOldAccountsForm()
-        resetdateform = ResetDateForm()
-        resetdateform.reset_date.id = 'reset_date'
-        admin_account = User.get_user_by_username(current_user.username)
-
-        #Update password
-        if passwordform.password.data and passwordform.validate_on_submit():
-            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-            if User.reset_pwd(admin_account.id, hashed_password) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('admin_control'))
-
-        #Update email
-        if emailform.email.data and emailform.validate_on_submit():
-            if User.update_email(admin_account.id, emailform.email.data) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('admin_control'))
-            
-        #Remove old accounts
-        if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
-            results = User.delete_innactive_accounts(oldaccountsform.years.data)
-            if results:
-                flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
-            else:
-                flash('No accounts were deleted', 'success')
-            return redirect(url_for('admin_control'))
-            
-        #Change reset date    
-        if resetdateform.reset_date.data and resetdateform.validate_on_submit():
-            if Reset_Date.change_date(resetdateform.reset_date.data):
-                flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
-            else:
-                flash('Sorry, we were not able to change the date', 'danger')
-            return redirect(url_for('admin_control'))
-            
-
-        #Load page
-        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
-        emailform.email.data = current_user.email
-          
-        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
-        
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
-
-@app.route("/admin_settings", methods=['GET', 'POST'])
-@login_required
-def admin_settings():
-  
-    try: 
-        if not User.verify_role(current_user.id):     
-            return redirect(url_for('dashboard'))
-            
-        badges = Badge.get_all_badges()
-        badge_forms = {}
-
-
-        for badge in badges:
-            form = BadgePointsForm(prefix=str(badge.badge_id)) 
-            if form.submit.data and form.validate_on_submit():
-                if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
-                    flash('Successfully changed badge points', 'success')
-                else:
-                    flash('Sorry, we were not able to change the badge points', 'danger')
-                return redirect(url_for('admin_settings'))        
-            form.level1_points.data = badge.level1_points    
-            form.level2_points.data = badge.level2_points            
-            form.level3_points.data = badge.level3_points           
-            form.level4_points.data = badge.level4_points            
-            form.level5_points.data = badge.level5_points          
-            form.level6_points.data = badge.level6_points            
-            form.level7_points.data = badge.level7_points            
-            form.level8_points.data = badge.level8_points           
-            form.level9_points.data = badge.level9_points           
-            form.level10_points.data = badge.level10_points                    
-            badge_forms[badge.badge_id] = form 
-
-        return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
