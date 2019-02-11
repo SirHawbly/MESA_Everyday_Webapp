@@ -15,7 +15,7 @@ from flask_mail import Message
 from datetime import datetime
 import secrets
 import os
-
+    
 
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/landpage", methods=['GET', 'POST'])
@@ -25,10 +25,13 @@ def landpage():
       Consists of both the registration form and the login form
     """
     
-    form_register = RegistrationForm()
-    form_login = LoginForm()
-    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
-
+    try:
+        form_register = RegistrationForm()
+        form_login = LoginForm()
+        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+    except:    
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')  
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -36,32 +39,35 @@ def register():
       Route that processes a registration request
       After the registration is processes, it renders the landing page
     """   
-    
-    form_register = RegistrationForm()
-    form_login = LoginForm()
-    
-    # If the registration form is submitted and their are no errors in the form, try to register the user
-    if form_register.validate_on_submit():  
-    
-        # Generate username
-        new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
-       
-        if new_username == 'ERROR':
-            flash('Sorry, we were unable to generate an account for you.', 'danger')
-        else:
-            # Generate hashed password
-            hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
-            
-            # Add user to the database
-            new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
-                            form_register.email.data, hashed_password, form_register.school.data)
-            User.add_new_user(new_user)
+    try:
+        form_register = RegistrationForm()
+        form_login = LoginForm()
 
-            # Tell the user their new username and send them an email with the username
-            flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
-            send_generate_username(form_register.email.data, new_username)
+        # If the registration form is submitted and their are no errors in the form, try to register the user
+        if form_register.validate_on_submit():  
 
-    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+            # Generate username
+            new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
+           
+            if new_username == 'ERROR':
+                flash('Sorry, we were unable to generate an account for you.', 'danger')
+            else:
+                # Generate hashed password
+                hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
+                
+                # Add user to the database
+                new_user = User(new_username, form_register.firstname.data, form_register.lastname.data,
+                                form_register.email.data, hashed_password, form_register.school.data)
+                User.add_new_user(new_user)
+
+                # Tell the user their new username and send them an email with the username
+                flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
+                send_generate_username(form_register.email.data, new_username)
+
+        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')      
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -71,25 +77,29 @@ def login():
       If the login fails, the landing page is rendered
     """   
     
-    form_register = RegistrationForm()
-    form_login = LoginForm()
-    
-    # If the login form is submitted and their are no errors in the form, try to log them in
-    if form_login.validate_on_submit():
-        user = User.get_user_by_username(form_login.username.data)
-        
-        # User entered the correct credentials
-        if user and bcrypt.check_password_hash(user.password, form_login.password.data):
-            User.update_last_login(user.id, datetime.now())
-            login_user(user, remember=form_login.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+    try:
+        form_register = RegistrationForm()
+        form_login = LoginForm()
+
+        # If the login form is submitted and their are no errors in the form, try to log them in
+        if form_login.validate_on_submit():
+            user = User.get_user_by_username(form_login.username.data)
             
-        # User did not enter the correct credentials
-        else:
-            flash('Login Unsuccessful. Please check username and password', 'danger')
-            
-    return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+            # User entered the correct credentials
+            if user and bcrypt.check_password_hash(user.password, form_login.password.data):
+                User.update_last_login(user.id, datetime.now())
+                login_user(user, remember=form_login.remember.data)
+                next_page = request.args.get('next')
+                return redirect(next_page) if next_page else redirect(url_for('dashboard'))
+                
+            # User did not enter the correct credentials
+            else:
+                flash('Login Unsuccessful. Please check username and password', 'danger')
+                
+        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')
 
 
 @app.route("/dashboard", methods=['GET', 'POST'])
@@ -99,39 +109,41 @@ def dashboard():
         Page that displays summary information about a student's progress
         This is the default page a user is taken to when they log in
     """   
-    
-    # Send admins to the admin page
-    if (User.verify_role(current_user.id)):
-        return redirect(url_for('admin'))
-        
-    # Get all the badges
-    badges = Badge.get_all_badges()
-    
-    # Get Badge Progress
-    all_progress = {}    
-    for badge in badges:
-        progress = User.get_badge_progress(current_user.id, badge.badge_id)
-        all_progress[badge.badge_id] = progress
-        
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    mesa_events = get_mesa_events(events)
-    
-    return render_template('dashboard.html',
-                           badges=badges,
-                           progress=all_progress,
-                           events=events,
-                           number_upcoming=len(upcoming_events),
-                           upcoming_events=upcoming_events,
-                           mesa_days=mesa_days,
-                           mesa_events=mesa_events,
-                           other_days=other_days)
+    try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
 
+        # Get all the badges
+        badges = Badge.get_all_badges()
+        
+        # Get Badge Progress
+        all_progress = {}    
+        for badge in badges:
+            progress = User.get_badge_progress(current_user.id, badge.badge_id)
+            all_progress[badge.badge_id] = progress
+            
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        mesa_events = get_mesa_events(events)
+        
+        return render_template('dashboard.html',
+                               badges=badges,
+                               progress=all_progress,
+                               events=events,
+                               number_upcoming=len(upcoming_events),
+                               upcoming_events=upcoming_events,
+                               mesa_days=mesa_days,
+                               mesa_events=mesa_events,
+                               other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html')
 
 @app.route("/events", methods=['GET', 'POST'])
 # @login_required
@@ -140,40 +152,42 @@ def events():
         Page that displays summary information about a student's progress
         This is the default page a user is taken to when they log in
     """   
-    
-    # Send admins to the admin page
-    if (User.verify_role(current_user.id)):
-        return redirect(url_for('admin'))
-        
-    # Get all the badges
-    badges = Badge.get_all_badges()
-    #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
-    
-    # Get Badge Progress
-    all_progress = {}    
-    for badge in badges:
-        progress = User.get_badge_progress(current_user.id, badge.badge_id)
-        all_progress[badge.badge_id] = progress
-        
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    mesa_events = get_mesa_events(events)
-    
-    return render_template('events.html',
-                           badges=badges,
-                           progress=all_progress,
-                           events=events,
-                           number_upcoming=len(upcoming_events),
-                           upcoming_events=upcoming_events,
-                           mesa_days=mesa_days,
-                           mesa_events=mesa_events,
-                           other_days=other_days)
+    try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+            
+        # Get all the badges
+        badges = Badge.get_all_badges()
+        #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
 
+        # Get Badge Progress
+        all_progress = {}    
+        for badge in badges:
+            progress = User.get_badge_progress(current_user.id, badge.badge_id)
+            all_progress[badge.badge_id] = progress
+            
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        mesa_events = get_mesa_events(events)
+
+        return render_template('events.html',
+                               badges=badges,
+                               progress=all_progress,
+                               events=events,
+                               number_upcoming=len(upcoming_events),
+                               upcoming_events=upcoming_events,
+                               mesa_days=mesa_days,
+                               mesa_events=mesa_events,
+                               other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html')
 
 
 @app.route("/logout")
@@ -182,8 +196,12 @@ def logout():
         Route that logs a user out and sends them to the landing page
         Can be accessed anywhere on the site once a user has logged in
     """   
-    logout_user()
-    return redirect(url_for('landpage'))
+    try:
+        logout_user()
+        return redirect(url_for('landpage'))
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')
 
 
 @app.route("/reset_password", methods=['GET', 'POST'])
@@ -192,22 +210,25 @@ def reset_request():
         Page for users who are not logged on to request a password reset  
         Sends an email to the user with a link to a password reset page if they enter a valid email
     """   
-    # Send user to the dashboard if they are logged in. This page is intended for those who forgot their password
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+    try:
+        # Send user to the dashboard if they are logged in. This page is intended for those who forgot their password
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
 
-    form = RequestResetForm()
+        form = RequestResetForm()
 
-    # If the user has submitted the form with a valid email, send them an email with a link to the reset password page
-    if form.validate_on_submit():
-        user = User.get_user_by_email(form.email.data)
-        send_reset_email(user)
-        flash('An email has been sent with instructions to reset your password.', 'info')
-        return redirect(url_for('landpage'))
+        # If the user has submitted the form with a valid email, send them an email with a link to the reset password page
+        if form.validate_on_submit():
+            user = User.get_user_by_email(form.email.data)
+            send_reset_email(user)
+            flash('An email has been sent with instructions to reset your password.', 'info')
+            return redirect(url_for('landpage'))
 
-    return render_template('reset_request.html', title='Rest Password', form=form)
-
-
+        return render_template('reset_request.html', title='Rest Password', form=form)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')
+        
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     """
@@ -215,34 +236,37 @@ def reset_token(token):
         Will not work if the route does not contain a valid token 
         This page can only be reached via an email sent to the user
     """      
-    # Send user to the dashboard if they are logged in. This page is intended for those who forgot their password
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+    try:
+        # Send user to the dashboard if they are logged in. This page is intended for those who forgot their password
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
 
-    # Verify that the token is valid and has not expired
-    user = User.verify_reset_token(token)
-    if user is None:
-        flash('That is an invalid or expired token', 'warning')
-        return redirect(url_for('landpage'))
-
-    form = ResetPasswordForm()
-    
-    # If the form has been submitted and is valid, reset their paassword
-    if form.validate_on_submit():
-    
-        # Hash the new password that the user has chosen
-        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-      
-        # Reset the password. If it updates correctly, tell the user that their password was updated
-        if User.reset_pwd(user.id, hashed_password) == True:
-            flash('Your password has been updated! You are now able to log in', 'success')
+        # Verify that the token is valid and has not expired
+        user = User.verify_reset_token(token)
+        if user is None:
+            flash('That is an invalid or expired token', 'warning')
             return redirect(url_for('landpage'))
-        # If the password didn't update correctly, tell the user that it failed
-        else:
-            flash('Sorry, we were unable to update your password', 'danger')
-            return redirect(url_for('landpage'))
-    return render_template('reset_token.html', title='Rest Password', form=form)
 
+        form = ResetPasswordForm()
+        
+        # If the form has been submitted and is valid, reset their paassword
+        if form.validate_on_submit():
+        
+            # Hash the new password that the user has chosen
+            hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+          
+            # Reset the password. If it updates correctly, tell the user that their password was updated
+            if User.reset_pwd(user.id, hashed_password) == True:
+                flash('Your password has been updated! You are now able to log in', 'success')
+                return redirect(url_for('landpage'))
+            # If the password didn't update correctly, tell the user that it failed
+            else:
+                flash('Sorry, we were unable to update your password', 'danger')
+                return redirect(url_for('landpage'))
+        return render_template('reset_token.html', title='Rest Password', form=form)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')
 
 @app.route("/forgot_username", methods=['GET', 'POST'])
 def forgot_username():
@@ -251,20 +275,23 @@ def forgot_username():
         Usernames are generated at registration and are unchangeable
         Sends an email to a user with their username if they enter a valid email
     """     
-    # Send user to the dashboard if they are logged in. This page is intended for those who forgot their username
-    if current_user.is_authenticated:
-        return redirect(url_for('dashboard'))
+    try:
+        # Send user to the dashboard if they are logged in. This page is intended for those who forgot their username
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+            
+        form = RequestResetUserForm()
         
-    form = RequestResetUserForm()
-    
-    # If the form has been submitted and is valid, send the user an email with their username
-    if form.validate_on_submit():
-        user = User.get_user_by_email(form.email.data)
-        send_forgot_username(user)
-        flash('An email has been sent with your username.', 'info')
-        return redirect(url_for('landpage'))
-    return render_template('forgot_username.html', title='Rest User', form=form)
-    
+        # If the form has been submitted and is valid, send the user an email with their username
+        if form.validate_on_submit():
+            user = User.get_user_by_email(form.email.data)
+            send_forgot_username(user)
+            flash('An email has been sent with your username.', 'info')
+            return redirect(url_for('landpage'))
+        return render_template('forgot_username.html', title='Rest User', form=form)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error.html')    
    
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
@@ -273,102 +300,108 @@ def account():
         Page for users to change their account information
         Page is broken up into separate forms for each section, so they can only update their account one piece at a time
     """    
-    emailform = UpdateEmailForm()
-    nameform = UpdateNameForm()
-    schoolform = UpdateSchoolForm()
-    passwordform= UpdatePasswordForm()
-    avatars = ""
-    myaccount = User.get_user_by_username(current_user.username)
+    try:
+        emailform = UpdateEmailForm()
+        nameform = UpdateNameForm()
+        schoolform = UpdateSchoolForm()
+        passwordform= UpdatePasswordForm()
+        avatars = ""
+        myaccount = User.get_user_by_username(current_user.username)
 
-	#Update password
-    if passwordform.password.data and passwordform.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-        if User.reset_pwd(myaccount.id, hashed_password) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('account'))
-
-	#Update email
-    if emailform.email.data and emailform.validate_on_submit():
-        if User.update_email(myaccount.id, emailform.email.data) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('account'))
-
-	#Update name
-    if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
-        if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('account'))
-
-    #Update school
-    if schoolform.school.data and schoolform.validate_on_submit():
-        if User.update_school(myaccount.id, schoolform.school.data) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('account'))
-
-    #Update avatar
-    if request.method=='POST':
-        avatarSelect = request.form.get('avatarSelect')
-        if avatarSelect:
-            if User.update_avatar(myaccount.id, avatarSelect) == True:
+        #Update password
+        if passwordform.password.data and passwordform.validate_on_submit():
+            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+            if User.reset_pwd(myaccount.id, hashed_password) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
                 flash('Sorry, we were unable to update your account', 'danger')
             return redirect(url_for('account'))
 
-    #Load page
+        #Update email
+        if emailform.email.data and emailform.validate_on_submit():
+            if User.update_email(myaccount.id, emailform.email.data) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('account'))
 
-    emailform.email.data = current_user.email
-    nameform.firstname.data = current_user.first_name
-    nameform.lastname.data = current_user.last_name
-    schoolform.school.data = current_user.school_id
+        #Update name
+        if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
+            if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('account'))
 
-    # Get all the badges
-    badges = Badge.get_all_badges_id_with_names()
-    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+        #Update school
+        if schoolform.school.data and schoolform.validate_on_submit():
+            if User.update_school(myaccount.id, schoolform.school.data) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('account'))
 
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
+        #Update avatar
+        if request.method=='POST':
+            avatarSelect = request.form.get('avatarSelect')
+            if avatarSelect:
+                if User.update_avatar(myaccount.id, avatarSelect) == True:
+                    flash('Your account has been successfully updated!', 'success')
+                else:
+                    flash('Sorry, we were unable to update your account', 'danger')
+                return redirect(url_for('account'))
+
+        #Load page
+
+        emailform.email.data = current_user.email
+        nameform.firstname.data = current_user.first_name
+        nameform.lastname.data = current_user.last_name
+        schoolform.school.data = current_user.school_id
+
+        # Get all the badges
+        badges = Badge.get_all_badges_id_with_names()
+        badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
         
-    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform, result=zip(badge_names, badge_ids), events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                           other_days=other_days)
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+            
+        return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform, result=zip(badge_names, badge_ids), events=events,
+                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                               other_days=other_days)
+    except:    
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html')    
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
 @login_required
 def account_deactivate():
-    myaccount = User.get_user_by_username(current_user.username)
-    print(myaccount.id)
-    if current_user.is_authenticated:
-        if request.method=='POST':
-            firstName=request.form.get('FirstName')
-            lastName=request.form.get('LastName')
+    try:
+        myaccount = User.get_user_by_username(current_user.username)
+        print(myaccount.id)
+        if current_user.is_authenticated:
+            if request.method=='POST':
+                firstName=request.form.get('FirstName')
+                lastName=request.form.get('LastName')
 
-            if ((firstName.lower()==current_user.first_name.lower())
-                    and (lastName.lower()==current_user.last_name.lower())):
-                print(request.form.get('FirstName'))
-                User.delete_user_by_id(myaccount.id)
-                logout_user()
-                return redirect(url_for('landpage'))
-            else :
-                flash('Account does not match. Please check First Name and Last Name!!', 'danger')
-        return render_template('account_deactivate.html')
+                if ((firstName.lower()==current_user.first_name.lower())
+                        and (lastName.lower()==current_user.last_name.lower())):
+                    print(request.form.get('FirstName'))
+                    User.delete_user_by_id(myaccount.id)
+                    logout_user()
+                    return redirect(url_for('landpage'))
+                else :
+                    flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+            return render_template('account_deactivate.html')
 
 
-
-
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html') 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
 def earn_stamps():
@@ -378,54 +411,57 @@ def earn_stamps():
         The stamp will be added to the user's account and does not do any verification
             as to whether or not they actually did the task
     """  
+    try:
+        # Get all badge names
+        badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
 
-    # Get all badge names
-    badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
+        # A dictionary that maps badge_ids to badge_name
+        badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    
+        
+        forms, t = [], 1       # several pairs of forms (stamp, date, submit). t is used to assign unique id
+        for badge in badges:
+            stamps = Stamp.get_stamps_of_badge(badge[0])
 
-    # A dictionary that maps badge_ids to badge_name
-    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    
-    
-    forms, t = [], 1       # several pairs of forms (stamp, date, submit). t is used to assign unique id
-    for badge in badges:
-        stamps = Stamp.get_stamps_of_badge(badge[0])
+            if stamps.first() is not None:
+                form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
 
-        if stamps.first() is not None:
-            form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
+                form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
+                                                                    # HTML doesnt seem to be friendly to an id with space(s), sigh
 
-            form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
-                                                                # HTML doesnt seem to be friendly to an id with space(s), sigh
+                form.stamps.choices = stamps                      # assign unearned stamps to the select field
+                forms.append(form)                                  # create a list of forms
+                t += 1
+        for form in forms:
+            if form.submit.data:
+                if form.validate_on_submit():
+                    id = current_user.id    # acquire the user_id of current user
+                    if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
+                        # flash('You've earned a new stamp!', 'success')
+                        # some message should be shown here, flash doesnt work
+                        print('successfully added.')
+                    # else:
+                        # flash('Failed adding stamp', 'warning')
+                        # some message should be shown here, flash doesnt work
+                    return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
 
-            form.stamps.choices = stamps                      # assign unearned stamps to the select field
-            forms.append(form)                                  # create a list of forms
-            t += 1
-    for form in forms:
-        if form.submit.data:
-            if form.validate_on_submit():
-                id = current_user.id    # acquire the user_id of current user
-                if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
-                    # flash('You've earned a new stamp!', 'success')
-                    # some message should be shown here, flash doesnt work
-                    print('successfully added.')
-                # else:
-                    # flash('Failed adding stamp', 'warning')
-                    # some message should be shown here, flash doesnt work
-                return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
+        # Get all the badges
+        badges = Badge.get_all_badges()
 
-    # Get all the badges
-    badges = Badge.get_all_badges()
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
 
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-
-    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                           other_days=other_days)
-
+        return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
+                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                               other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html') 
+        
 @app.route("/badges/<badge_id>", methods=['GET', 'POST'])
 @login_required
 def check_badge(badge_id):
@@ -433,56 +469,58 @@ def check_badge(badge_id):
         Page for checking a user's progress on an individual badge
         The particular badge being view is passed in through the route
     """  
+    try:
+        # Get all the badges
+        badges = Badge.get_all_badges()
 
-    # Get all the badges
-    badges = Badge.get_all_badges()
+        # Get the current badge being viewed
+        badge = Badge.get_badge_by_id(badge_id)
+          
+        # Get the id of current user and separate the stamps that they have earned from the one's they have not earned
+        user_id = current_user.id    
+        unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(user_id, badge.badge_id)]     
+        earned_stamps = [row for row in UserStamp.get_earned_stamps_of_badge(user_id, badge.badge_id)]
+        
+        # If all the stamps for this badge have been earned, print this instead
+        if not unearned_stamps:
+            unearned_stamps = ['All stamps earned'] 
+        
+        # Get the user's progress on the badge
+        badge_progress = User.get_badge_progress(user_id, badge.badge_id)
+        if badge_progress:
+            points = badge_progress[0]
+            current_level = badge_progress[1]
+            to_next_lv = badge_progress[2]
+        else:
+            points = 0
+            current_level = 0
+            to_next_lv = 0
 
-    # Get the current badge being viewed
-    badge = Badge.get_badge_by_id(badge_id)
-      
-    # Get the id of current user and separate the stamps that they have earned from the one's they have not earned
-    user_id = current_user.id    
-    unearned_stamps = [row.stamp_name for row in Stamp.get_unearned_stamps_of_badge(user_id, badge.badge_id)]     
-    earned_stamps = [row for row in UserStamp.get_earned_stamps_of_badge(user_id, badge.badge_id)]
-    
-    # If all the stamps for this badge have been earned, print this instead
-    if not unearned_stamps:
-        unearned_stamps = ['All stamps earned'] 
-    
-    # Get the user's progress on the badge
-    badge_progress = User.get_badge_progress(user_id, badge.badge_id)
-    if badge_progress:
-        points = badge_progress[0]
-        current_level = badge_progress[1]
-        to_next_lv = badge_progress[2]
-    else:
-        points = 0
-        current_level = 0
-        to_next_lv = 0
-
-    # process on deleting stamp
-    if request.method == 'POST':
-        stamp_id = request.form.get('stamp_id')
-        time_finished = datetime.strptime(request.form.get('time_finished'), '%Y-%m-%d').date()
-        log_date = datetime.strptime(request.form.get('log_date'), '%Y-%m-%d %H:%M:%S')
-        if stamp_id and time_finished and log_date:
-            if UserStamp.delete_stamp(user_id, stamp_id, time_finished, log_date):
-                print('deleted:\nid: ' + str(stamp_id) + '\ntime finished: ' +  str(time_finished) + '\nlog_date: ' + str(log_date))
-            else:
-                print('error when deleting user earned stamp')
-        return redirect('/badges/' + str(badge_id))
-    
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    
-    return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days)
-
+        # process on deleting stamp
+        if request.method == 'POST':
+            stamp_id = request.form.get('stamp_id')
+            time_finished = datetime.strptime(request.form.get('time_finished'), '%Y-%m-%d').date()
+            log_date = datetime.strptime(request.form.get('log_date'), '%Y-%m-%d %H:%M:%S')
+            if stamp_id and time_finished and log_date:
+                if UserStamp.delete_stamp(user_id, stamp_id, time_finished, log_date):
+                    print('deleted:\nid: ' + str(stamp_id) + '\ntime finished: ' +  str(time_finished) + '\nlog_date: ' + str(log_date))
+                else:
+                    print('error when deleting user earned stamp')
+            return redirect('/badges/' + str(badge_id))
+        
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        
+        return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
+                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_user.html') 
 
 def random_code():
     """
@@ -634,38 +672,40 @@ login to the app. '''
 @app.route("/admin")
 @login_required
 def admin():
-    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-    if not User.verify_role(current_user.id):
-        return redirect(url_for('dashboard'))
+
+    try:
+        # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+        if not User.verify_role(current_user.id):
+            return redirect(url_for('dashboard'))
+            
+        # Top scores will be a dictionary of arrays. 
+        # Each array holds all the users and top scores for a specific badge
+        # The dictionary will be for each badge and is indexed based on the badge id
+        top_scores = {}    
+            
+        # Get all badges
+        badges = Badge.get_all_badges()
         
-    # Top scores will be a dictionary of arrays. 
-    # Each array holds all the users and top scores for a specific badge
-    # The dictionary will be for each badge and is indexed based on the badge id
-    top_scores = {}    
-        
-    # Get all badges
-    badges = Badge.get_all_badges()
-    
-    # Get all the top scores/users for each badge
-    for badge in badges:
-        # Find out what the top three scores are
-        top_badge_scores = Badge.get_top_scores(badge.badge_id)
-        record_holders = []
-        
-        if top_badge_scores:
-            # For each top score, get all the users that have that score        
-            for top_score in top_badge_scores:
-                # Add each user with a top score to and array of users/top scores
-                users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
-                for user in users_with_top_score:
-                    record_holders.append(user)
-        # Add the array of users/top scores to the total list of scores (indexed by the badge id)
-        top_scores[badge.badge_id] = record_holders
-        
-        
-        
-    
-    return render_template('admin.html', badges=badges, top_scores=top_scores)
+        # Get all the top scores/users for each badge
+        for badge in badges:
+            # Find out what the top three scores are
+            top_badge_scores = Badge.get_top_scores(badge.badge_id)
+            record_holders = []
+            
+            if top_badge_scores:
+                # For each top score, get all the users that have that score        
+                for top_score in top_badge_scores:
+                    # Add each user with a top score to and array of users/top scores
+                    users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+                    for user in users_with_top_score:
+                        record_holders.append(user)
+            # Add the array of users/top scores to the total list of scores (indexed by the badge id)
+            top_scores[badge.badge_id] = record_holders
+           
+        return render_template('admin.html', badges=badges, top_scores=top_scores)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
@@ -674,99 +714,96 @@ def admin_control():
         Page for admin to control various parts of the application
         Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
         Only those will a valid admin account can view this page
-    """  
-    if not User.verify_role(current_user.id):
-        return redirect(url_for('dashboard'))
-        
-    emailform = UpdateEmailForm()
-    passwordform = UpdatePasswordForm()
-    oldaccountsform = RemoveOldAccountsForm()
-    resetdateform = ResetDateForm()
-    resetdateform.reset_date.id = 'reset_date'
-    admin_account = User.get_user_by_username(current_user.username)
+    """ 
+    try:    
+        if not User.verify_role(current_user.id):
+            return redirect(url_for('dashboard'))
+            
+        emailform = UpdateEmailForm()
+        passwordform = UpdatePasswordForm()
+        oldaccountsform = RemoveOldAccountsForm()
+        resetdateform = ResetDateForm()
+        resetdateform.reset_date.id = 'reset_date'
+        admin_account = User.get_user_by_username(current_user.username)
 
-	#Update password
-    if passwordform.password.data and passwordform.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-        if User.reset_pwd(admin_account.id, hashed_password) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('admin_control'))
+        #Update password
+        if passwordform.password.data and passwordform.validate_on_submit():
+            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+            if User.reset_pwd(admin_account.id, hashed_password) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('admin_control'))
 
-	#Update email
-    if emailform.email.data and emailform.validate_on_submit():
-        if User.update_email(admin_account.id, emailform.email.data) == True:
-            flash('Your account has been successfully updated!', 'success')
-        else:
-            flash('Sorry, we were unable to update your account', 'danger')
-        return redirect(url_for('admin_control'))
-        
-    #Remove old accounts
-    if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
-        results = User.delete_innactive_accounts(oldaccountsform.years.data)
-        if results:
-            flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
-        else:
-            flash('No accounts were deleted', 'success')
-        return redirect(url_for('admin_control'))
-        
-    #Change reset date    
-    if resetdateform.reset_date.data and resetdateform.validate_on_submit():
-        if Reset_Date.change_date(resetdateform.reset_date.data):
-            flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
-        else:
-            flash('Sorry, we were not able to change the date', 'danger')
-        return redirect(url_for('admin_control'))
-        
+        #Update email
+        if emailform.email.data and emailform.validate_on_submit():
+            if User.update_email(admin_account.id, emailform.email.data) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('admin_control'))
+            
+        #Remove old accounts
+        if oldaccountsform.years.data and oldaccountsform.validate_on_submit():   
+            results = User.delete_innactive_accounts(oldaccountsform.years.data)
+            if results:
+                flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
+            else:
+                flash('No accounts were deleted', 'success')
+            return redirect(url_for('admin_control'))
+            
+        #Change reset date    
+        if resetdateform.reset_date.data and resetdateform.validate_on_submit():
+            if Reset_Date.change_date(resetdateform.reset_date.data):
+                flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
+            else:
+                flash('Sorry, we were not able to change the date', 'danger')
+            return redirect(url_for('admin_control'))
+            
 
-    #Load page
-    resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
-    emailform.email.data = current_user.email
-      
-    return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
+        #Load page
+        resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
+        emailform.email.data = current_user.email
+          
+        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
         
-
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
 
 @app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
 def admin_settings():
   
+    try: 
+        if not User.verify_role(current_user.id):     
+            return redirect(url_for('dashboard'))
+            
+        badges = Badge.get_all_badges()
+        badge_forms = {}
 
-    if not User.verify_role(current_user.id):     
-        return redirect(url_for('dashboard'))
-        
-    badges = Badge.get_all_badges()
-    badge_forms = {}
-    
 
-    for badge in badges:
-        form = BadgePointsForm(prefix=str(badge.badge_id)) 
-        if form.submit.data and form.validate_on_submit():
-            if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
-                flash('Successfully changed badge points', 'success')
-            else:
-                flash('Sorry, we were not able to change the badge points', 'danger')
-            return redirect(url_for('admin_settings'))        
-        form.level1_points.data = badge.level1_points    
-        form.level2_points.data = badge.level2_points            
-        form.level3_points.data = badge.level3_points           
-        form.level4_points.data = badge.level4_points            
-        form.level5_points.data = badge.level5_points          
-        form.level6_points.data = badge.level6_points            
-        form.level7_points.data = badge.level7_points            
-        form.level8_points.data = badge.level8_points           
-        form.level9_points.data = badge.level9_points           
-        form.level10_points.data = badge.level10_points                    
-        badge_forms[badge.badge_id] = form 
-   
-   
+        for badge in badges:
+            form = BadgePointsForm(prefix=str(badge.badge_id)) 
+            if form.submit.data and form.validate_on_submit():
+                if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
+                    flash('Successfully changed badge points', 'success')
+                else:
+                    flash('Sorry, we were not able to change the badge points', 'danger')
+                return redirect(url_for('admin_settings'))        
+            form.level1_points.data = badge.level1_points    
+            form.level2_points.data = badge.level2_points            
+            form.level3_points.data = badge.level3_points           
+            form.level4_points.data = badge.level4_points            
+            form.level5_points.data = badge.level5_points          
+            form.level6_points.data = badge.level6_points            
+            form.level7_points.data = badge.level7_points            
+            form.level8_points.data = badge.level8_points           
+            form.level9_points.data = badge.level9_points           
+            form.level10_points.data = badge.level10_points                    
+            badge_forms[badge.badge_id] = form 
 
-       
-    
-
-    
-    
-        
-
-    return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
+        return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
+    except:
+        flash('Sorry, we could not process that request.', 'warning')
+        return render_template('error_admin.html') 
