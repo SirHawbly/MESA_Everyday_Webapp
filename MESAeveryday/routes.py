@@ -8,7 +8,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request,jsonify
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
-    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm
+    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm
 
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 
@@ -457,6 +457,21 @@ def stamp(badgeid):
         stampArray.append(stampObj)
 
     return jsonify({'stamps' : stampArray})
+
+@app.route("/edit_badge", methods=['GET','POST'])
+@login_required
+def edit_badge():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = EditBadgeForm()
+    if form.validate_on_submit():
+        badgeId=form.badge.data
+        badgeName= request.form.get('badgeName')
+        Badge.update_badge_name(badgeId,badgeName)
+        flash('Badge name has been update!', 'success')
+
+    return render_template('edit_badgename.html',form_badge=form)
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
