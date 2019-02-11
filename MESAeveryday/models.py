@@ -381,6 +381,17 @@ class Badge(Base):
             return None
         return True
 
+    def update_badge_name(badge_id,new_badge_name):
+        try:
+           badge=session.query(Badge).filter(Badge.badge_id==badge_id).first()
+           badge.badge_name=new_badge_name
+           session.commit()
+
+        except:
+            session.rollback()
+            return None
+
+
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
     __tablename__ = 'stamps'
