@@ -271,7 +271,7 @@ def dashboard():
                                other_days=other_days)
     except:
 
-    return redirect(url_for('error'))
+        return redirect(url_for('error'))
 
 @app.route("/events", methods=['GET', 'POST'])
 # @login_required
