@@ -389,20 +389,31 @@ class Stamp(Base, UserMixin):
         self.points = points
         self.url = url
 
-    def get_stamps_of_badge(badge_id):
-        try:
-            return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
-        except:
+    def get_stamps_of_badge(user_id, badge_id):
+      #  try:
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
+            return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
+       # except:
             session.rollback()
             return None
 
     def get_unearned_stamps_of_badge(user_id, badge_id):
         try:
-            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
         except:
             session.rollback()
-            return None 
+            return None
             
     def get_max_points(badge_id):
         try:
@@ -431,13 +442,6 @@ class UserStamp(Base, UserMixin):
         self.log_date = log_date
         self.stamp_date = stamp_date
 
-    def get_earned_stamp(user_id):
-        try:
-            return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-        except:
-            session.rollback()
-            return None
-
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
         new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
         try:
@@ -450,7 +454,12 @@ class UserStamp(Base, UserMixin):
 
     def get_earned_stamps_of_badge(user_id, badge_id):
         try:
-            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(UserStamp.user_id == user_id).filter(Stamp.stamp_id == UserStamp.stamp_id)
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(and_(and_(and_(UserStamp.user_id == user_id, Stamp.stamp_id == UserStamp.stamp_id), UserStamp.log_date >= last_reset_date), Stamp.badge_id == badge_id))
         except:
             session.rollback()
             return None
