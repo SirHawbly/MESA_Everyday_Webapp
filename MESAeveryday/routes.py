@@ -233,43 +233,43 @@ def dashboard():
         Page that displays summary information about a student's progress
         This is the default page a user is taken to when they log in
     """   
-#try:
-    # Send admins to the admin page
-    if (User.verify_role(current_user.id)):
-        return redirect(url_for('admin'))
+    try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
 
-    # Get all the badges
-    badges = Badge.get_all_badges()
-    
-    # Get Badge Progress and max points
-    all_progress = {}  
-    all_max_points = {}       
-    for badge in badges:
-        progress = User.get_badge_progress(current_user.id, badge.badge_id)
-        all_progress[badge.badge_id] = progress
-        max_points = Stamp.get_max_points(badge.badge_id)
-        all_max_points[badge.badge_id] = max_points
+        # Get all the badges
+        badges = Badge.get_all_badges()
         
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    mesa_events = get_mesa_events(events)
-    
-    return render_template('dashboard.html',
-                           badges=badges,
-                           progress=all_progress,
-                           all_max_points=all_max_points,
-                           events=events,
-                           number_upcoming=len(upcoming_events),
-                           upcoming_events=upcoming_events,
-                           mesa_days=mesa_days,
-                           mesa_events=mesa_events,
-                           other_days=other_days)
-#except:
+        # Get Badge Progress and max points
+        all_progress = {}  
+        all_max_points = {}       
+        for badge in badges:
+            progress = User.get_badge_progress(current_user.id, badge.badge_id)
+            all_progress[badge.badge_id] = progress
+            max_points = Stamp.get_max_points(badge.badge_id)
+            all_max_points[badge.badge_id] = max_points
+            
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        mesa_events = get_mesa_events(events)
+        
+        return render_template('dashboard.html',
+                               badges=badges,
+                               progress=all_progress,
+                               all_max_points=all_max_points,
+                               events=events,
+                               number_upcoming=len(upcoming_events),
+                               upcoming_events=upcoming_events,
+                               mesa_days=mesa_days,
+                               mesa_events=mesa_events,
+                               other_days=other_days)
+    except:
 
     return redirect(url_for('error'))
 
