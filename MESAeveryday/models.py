@@ -313,8 +313,8 @@ class Badge(Base):
             return session.query(Badge)
         except:
             session.rollback()
-            return None 
-
+            return None          
+            
     def get_badge_by_id(badge_id):
         try:
             return session.query(Badge).filter(Badge.badge_id == badge_id).first()
@@ -404,9 +404,9 @@ class Stamp(Base, UserMixin):
             session.rollback()
             return None 
             
-    def get_max_point(badge_id):
+    def get_max_points(badge_id):
         try:
-            return session.query(func.sum(Stamp.points).label('max_points')).filter(Stamp.badge_id == badge_id)
+            return session.query(func.sum(Stamp.points).label('max_points')).filter(Stamp.badge_id == badge_id).first()
         except:
             session.rollback()
             return None

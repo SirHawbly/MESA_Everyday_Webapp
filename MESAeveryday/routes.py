@@ -40,8 +40,8 @@ def landpage():
         form_login = LoginForm()
         return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
     except:    
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')  
+
+        return redirect(url_for('error'))
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -76,8 +76,8 @@ def register():
 
         return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')      
+
+        return redirect(url_for('error'))      
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -108,8 +108,8 @@ def login():
                 
         return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')
+
+        return redirect(url_for('error'))
 
 @app.route("/logout")
 def logout():
@@ -121,8 +121,8 @@ def logout():
         logout_user()
         return redirect(url_for('landpage'))
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')
+
+        return redirect(url_for('error'))
 
 
 @app.route("/reset_password", methods=['GET', 'POST'])
@@ -147,8 +147,8 @@ def reset_request():
 
         return render_template('reset_request.html', title='Rest Password', form=form)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')
+
+        return redirect(url_for('error'))
         
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
@@ -186,8 +186,8 @@ def reset_token(token):
                 return redirect(url_for('landpage'))
         return render_template('reset_token.html', title='Rest Password', form=form)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')
+
+        return redirect(url_for('error'))
 
 @app.route("/forgot_username", methods=['GET', 'POST'])
 def forgot_username():
@@ -211,10 +211,14 @@ def forgot_username():
             return redirect(url_for('landpage'))
         return render_template('forgot_username.html', title='Rest User', form=form)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error.html')    
+
+        return redirect(url_for('error'))    
         
-        
+@app.route("/error", methods=['GET'])
+def error():
+    flash('Sorry, we could not process that request.', 'danger')
+    return render_template('error.html')        
+      
         
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                             User Routes
@@ -229,41 +233,45 @@ def dashboard():
         Page that displays summary information about a student's progress
         This is the default page a user is taken to when they log in
     """   
-    try:
-        # Send admins to the admin page
-        if (User.verify_role(current_user.id)):
-            return redirect(url_for('admin'))
+#try:
+    # Send admins to the admin page
+    if (User.verify_role(current_user.id)):
+        return redirect(url_for('admin'))
 
-        # Get all the badges
-        badges = Badge.get_all_badges()
+    # Get all the badges
+    badges = Badge.get_all_badges()
+    
+    # Get Badge Progress and max points
+    all_progress = {}  
+    all_max_points = {}       
+    for badge in badges:
+        progress = User.get_badge_progress(current_user.id, badge.badge_id)
+        all_progress[badge.badge_id] = progress
+        max_points = Stamp.get_max_points(badge.badge_id)
+        all_max_points[badge.badge_id] = max_points
         
-        # Get Badge Progress
-        all_progress = {}    
-        for badge in badges:
-            progress = User.get_badge_progress(current_user.id, badge.badge_id)
-            all_progress[badge.badge_id] = progress
-            
-        # Call the google api and pull all upcoming events
-        events = get_event_list()
-        
-        # Parse the events into incoming and special groups
-        mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
-        mesa_events = get_mesa_events(events)
-        
-        return render_template('dashboard.html',
-                               badges=badges,
-                               progress=all_progress,
-                               events=events,
-                               number_upcoming=len(upcoming_events),
-                               upcoming_events=upcoming_events,
-                               mesa_days=mesa_days,
-                               mesa_events=mesa_events,
-                               other_days=other_days)
-    except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html')
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
+    
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    mesa_events = get_mesa_events(events)
+    
+    return render_template('dashboard.html',
+                           badges=badges,
+                           progress=all_progress,
+                           all_max_points=all_max_points,
+                           events=events,
+                           number_upcoming=len(upcoming_events),
+                           upcoming_events=upcoming_events,
+                           mesa_days=mesa_days,
+                           mesa_events=mesa_events,
+                           other_days=other_days)
+#except:
+
+    return redirect(url_for('error'))
 
 @app.route("/events", methods=['GET', 'POST'])
 # @login_required
@@ -306,8 +314,8 @@ def events():
                                mesa_events=mesa_events,
                                other_days=other_days)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html')
+
+        return redirect(url_for('error'))
 
 
 
@@ -326,7 +334,7 @@ def account():
         passwordform= UpdatePasswordForm()
         avatars = ""
         myaccount = User.get_user_by_username(current_user.username)
-
+    
         #Update password
         if passwordform.password.data and passwordform.validate_on_submit():
             hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
@@ -398,8 +406,8 @@ def account():
                                other_days=other_days)
          
     except:    
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html')    
+
+        return redirect(url_for('error'))    
 
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
@@ -425,8 +433,8 @@ def account_deactivate():
 
 
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html') 
+
+        return redirect(url_for('error')) 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
 def earn_stamps():
@@ -484,8 +492,8 @@ def earn_stamps():
                                number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
                                other_days=other_days)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html') 
+
+        return redirect(url_for('error')) 
         
 @app.route("/badges/<badge_id>", methods=['GET', 'POST'])
 @login_required
@@ -544,8 +552,8 @@ def check_badge(badge_id):
         return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
                                number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_user.html') 
+
+        return redirect(url_for('error')) 
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -591,8 +599,8 @@ def admin():
            
         return render_template('admin.html', badges=badges, top_scores=top_scores)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
+
+        return redirect(url_for('error')) 
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
@@ -655,8 +663,8 @@ def admin_control():
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
         
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
+
+        return redirect(url_for('error')) 
 
 @app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
@@ -692,8 +700,8 @@ def admin_settings():
 
         return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
     except:
-        flash('Sorry, we could not process that request.', 'warning')
-        return render_template('error_admin.html') 
+
+        return redirect(url_for('error')) 
         
  
 
