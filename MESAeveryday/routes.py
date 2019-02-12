@@ -8,7 +8,7 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 from flask import render_template, url_for, flash, redirect, request,jsonify
 from MESAeveryday import app, bcrypt, mail
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
-    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm
+    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm,BadgeForm
 
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 
@@ -838,3 +838,28 @@ def admin_settings():
         return redirect(url_for('dashboard'))
 
     return render_template('admin_settings.html')
+
+
+@app.route("/badge_image", methods=['GET', 'POST'])
+@login_required
+def badge_image():
+
+    badge_form=BadgeForm()
+
+    avatars = ""
+
+    # Update avatar
+    if request.method == 'POST':
+        badge_id=request.form.get('badge')
+        avatarSelect = request.form.get('avatarSelect')
+        print(badge_id)
+        print(avatarSelect)
+        if avatarSelect:
+            if Badge.update_avatar(badge_id, avatarSelect) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('badge_image'))
+
+
+    return render_template('badge_image_picking.html', title='Badge Picking Image', avatar_files=Avatar.get_all_avatars(),form_badge=badge_form)
