@@ -332,7 +332,6 @@ def account():
 
     # Get all the badges
     badges = Badge.get_all_badges_id_with_names()
-    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
 
     # Call the google api and pull all upcoming events
     events = get_event_list()
@@ -342,8 +341,7 @@ def account():
     other_days = searchEvents(events, ['Mesa','Day'])
     upcoming_events = [event for event in events if event['remain_days'] < 7]
         
-    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform, result=zip(badge_names, badge_ids), events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform, events=                       events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
                            other_days=other_days)
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
