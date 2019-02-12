@@ -391,6 +391,16 @@ class Badge(Base):
             session.rollback()
             return None
 
+    def update_avatar(id, new_avatar_id):
+        try:
+            badge = session.query(Badge).filter(Badge.badge_id == id).first()
+            badge.icon_id = new_avatar_id
+            session.commit()
+        except:
+            session.rollback()
+            return False
+        return True
+
 
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
