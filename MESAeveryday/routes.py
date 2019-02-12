@@ -161,8 +161,8 @@ def events():
     # Parse the events into incoming and special groups
     mesa_days = searchEvents(events, ['Mesa','Day'])
     other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
-    mesa_events = get_mesa_events(events)
+    upcoming_events = [event for event in events if event['remain_days'] < 14]
+    mesa_events = get_mesa_events(upcoming_events)
     
     return render_template('events.html',
                            badges=badges,

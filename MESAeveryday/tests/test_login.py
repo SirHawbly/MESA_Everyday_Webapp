@@ -1,78 +1,3 @@
-"""
-import sys
-sys.path.append('..')
-
-import pytest
-from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.models import User
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm
-from flask import render_template, url_for, flash, redirect, request
-from datetime import datetime
-from flask_login import login_user, current_user, logout_user, login_required, login_manager
-
-# --
-
-# # Sign In 
-# # items shouldnt need to be tested for validity, they should already be 
-# # vetted by registering
-# #   - Name - just needs to match an account, should be valid 
-# #   - Password - just needs to match the account, should be valid
-# #   - Account - should be the account owned by the inputted name
-# #   - Logged In User - Logging in should open the correct account
-# #   - Logged In User - This account should also be pulled correctly
-
-# -- 
-
-# # test the user's name when logging in
-def test_username(appinst, username, password):
-
-    form_login = LoginForm()
-
-    if (username != '' and password != ''):
-        form_login.username = username
-        form_login.password = password
-
-    # # If the login form is submitted and their are no errors in the form, try to log them in
-    if form_login.validate_on_submit():
-        user = User.get_user_by_username(form_login.username.data)
-        
-        # # User entered the correct credentials
-        if user and bcrypt.check_password_hash(user.password, form_login.password.data):
-            # User.update_last_login(user.id, datetime.now())
-            # login_user(user, remember=form_login.remember.data)
-            # next_page = request.args.get('next')
-            # return redirect(next_page) if next_page else redirect(url_for('dashboard'))
-            return True
-
-        # # User did not enter the correct credentials
-        else:
-            return False
-
-    thingy = appinst.post('/login', username=username, passowrd=password, follow_redirects=True)
-    return thingy
-
-# --
-
-# # run all of the tests having to do with logging in
-def test_login():
-    login_app = app()
-
-    assert(test_username(login_app, uname, passwd) == True)
-    assert(test_username(login_app, bname, passwd) == False)
-    assert(test_username(login_app, uname, bpass) == True)
-    assert(test_username(login_app, bname, bpass) == True)
-
-    assert(False)
-    return login_app
-
-# --
-
-test_login()
-
-"""
-
-# --
-
 import os
 from datetime import datetime
 from MESAeveryday.models import User
@@ -83,10 +8,10 @@ abs_path = os.path.join(script_dir, rel_path)
 
 today = datetime.today()
 
-bname = os.environ['MESAhostname']
-gname = os.environ['MESAhostname']
-bpass = os.environ['MESAhostname']
-gpass = os.environ['MESAhostname']
+bad_name = os.environ['MESAhostname']
+good_name = os.environ['MESAhostname']
+bad_pass = os.environ['MESAhostname']
+good_pass = os.environ['MESAhostname']
 
 
 # --
@@ -104,12 +29,12 @@ def logout(client):
 
 # --
 
-def is_logged_in(test_data):
+def is_logged_in(test_client, test_data):
     # login_pass = b'Login Unsuccessful' not in test_data
     # badge_info = b'Badge Information' in test_data
     # print(login_pass, badge_info)
-    login = client.get('/login', follow_redirects=True)
-    dashboard= client.get('/dashboard', follow_redirects=True)
+    login = test_client.get('/login', follow_redirects=True)
+    dashboard= test_client.get('/dashboard', follow_redirects=True)
 
     return login != dashboard
 
