@@ -13,7 +13,6 @@ good_name = os.environ['MESAhostname']
 bad_pass = os.environ['MESAhostname']
 good_pass = os.environ['MESAhostname']
 
-
 # --
 
 def login(client, username, password):
@@ -50,9 +49,9 @@ def log_tests(test_data):
 
 # --
 
-def test_logging(test_client, uname, passwd):
-    test_in = login(test_client, gname, gpass)
-    log_state = User.get_user_by_username(gname)
+def test_logging(test_client, username, password):
+    test_in = login(test_client, username, password)
+    log_state = User.get_user_by_username(username)
     test_out = logout(test_client)
     return [test_in, log_state, test_out]
 
@@ -63,16 +62,16 @@ def test_login(test_client):
     tests = []
     answers = []
 
-    tests += [test_logging(test_client, gname, gpass),]
-    answers += [[True, gname, True],]
+    tests += [test_logging(test_client, good_name, good_pass),]
+    answers += [[True, good_name, True],]
 
-    tests += [test_logging(test_client, bname, gpass),]
+    tests += [test_logging(test_client, bad_name, good_pass),]
     answers += [[False, None, False],]
     
-    tests += [test_logging(test_client, gname, bpass),]
+    tests += [test_logging(test_client, good_name, bad_pass),]
     answers += [[False, None, False],]
 
-    tests += [test_logging(test_client, bname, bpass),]
+    tests += [test_logging(test_client, bad_name, bad_pass),]
     answers += [[False, None, False],]
 
     log_tests(tests)
