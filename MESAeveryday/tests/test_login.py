@@ -49,7 +49,7 @@ def log_tests(test_data):
 
 # --
 
-def test_logging(test_client, username, password):
+def do_test(test_client, username, password):
     test_in = login(test_client, username, password)
     log_state = User.get_user_by_username(username)
     test_out = logout(test_client)
@@ -62,16 +62,16 @@ def test_login(test_client):
     tests = []
     answers = []
 
-    tests += [test_logging(test_client, good_name, good_pass),]
+    tests += [do_test(test_client, good_name, good_pass),]
     answers += [[True, good_name, True],]
 
-    tests += [test_logging(test_client, bad_name, good_pass),]
+    tests += [do_test(test_client, bad_name, good_pass),]
     answers += [[False, None, False],]
     
-    tests += [test_logging(test_client, good_name, bad_pass),]
+    tests += [do_test(test_client, good_name, bad_pass),]
     answers += [[False, None, False],]
 
-    tests += [test_logging(test_client, bad_name, bad_pass),]
+    tests += [do_test(test_client, bad_name, bad_pass),]
     answers += [[False, None, False],]
 
     log_tests(tests)
