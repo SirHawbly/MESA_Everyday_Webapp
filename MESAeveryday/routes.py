@@ -35,6 +35,7 @@ def landpage():
     """
     
     try:
+        
         form_register = RegistrationForm()
         form_login = LoginForm()
         return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)

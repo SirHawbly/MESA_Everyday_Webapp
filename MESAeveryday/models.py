@@ -13,7 +13,7 @@ from MESAeveryday import login_manager, app, bcrypt
 from flask_login import UserMixin
 from flask import flash
 import os
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -349,6 +349,8 @@ class Badge(Base):
         except:
             session.rollback()
             return None
+           
+
             
     def change_points(badge_id, level1_points, level2_points, level3_points, level4_points, level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
         try: 
@@ -400,7 +402,16 @@ class Stamp(Base, UserMixin):
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
         except:
             session.rollback()
-            return None  
+            return None 
+            
+    def get_max_point(badge_id):
+        try:
+            return session.query(func.sum(Stamp.points).label('max_points')).filter(Stamp.badge_id == badge_id)
+        except:
+            session.rollback()
+            return None
+            
+    
 
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
