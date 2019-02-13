@@ -102,32 +102,34 @@
                         </button></td>
                     </tr>
                 {% endfor %}
+                
                 <tr> <td> -- </td> </tr>
+                
                 {% for event in mesa_events[badge.badge_id][:5] %}
-                <tr> 
-                    <td>
-                        {{ event['summary'] }}
-                        - in {{ event['remain_days'] }} days
-                    </td>
-                </tr>
-                <tr> 
-                    <td>
-                        {{ event['start_string'] }} 
-                        at {{ event['location'] }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        badge: {{event['badgeColor']}}
-                    </td>
-                </tr>
-                <tr> 
-                    <td>
-                        <a href={{ event['htmlLink'] }}> Event Link </a>
-                    </td>                                              
-                </tr>                                                
-                <tr><td> -- </td></tr>
-            {% endfor %}
+                    <tr>
+                        <td>
+                            {{ event['summary'] }}
+                            - in {{ event['remain_days'] }} days
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            {{ event['start_string'] }}
+                            at {{ event['location'] }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            badge: {{event['badgeColor']}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href={{ event['htmlLink'] }}> Event Link </a>
+                        </td>
+                    </tr>
+                    <tr><td> -- </td></tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>
