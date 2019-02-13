@@ -43,26 +43,35 @@ CAL_COLORS = {
              }
 
 MESA_COLORS = {
-               '3' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # purple (!MESA)
+               # '3' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # purple (!MESA)
                '6' : {'r':255,'g':158,'b':21,'hex':'ff9e15'}, # orange
                '8' : {'r':114,'g':102,'b':88,'hex':'716558'}, # grey
                '9' : {'r':130,'g':149,'b':177,'hex':'8195b1'}, # blue
                '10' : {'r':191,'g':215,'b':48,'hex':'bed62f'}, # green
-               '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'}, # red
+               # '11' : {'r':235,'g':78,'b':70,'hex':'ea4e46'}, # red
                # NOT USED, NO LIGHT GRAY IN G CAL
                #'12' : {'r':232,'g':224,'b':215,'hex':'e7e0d7'}, # No light grey
               }
 
 BADGE_COLORS = {
-                '3' : 'mauve un-named badge', # Purple (!MESA)
+                # '3' : 'mauve un-named badge', # Purple (!MESA)
                 '6' : 'MESA Expert', # Orange
                 '8' : 'Career Pro', # Grey
                 '9' : 'College Knowledge', # Blue
                 '10' : 'Professional Development', # Green
-                '11' : 'red un-named badge', # Red (!MESA)
+                # '11' : 'red un-named badge', # Red (!MESA)
                 # '12' : 'light grey un-named badge', # No Light Grey
                }
 
+BADGE_IDS = {
+             # '3' : 'mauve un-named badge', # Purple (!MESA)
+             '6' : 4, # Orange
+             '8' : 2, # Grey
+             '9' : 1, # Blue
+             '10' : 3, # Green
+             # '11' : 'red un-named badge', # Red (!MESA)
+             # '12' : 'light grey un-named badge', # No Light Grey
+            }
 
 # --
 
@@ -254,9 +263,12 @@ def get_event_list():
             if event['colorId'] in MESA_COLORS: 
                 event['mesaColor'] = MESA_COLORS[event['colorId']]
                 event['badgeColor'] = BADGE_COLORS[event['colorId']]
+                event['badgeId'] = BADGE_IDS[event['colorId']]
             else:
                 event['mesaColor'] = 'Not a MESA Color'
                 event['badgeColor'] = 'No MESA Badge'
+                event['badgeId'] = 0
+
         else:
             event['calColor'] = 'None'
             event['mesaColor'] = 'None'
@@ -298,8 +310,9 @@ def searchEvents(events, keywords):
         # # go through all words and check
         # # them against the events name
         for word in keywords:
-            if word.lower() not in event['summary'].lower():
-                notin = True
+            if 'summary' in event:
+                if word.lower() not in event['summary'].lower():
+                    notin = True
 
         # # if we havent tripped the bit,
         # # add the event to the set
@@ -323,10 +336,10 @@ def get_mesa_events(events):
             [[event], [event1], [event2]]
             * event1['colorId'] = 9 *
             * CAL_COLORS[9] = Blue *
-            * BADGE_COLORS[9] = College Knowledge *
+            * BADGE_IDS[9] = 5 (College Knowledge) *
 
         output:
-            [College Knowledge:[event1], MESA Expert:[], ...]
+            ['5':[event1], '':[], ...]
     """
 
     # # make a empty dictionary
@@ -334,15 +347,16 @@ def get_mesa_events(events):
 
     # # fill it with empty lists under the different
     # # badge names (ie. {'MESA Expert'=[], } )
-    for key in BADGE_COLORS:
-        MESA_EVENTS[BADGE_COLORS[key]] = []
+    for key in BADGE_IDS:
+        MESA_EVENTS[BADGE_IDS[key]] = []
 
     # # tie the different events with their colors
     # # to their different badges in the dictionary
     for event in events:
-        if event['colorId'] in BADGE_COLORS:        
-            etype = BADGE_COLORS[event['colorId']]
-            MESA_EVENTS[etype] += [event]
+        if 'colorId' in event:
+            if event['colorId'] in BADGE_COLORS:   
+                etype = BADGE_IDS[event['colorId']]
+                MESA_EVENTS[etype] += [event]
 
     # # return the dictionary
     return MESA_EVENTS

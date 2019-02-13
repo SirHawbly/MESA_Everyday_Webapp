@@ -1,6 +1,7 @@
 import os
 from datetime import datetime
 from MESAeveryday.models import User
+from MESAeveryday import models
 
 script_dir = os.path.dirname(__file__)
 rel_path = "test_logs/test_login.txt"
@@ -18,7 +19,8 @@ good_pass = os.environ['MESAhostname']
 def login(client, username, password):
     return client.post('/login', data=dict(
         username=username,
-        password=password
+        password=password,
+        submit='login',
     ), follow_redirects=True)
 
 # --
@@ -28,14 +30,14 @@ def logout(client):
 
 # --
 
-def is_logged_in(test_client, test_data):
+def is_logged_in(test_client):
     # login_pass = b'Login Unsuccessful' not in test_data
     # badge_info = b'Badge Information' in test_data
     # print(login_pass, badge_info)
-    login = test_client.get('/login', follow_redirects=True)
-    dashboard= test_client.get('/dashboard', follow_redirects=True)
+    login = test_client.get('/login')
+    dashboard= test_client.get('/dashboard')
 
-    return login != dashboard
+    return [login, dashboard]
 
 # --
 
@@ -51,9 +53,10 @@ def log_tests(test_data):
 
 def do_test(test_client, username, password):
     test_in = login(test_client, username, password)
-    log_state = User.get_user_by_username(username)
+    log_state = models.User.get_user_by_username(username)
+    logged_in = is_logged_in(test_client)
     test_out = logout(test_client)
-    return [test_in, log_state, test_out]
+    return [test_in, log_state, logged_in, test_out]
 
 # -- 
 

@@ -92,3 +92,113 @@ Test Ran: 2019-02-11 18:26:28.767382
 	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
 #4: 
 	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:29:53.374179
+#1: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:37:48.577360
+#1: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:41:34.980068
+#1: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:43:35.742497
+#1: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:44:05.070399
+#1: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f3de97fb730>, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f3de97fb730>, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f3de97fb730>, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f3de97fb730>, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:44:36.916875
+#1: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f395af98730>, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f395af98730>, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f395af98730>, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f395af98730>, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:45:48.588076
+#1: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f4b47144730>, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f4b47144730>, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f4b47144730>, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, <function is_logged_in at 0x7f4b47144730>, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:46:26.431911
+#1: 
+	[<Response streamed [200 OK]>, None, False, <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, False, <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, False, <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, False, <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 18:47:33.493308
+#1: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 19:13:21.022750
+#1: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [200 OK]>], <Response streamed [200 OK]>]
+
+Test Ran: 2019-02-11 19:16:02.835308
+#1: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [302 FOUND]>], <Response streamed [200 OK]>]
+#2: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [302 FOUND]>], <Response streamed [200 OK]>]
+#3: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [302 FOUND]>], <Response streamed [200 OK]>]
+#4: 
+	[<Response streamed [200 OK]>, None, [<Response streamed [200 OK]>, <Response streamed [302 FOUND]>], <Response streamed [200 OK]>]
