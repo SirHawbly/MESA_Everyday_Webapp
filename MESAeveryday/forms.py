@@ -7,12 +7,16 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, DateField, IntegerField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError, Regexp, Optional
 from MESAeveryday.models import User, School, Badge, Stamp, Reset_Date
 from flask_login import current_user
 from MESAeveryday import bcrypt
 from datetime import datetime
+
+def positive(form, field):
+        if field.data != None and field.data < 1:
+            raise ValidationError('Number must be positive.')
 
 class RegistrationForm(FlaskForm):
     firstname = StringField('Firstname', validators=[DataRequired()])
@@ -120,3 +124,36 @@ class ResetDateForm(FlaskForm):
  
     reset_date = DateField('reset date', format='%m-%d', validators=[DataRequired()])
     submit = SubmitField('Change Reset Date')
+    
+class BadgePointsForm(FlaskForm):
+    level1_points = IntegerField('level 1 points', validators=[positive])
+    level2_points = IntegerField('level 2 points', validators=[Optional(), positive])
+    level3_points = IntegerField('level 3 points', validators=[Optional(), positive])
+    level4_points = IntegerField('level 4 points', validators=[Optional(), positive])
+    level5_points = IntegerField('level 5 points', validators=[Optional(), positive])
+    level6_points = IntegerField('level 6 points', validators=[Optional(), positive])
+    level7_points = IntegerField('level 7 points', validators=[Optional(), positive])
+    level8_points = IntegerField('level 8 points', validators=[Optional(), positive])
+    level9_points = IntegerField('level 9 points', validators=[Optional(), positive])
+    level10_points = IntegerField('level 10 points', validators=[Optional(), positive])
+    submit = SubmitField('Change Badge Points') 
+           
+    def validate(self):       
+        result = True 
+        # Check normal validation
+        if not FlaskForm.validate(self):
+            result = False     
+            
+        # Make sure that a levels points are not less than the level before it (unless it is set to None)
+        previous_points = self.level1_points.data      
+        for field in [self.level2_points, self.level3_points, self.level4_points, self.level5_points, self.level6_points, self.level7_points, self.level8_points, self.level9_points, self.level10_points]:           
+            if field.data:
+                if previous_points == None:
+                    field.errors.append('This level cannot have points if the previous level does not have points.')
+                    result = False
+                elif field.data <= previous_points:
+                    field.errors.append('The points for this level cannot be less than the points for the previous level.')
+                    result = False
+                               
+            previous_points = field.data
+        return result
