@@ -340,7 +340,7 @@ def get_mesa_events(events):
     # # tie the different events with their colors
     # # to their different badges in the dictionary
     for event in events:
-        if event['colorId'] in BADGE_COLORS:        
+        if 'colorId' in event.keys() and event['colorId'] in BADGE_COLORS:        
             etype = BADGE_COLORS[event['colorId']]
             MESA_EVENTS[etype] += [event]
 
