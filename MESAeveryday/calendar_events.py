@@ -313,6 +313,8 @@ def searchEvents(events, keywords):
             if 'summary' in event:
                 if word.lower() not in event['summary'].lower():
                     notin = True
+            else:
+                notin = True
 
         # # if we havent tripped the bit,
         # # add the event to the set
