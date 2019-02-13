@@ -361,6 +361,7 @@ def get_mesa_events(events):
                 etype = BADGE_IDS[event['colorId']]
                 MESA_EVENTS[etype] += [event]
                 
+
     # # return the dictionary
     return MESA_EVENTS
 

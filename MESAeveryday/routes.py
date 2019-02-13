@@ -444,56 +444,56 @@ def earn_stamps():
         The stamp will be added to the user's account and does not do any verification
             as to whether or not they actually did the task
     """  
-# try:
-    # Get all badge names
-    badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
+    try:
+        # Get all badge names
+        badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
 
-    # A dictionary that maps badge_ids to badge_name
-    badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    
-    
-    forms, t = [], 1       # several pairs of forms (stamp, date, submit). t is used to assign unique id
-    for badge in badges:
-        stamps = Stamp.get_stamps_of_badge(current_user.id, badge[0])
+        # A dictionary that maps badge_ids to badge_name
+        badges = {row.badge_id : row.badge_name for row in Badge.get_all_badges_id_with_names()}.items()    
+        
+        forms, t = [], 1       # several pairs of forms (stamp, date, submit). t is used to assign unique id
+        for badge in badges:
+            stamps = Stamp.get_stamps_of_badge(current_user.id, badge[0])
 
-        if stamps is not None:
-            form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
+            if stamps is not None:
+                form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
 
-            form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
-                                                                # HTML doesnt seem to be friendly to an id with space(s), sigh
+                form.time_finished.id = "date" + str(t)             # to create an unique id without space, slash, etc...
+                                                                    # HTML doesnt seem to be friendly to an id with space(s), sigh
 
-            form.stamps.choices = stamps                      # assign unearned stamps to the select field
-            forms.append(form)                                  # create a list of forms
-            t += 1
-    for form in forms:
-        if form.submit.data:
-            if form.validate_on_submit():
-                id = current_user.id    # acquire the user_id of current user
-                if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
-                    # flash('You've earned a new stamp!', 'success')
-                    # some message should be shown here, flash doesnt work
-                    print('successfully added.')
-                # else:
-                    # flash('Failed adding stamp', 'warning')
-                    # some message should be shown here, flash doesnt work
-                return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
+                form.stamps.choices = stamps                      # assign unearned stamps to the select field
+                forms.append(form)                                  # create a list of forms
+                t += 1
+        for form in forms:
+            if form.submit.data:
+                if form.validate_on_submit():
+                    id = current_user.id    # acquire the user_id of current user
+                    if UserStamp.earn_stamp(id, form.stamps.data, datetime.now(), form.time_finished.data.strftime('%Y-%m-%d')) == True:
+                        # flash('You've earned a new stamp!', 'success')
+                        # some message should be shown here, flash doesnt work
+                        print('successfully added.')
+                    # else:
+                        # flash('Failed adding stamp', 'warning')
+                        # some message should be shown here, flash doesnt work
+                    return redirect('/dashboard')   # could be redirected to either dashboard or the same page?
 
-    # Get all the badges
-    badges = Badge.get_all_badges()
+        # Get all the badges
+        badges = Badge.get_all_badges()
 
-    # Call the google api and pull all upcoming events
-    events = get_event_list()
-    
-    # Parse the events into incoming and special groups
-    mesa_days = searchEvents(events, ['Mesa','Day'])
-    other_days = searchEvents(events, ['Mesa','Day'])
-    upcoming_events = [event for event in events if event['remain_days'] < 7]
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        other_days = searchEvents(events, ['Mesa','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 7]
 
-    return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
-                           number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                           other_days=other_days)
-#  except:
+        return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
+                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                               other_days=other_days)
+    except:
 
-    return redirect(url_for('error')) 
+        return redirect(url_for('error')) 
         
 @app.route("/badges/<badge_id>", methods=['GET', 'POST'])
 @login_required

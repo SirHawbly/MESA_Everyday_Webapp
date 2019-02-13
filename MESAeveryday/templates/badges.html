@@ -1,6 +1,16 @@
 {% extends "dashboard_layout.html" %}
 {% block main %}
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <!--Panel-->
 <div class="card mb-4">
     <div class="card-header white-text primary-color">
@@ -92,38 +102,33 @@
                         </button></td>
                     </tr>
                 {% endfor %}
-            </tbody>
-        </table>
-    <div class='card-body'>
-        Earned Stamps For Badge {{ badge.badge_name }}
-    </div>
-    <div class="card-body">
-        <table class="table table-hover mb-0" id="earnedTable">
-            {% for event in mesa_events[badge.badge_id][:5] %}
-                <tr bgcolor="#7777AA">
+                <tr> <td> -- </td> </tr>
+                {% for event in mesa_events[badge.badge_id][:5] %}
+                <tr> 
                     <td>
                         {{ event['summary'] }}
                         - in {{ event['remain_days'] }} days
                     </td>
                 </tr>
-                <tr bgcolor="#7777AA">
+                <tr> 
                     <td>
                         {{ event['start_string'] }} 
                         at {{ event['location'] }}
                     </td>
                 </tr>
-                <tr bgcolor="#7777AA">
+                <tr>
                     <td>
                         badge: {{event['badgeColor']}}
                     </td>
                 </tr>
-                <tr bgcolor="#7777AA">
+                <tr> 
                     <td>
                         <a href={{ event['htmlLink'] }}> Event Link </a>
                     </td>                                              
                 </tr>                                                
                 <tr><td> -- </td></tr>
             {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
