@@ -2,3 +2,5 @@
 __pycache__/
 *.pyc
 MESAeveryday/credentials/
+devmed.pdf
+.vscode/settings.json
