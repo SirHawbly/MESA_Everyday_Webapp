@@ -1,2 +1,0 @@
-<FlaskClient <Flask 'MESAeveryday'>>
-<FlaskClient <Flask 'MESAeveryday'>>
