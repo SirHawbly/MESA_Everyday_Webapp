@@ -189,6 +189,7 @@ def add_time_strings(event):
 
 
 # --
+
 def add_remain_days(event):
     """
       parses an events time tuple for its
@@ -356,10 +357,10 @@ def get_mesa_events(events):
     # # to their different badges in the dictionary
     for event in events:
         if 'colorId' in event:
-            if event['colorId'] in BADGE_COLORS:   
+            if event['colorId'] in BADGE_COLORS:
                 etype = BADGE_IDS[event['colorId']]
                 MESA_EVENTS[etype] += [event]
-
+                
     # # return the dictionary
     return MESA_EVENTS
 
