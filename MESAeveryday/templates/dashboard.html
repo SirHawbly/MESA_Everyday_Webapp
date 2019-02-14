@@ -1,11 +1,26 @@
 {% extends "dashboard_layout.html" %}
 {% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="card mb-4">
+
+
     <div class="card-header white-text primary-color">
         Badge Information
     </div>
 
     <div class="card-body">
+    
+
         <!-- Main student badge content goes here -->
         <!-- <h5>Earned points</h5> -->
 
