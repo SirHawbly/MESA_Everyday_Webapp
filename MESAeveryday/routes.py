@@ -256,7 +256,7 @@ def dashboard():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        upcoming_events = [event for event in events if event['remain_days'] < 15]
         mesa_events = get_mesa_events(events)
         
         return render_template('dashboard.html',
@@ -301,7 +301,7 @@ def events():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        upcoming_events = [event for event in events if event['remain_days'] < 15]
         mesa_events = get_mesa_events(events)
 
         return render_template('events.html',
@@ -400,7 +400,7 @@ def account():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        upcoming_events = [event for event in events if event['remain_days'] < 15]
         
         return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
                                other_days=other_days)
@@ -486,7 +486,7 @@ def earn_stamps():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
+        upcoming_events = [event for event in events if event['remain_days'] < 15]
 
         return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
                                number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
@@ -547,10 +547,11 @@ def check_badge(badge_id):
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
-        
+        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        mesa_events = get_mesa_events(events)
+
         return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
-                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days)
+                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days, mesa_events=mesa_events)
     except:
 
         return redirect(url_for('error')) 

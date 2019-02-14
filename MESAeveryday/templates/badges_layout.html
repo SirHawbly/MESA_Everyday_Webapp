@@ -208,7 +208,7 @@
                     <!--Panel-->
                     <div class="card mb-4">
                         <div class="card-header white-text primary-color">
-                            Upcoming Events
+                            {{ badge.badge_name }} Events
                         </div>
                         <div class="card-body">
                             <div class="accordion md-accordion" id="accordionEx" role="tablist" aria-multiselectable="true">
@@ -217,7 +217,7 @@
                                     <div class="card-header" role="tab" id="headingOne1">
                                         <a data-toggle="collapse" data-parent="#accordionEx" href="#collapseOne1" aria-expanded="true" aria-controls="collapseOne1">
                                             <h5 class="mb-0">
-                                                Regular Event <i class="fa fa-angle-down rotate-icon"></i>
+                                                {{ badge.badge_name }} <i class="fa fa-angle-down rotate-icon"></i>
                                             </h5>
                                         </a>
                                     </div>
@@ -231,7 +231,7 @@
                                                     <th>Location</th>
                                                 </thead>
                                                 <tbody>
-                                                    {% for event in events[:10] %}    
+                                                    {% for event in mesa_events[badge.badge_id][:10] %}
                                                         {% if event['remain_days'] < 15 %} 
                                                             <tr>
                                                                 <td>{{event['summary']}}</td>
