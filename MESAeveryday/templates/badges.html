@@ -2,7 +2,7 @@
 {% block main %}
 
 <!--Panel-->
-<div class="card mb-4">
+<div class="card mb-4" style="background-color: {{ badge.color }}">
     <div class="card-header white-text primary-color">
        Badge Information
     </div>
@@ -14,13 +14,13 @@
             <!--Grid column-->
             <div class="col-lg-4 mb-4">
                 <!--Featured image-->
-                <div>
-                    <div style="align-items: center;justify-content: center;display: flex;height: 10em">
-                    <img class="rounded-circle account-img" src="../static/badge_icons/{{ badge.icon.file_name }}">
-                    </div>
-                    <a>
+                <div style="align-items: center;justify-content: center;display: flex;height: 10em">
+                    <!-- <div style="align-items: center;justify-content: center;display: flex;height: 10em"> -->
+                    <img class="rounded-circle account-img" src="../static/badge_icons/{{ badge.icon.file_name }}" style="height: 150px">
+                    <!-- </div> -->
+                    <!-- <a>
                         <div class="mask rgba-white-slight"></div>
-                    </a>
+                    </a> -->
                 </div>
             </div>
             <!--Grid column-->
@@ -28,7 +28,7 @@
             <!--Grid column-->
             <div class="col-lg-7 mb-4">
                 <!--Excerpt-->
-                <a href="" class="teal-text"><h6 class="pb-1"><i class="fa fa-heart"></i><strong> Level {{ lv }} </strong></h6></a>
+                <a href="" class="text" style="color: black"><h6 class="pb-1"><strong> Level {{ lv }} </strong></h6></a>
                 <h4 class="mb-4"><strong>Earned points for Badge {{ badge.badge_name }}</strong></h4>
                 <p>You've earned {{ pt }} points for this badge</p>
                 {% if to_next_lv == 0 %}
@@ -47,7 +47,7 @@
 
 <!-- Panel -->
 
-<div class="card mb-4">
+<div class="card mb-4" style="background-color: {{ badge.color }}">
     <div class="card-header white-text primary-color">
         Unearned Stamps For Badge {{ badge.badge_name }}
     </div>
@@ -69,7 +69,7 @@
 
 <!-- Panel -->
 
-<div class="card mb-4">
+<div class="card mb-4" style="background-color: {{ badge.color }}">
     <div class="card-header white-text primary-color">
         Earned Stamps For Badge {{ badge.badge_name }}
     </div>
@@ -87,7 +87,7 @@
                         <td>{{ u[3] }}</td>
                         <td>{{ u[2] }}</td>
                         <td>{{ u[1] }}</td>
-                        <td><button type="button" class="btn" data-toggle="modal" data-target="#deleteModal" onclick="Values( '{{ u[0] }}', '{{ u[2] }}', '{{ u[1] }}')">
+                        <td><button type="button" class="btn btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="Values( '{{ u[0] }}', '{{ u[2] }}', '{{ u[1] }}')">
                             delete
                         </button></td>
                     </tr>
