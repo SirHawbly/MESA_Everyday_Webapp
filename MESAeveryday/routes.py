@@ -327,114 +327,114 @@ def account():
         Page for users to change their account information
         Page is broken up into separate forms for each section, so they can only update their account one piece at a time
     """    
-    try:
-        emailform = UpdateEmailForm()
-        nameform = UpdateNameForm()
-        schoolform = UpdateSchoolForm()
-        passwordform= UpdatePasswordForm()
-        avatars = ""
-        myaccount = User.get_user_by_username(current_user.username)
+# try:
+    emailform = UpdateEmailForm()
+    nameform = UpdateNameForm()
+    schoolform = UpdateSchoolForm()
+    passwordform= UpdatePasswordForm()
+    avatars = ""
+    myaccount = User.get_user_by_username(current_user.username)
+
+    #Update password
+    if passwordform.password.data and passwordform.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
+        if User.reset_pwd(myaccount.id, hashed_password) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('account'))
+
+    #Update email
+    if emailform.email.data and emailform.validate_on_submit():
+        if User.update_email(myaccount.id, emailform.email.data) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('account'))
+
+    #Update name
+    if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
+        if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('account'))
+
+    #Update school
+    if schoolform.school.data and schoolform.validate_on_submit():
+        if User.update_school(myaccount.id, schoolform.school.data) == True:
+            flash('Your account has been successfully updated!', 'success')
+        else:
+            flash('Sorry, we were unable to update your account', 'danger')
+        return redirect(url_for('account'))
+
+    #Update avatar
+    if request.method=='POST':
+        avatarSelect = request.form.get('avatarSelect')
+        if avatarSelect:
+            if User.update_avatar(myaccount.id, avatarSelect) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('account'))
+
+    #Load page
+
+
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+
+    emailform.email.data = current_user.email
+    nameform.firstname.data = current_user.first_name
+    nameform.lastname.data = current_user.last_name
+    schoolform.school.data = current_user.school_id
+
+
+    # Get all the badges
+    badges = Badge.get_all_badges_id_with_names()
+    badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
+
+    # Call the google api and pull all upcoming events
+    events = get_event_list()
     
-        #Update password
-        if passwordform.password.data and passwordform.validate_on_submit():
-            hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
-            if User.reset_pwd(myaccount.id, hashed_password) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('account'))
+    # Parse the events into incoming and special groups
+    mesa_days = searchEvents(events, ['Mesa','Day'])
+    other_days = searchEvents(events, ['Mesa','Day'])
+    upcoming_events = [event for event in events if event['remain_days'] < 7]
+    
+    return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+                           other_days=other_days)
+     
+# except:    
 
-        #Update email
-        if emailform.email.data and emailform.validate_on_submit():
-            if User.update_email(myaccount.id, emailform.email.data) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('account'))
-
-        #Update name
-        if (nameform.firstname.data or nameform.lastname.data) and nameform.validate_on_submit():
-            if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('account'))
-
-        #Update school
-        if schoolform.school.data and schoolform.validate_on_submit():
-            if User.update_school(myaccount.id, schoolform.school.data) == True:
-                flash('Your account has been successfully updated!', 'success')
-            else:
-                flash('Sorry, we were unable to update your account', 'danger')
-            return redirect(url_for('account'))
-
-        #Update avatar
-        if request.method=='POST':
-            avatarSelect = request.form.get('avatarSelect')
-            if avatarSelect:
-                if User.update_avatar(myaccount.id, avatarSelect) == True:
-                    flash('Your account has been successfully updated!', 'success')
-                else:
-                    flash('Sorry, we were unable to update your account', 'danger')
-                return redirect(url_for('account'))
-
-        #Load page
-
-
-        # Get all the badges
-        badges = Badge.get_all_badges_id_with_names()
-
-        emailform.email.data = current_user.email
-        nameform.firstname.data = current_user.first_name
-        nameform.lastname.data = current_user.last_name
-        schoolform.school.data = current_user.school_id
-
-
-        # Get all the badges
-        badges = Badge.get_all_badges_id_with_names()
-        badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
-
-        # Call the google api and pull all upcoming events
-        events = get_event_list()
-        
-        # Parse the events into incoming and special groups
-        mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 7]
-        
-        return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                               other_days=other_days)
-         
-    except:    
-
-        return redirect(url_for('error'))    
+    return redirect(url_for('error'))    
 
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
 @login_required
 def account_deactivate():
-    try:
-        myaccount = User.get_user_by_username(current_user.username)
-        print(myaccount.id)
-        if current_user.is_authenticated:
-            if request.method=='POST':
-                firstName=request.form.get('FirstName')
-                lastName=request.form.get('LastName')
+# try:
+    myaccount = User.get_user_by_username(current_user.username)
+    print(myaccount.id)
+    if current_user.is_authenticated:
+        if request.method=='POST':
+            firstName=request.form.get('FirstName')
+            lastName=request.form.get('LastName')
 
-                if ((firstName.lower()==current_user.first_name.lower())
-                        and (lastName.lower()==current_user.last_name.lower())):
-                    print(request.form.get('FirstName'))
-                    User.delete_user_by_id(myaccount.id)
-                    logout_user()
-                    return redirect(url_for('landpage'))
-                else :
-                    flash('Account does not match. Please check First Name and Last Name!!', 'danger')
-            return render_template('account_deactivate.html')
+            if ((firstName.lower()==current_user.first_name.lower())
+                    and (lastName.lower()==current_user.last_name.lower())):
+                print(request.form.get('FirstName'))
+                User.delete_user_by_id(myaccount.id)
+                logout_user()
+                return redirect(url_for('landpage'))
+            else :
+                flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+        return redirect(url_for('account'))
 
 
-    except:
+#   except:
 
-        return redirect(url_for('error')) 
+    return redirect(url_for('error')) 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
 def earn_stamps():
