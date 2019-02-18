@@ -847,13 +847,18 @@ def badge_image():
     badge_form=BadgeForm()
 
     avatars = ""
+    data_test = [{'1': 'red'}, {'2': 'green'}, {'3': 'blue'}]
 
     # Update avatar
     if request.method == 'POST':
+
+        id=request.form.get('data_select')
+        print(id)
+
         badge_id=request.form.get('badge')
         avatarSelect = request.form.get('avatarSelect')
-        print(badge_id)
-        print(avatarSelect)
+        #print(badge_id)
+        #print(avatarSelect)
         if avatarSelect:
             if Badge.update_avatar(badge_id, avatarSelect) == True:
                 flash('Your account has been successfully updated!', 'success')
@@ -862,4 +867,5 @@ def badge_image():
             return redirect(url_for('badge_image'))
 
 
-    return render_template('badge_image_picking.html', title='Badge Picking Image', avatar_files=Avatar.get_all_avatars(),form_badge=badge_form)
+    return render_template('badge_image_picking.html', title='Badge Picking Image', avatar_files=Avatar.get_all_avatars(),form_badge=badge_form,data=data_test)
+
