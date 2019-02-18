@@ -1,3 +1,21 @@
+Skip to content
+ 
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+ @mcohoe Sign out
+2
+1 1 mcohoe/MESA_Everyday_Webapp
+forked from FadiLabib/MESA_Everyday_Webapp
+ Code  Pull requests 0  Projects 0  Wiki  Insights  Settings
+MESA_Everyday_Webapp/Documents/devmed.sql
+79248d5  28 days ago
+@mcohoe mcohoe Added backup script for the devmed database
+     
+2677 lines (2598 sloc)  212 KB
 -- phpMyAdmin SQL Dump
 -- version 4.8.4
 -- https://www.phpmyadmin.net/
@@ -2674,3 +2692,16 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+© 2019 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+Press h to open a hovercard with more details.

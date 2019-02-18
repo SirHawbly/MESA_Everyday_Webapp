@@ -1,5 +1,16 @@
 {% extends "dashboard_layout.html" %}
 {% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="card mb-4">
     <div class="card-header white-text primary-color">
         Badge Information
@@ -35,25 +46,25 @@
                                 <p class="card-text" style="font-size: 150%">Total points earned: {{ progress[badge.badge_id].total_points }} points</p>
                                 <p class="card-text" style="font-size: 150%">Point until next level: {{ progress[badge.badge_id].to_next_level }} points</p>
                                 <table>
-                                    {% for event in mesa_events[badge.badge_name][:5] %}
-                                        <tr>
+                                    {% for event in mesa_events[badge.badge_id][:5] %}
+                                        <tr bgcolor="#7777AA">
                                             <td>
                                                 {{ event['summary'] }}
                                                 - in {{ event['remain_days'] }} days
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr bgcolor="#7777AA">
                                             <td>
                                                 {{ event['start_string'] }} 
                                                 at {{ event['location'] }}
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr bgcolor="#7777AA">
                                             <td>
                                                 badge: {{event['badgeColor']}}
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr bgcolor="#7777AA">
                                             <td>
                                                 <a href={{ event['htmlLink'] }}> Event Link </a>
                                             </td>                                              

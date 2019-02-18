@@ -1,5 +1,16 @@
 {% extends "dashboard_layout.html" %}
 {% block main %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <!--Panel-->
 <div class="card mb-4">
     <div class="card-header white-text primary-color">
@@ -14,7 +25,7 @@
                     <div class="card">
                     <div class="card-body">
 
-                        {{ f.badge_name }}
+                        <h4><b>{{ f.badge_name }}</b></h4>
                     
                     <div class="row" style="text-align: center;">
                         <div class="col-lg-4 col-md-12">

@@ -13,7 +13,7 @@ from MESAeveryday import login_manager, app, bcrypt
 from flask_login import UserMixin
 from flask import flash
 import os
-from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_
+from sqlalchemy import Column, Integer, String, create_engine, ForeignKey, DateTime, Date, or_, and_, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship, backref
 
@@ -22,6 +22,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
+# db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 
 # Create a session with the database
@@ -343,8 +344,8 @@ class Badge(Base):
             return session.query(Badge)
         except:
             session.rollback()
-            return None 
-
+            return None          
+            
     def get_badge_by_id(badge_id):
         try:
             return session.query(Badge).filter(Badge.badge_id == badge_id).first()
@@ -379,7 +380,8 @@ class Badge(Base):
         except:
             session.rollback()
             return None
-        return True
+           
+
 
     def update_badge_name(badge_id,new_badge_name):
         try:
@@ -402,6 +404,28 @@ class Badge(Base):
         return True
 
 
+
+            
+    def change_points(badge_id, level1_points, level2_points, level3_points, level4_points, level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
+        try: 
+            badge = session.query(Badge).filter(Badge.badge_id == badge_id).first()        
+            badge.level1_points = level1_points         
+            badge.level2_points = level2_points            
+            badge.level3_points = level3_points            
+            badge.level4_points = level4_points
+            badge.level5_points = level5_points
+            badge.level6_points = level6_points
+            badge.level7_points = level7_points
+            badge.level8_points = level8_points
+            badge.level9_points = level9_points
+            badge.level10_points = level10_points
+            session.commit()
+            return True
+        except:
+            session.rollback()
+            return False
+            
+
 #Class for the "stamps" table
 class Stamp(Base, UserMixin):
     __tablename__ = 'stamps'
@@ -420,6 +444,19 @@ class Stamp(Base, UserMixin):
         self.points = points
         self.url = url
 
+    def get_stamps_of_badge(user_id, badge_id):
+      #  try:
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
+            return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
+       # except:
+            session.rollback()
+            return None
+
     def get_stamps_of_badge(badge_id):
         try:
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
@@ -429,11 +466,17 @@ class Stamp(Base, UserMixin):
 
     def get_unearned_stamps_of_badge(user_id, badge_id):
         try:
-            subquery = session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
             return session.query(Stamp).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
         except:
             session.rollback()
             return None
+
 
     def get_earned_stamps_of_badge(user_id, badge_id):
         try:
@@ -473,6 +516,17 @@ class Stamp(Base, UserMixin):
             return None
 
 
+            
+    def get_max_points(badge_id):
+        try:
+            return session.query(func.sum(Stamp.points).label('max_points')).filter(Stamp.badge_id == badge_id).first()
+        except:
+            session.rollback()
+            return None
+            
+    
+
+
 #Class for the "user_stamps" table
 class UserStamp(Base, UserMixin):
     __tablename__ = 'user_stamps'
@@ -491,13 +545,6 @@ class UserStamp(Base, UserMixin):
         self.log_date = log_date
         self.stamp_date = stamp_date
 
-    def get_earned_stamp(user_id):
-        try:
-            return session.query(UserStamp.stamp_id).filter(UserStamp.user_id == user_id)
-        except:
-            session.rollback()
-            return None
-
     def earn_stamp(user_id, stamp_id, log_date, stamp_date):
         new_UserStamp = UserStamp(user_id, stamp_id, log_date, stamp_date)
         try:
@@ -512,7 +559,12 @@ class UserStamp(Base, UserMixin):
 
     def get_earned_stamps_of_badge(user_id, badge_id):
         try:
-            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(UserStamp.user_id == user_id).filter(Stamp.stamp_id == UserStamp.stamp_id)
+            reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
+            if datetime.datetime.now().strftime('%m-%d') >= reset_date:
+                last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
+            else:
+                last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
+            return session.query(UserStamp.stamp_id, UserStamp.log_date, UserStamp.stamp_date, Stamp.stamp_name).filter(and_(and_(and_(UserStamp.user_id == user_id, Stamp.stamp_id == UserStamp.stamp_id), UserStamp.log_date >= last_reset_date), Stamp.badge_id == badge_id))
         except:
             session.rollback()
             return None
