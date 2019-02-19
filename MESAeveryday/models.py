@@ -56,6 +56,7 @@ class User(Base, UserMixin):
     last_name = Column(String)
     username = Column(String)
     email = Column(String)
+    role = Column(String)
     school_id = Column(Integer, ForeignKey("schools.school_id"))
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
