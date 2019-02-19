@@ -144,12 +144,17 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    First Event Countdown
+                                    Demo Day Countdown
                                 </div>
                                 <div class="card-body">
                                     <table>
-                                        <tr><td>Time Until First Event<td></tr>
-                                        <tr><td><span id="clock" data-date-string={{events[0][ 'date_string' ]}}></span></td></tr>
+                                        {% if demo_days|length >= 1 %}
+                                            <tr><td>{{ demo_days[0]['summary'] }}</td></tr>
+                                            <tr><td>{{ demo_days[0]['start_string'] }}</td></tr>
+                                            <tr><td> <span id="clock1" data-date-string-one={{demo_days[0][ 'date_string' ]}}></span></td></tr>
+                                        {% else %}
+                                            No Upcoming Event
+                                        {% endif %}
                                     </table>
                                 </div>
                             </div>    
@@ -158,12 +163,17 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Last Event Countdown
+                                    Next Demo Day Countdown
                                 </div>
                                 <div class="card-body">
                                     <table>
-                                        <tr><td>Time Until Last Event<td></tr>
-                                        <tr><td><span id="clock2" data-date-string-second={{events[-1][ 'date_string' ]}}></span></td></tr>
+                                        {% if demo_days|length >= 2 %}
+                                            <tr><td>{{ demo_days[1]['summary'] }}</td></tr>
+                                            <tr><td>{{ demo_days[1]['start_string'] }}</td></tr>
+                                            <tr><td><span id="clock2" data-date-string-two={{demo_days[1][ 'date_string' ]}}></span></td></tr>
+                                        {% else %}
+                                            No Upcoming Event
+                                        {% endif %}
                                     </table>
                                 </div>
                             </div>    
@@ -172,12 +182,18 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                     MESA Day Countdown
+                                    MESA Day Countdown
                                 </div>
                                 <div class="card-body">
                                     <table>
-                                        <tr><td>Time Until MESA Day<td></tr>
-                                        <tr><td><span id="clock3" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
+                                        {% if mesa_days|length >= 1 %}
+                                            <tr><td>{{ mesa_days[0]['summary'] }}</td></tr>
+                                            <tr><td>{{ mesa_days[0]['start_string'] }}</td></tr>
+                                            <tr><td><span id="clock3" data-date-string-three={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
+                                        {% else %}
+                                            No Upcoming Event
+                                        {% endif %}
+
                                     </table>
                                 </div>
                             </div>    
