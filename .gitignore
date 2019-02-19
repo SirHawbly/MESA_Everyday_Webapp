@@ -4,3 +4,4 @@ __pycache__/
 MESAeveryday/credentials/
 *.pdf
 .vscode/settings.json
+vars.sh
