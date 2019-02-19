@@ -89,7 +89,7 @@
             location.href = "{{ url_for('earn_stamps') }}";
             };
             document.getElementById("progress_button{{ badge.badge_id }}").onclick = function () {
-            location.href = "/badges/{{ badge.badge_id }}";
+            location.href = "/badges{{ badge.badge_id }}";
             };
         </script>
     {% endfor %}
