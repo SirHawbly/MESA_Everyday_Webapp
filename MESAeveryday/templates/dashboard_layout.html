@@ -119,7 +119,7 @@
                         <div class="collapsible-body">
                             <ul>
                                 {% for badge in badges %}
-                                    <li><a href="/badges/{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
+                                    <li><a href="/badges{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>

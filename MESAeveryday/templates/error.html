@@ -20,13 +20,12 @@ font-weight:700}header.masthead{
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }}">
-                {{ message }}
-              </div>
-            {% endfor %}
-          {% endif %}
+	    {% endfor %}
+	  {% endif %}
         {% endwith %}
-
+    	<div class="alert alert-danger">
+            Sorry, we were unable to process that request
+        </div>
     </div>
   </header>
 

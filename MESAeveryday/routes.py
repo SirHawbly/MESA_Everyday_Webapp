@@ -216,7 +216,6 @@ def forgot_username():
         
 @app.route("/error", methods=['GET'])
 def error():
-    flash('Sorry, we could not process that request.', 'danger')
     return render_template('error.html')        
       
         
@@ -335,6 +334,9 @@ def account():
         avatars = ""
         myaccount = User.get_user_by_username(current_user.username)
 
+        #Get all badges
+        badges = Badge.get_all_badges()
+
         #Update password
         if passwordform.password.data and passwordform.validate_on_submit():
             hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
@@ -402,7 +404,7 @@ def account():
         other_days = searchEvents(events, ['Mesa','Day'])
         upcoming_events = [event for event in events if event['remain_days'] < 15]
         
-        return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
+        return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, badges=badges,
                                other_days=other_days)
          
     except:    
@@ -494,7 +496,7 @@ def earn_stamps():
 
         return redirect(url_for('error')) 
         
-@app.route("/badges/<badge_id>", methods=['GET', 'POST'])
+@app.route("/badges<badge_id>", methods=['GET', 'POST'])
 @login_required
 def check_badge(badge_id):
     """
@@ -538,7 +540,7 @@ def check_badge(badge_id):
                     print('deleted:\nid: ' + str(stamp_id) + '\ntime finished: ' +  str(time_finished) + '\nlog_date: ' + str(log_date))
                 else:
                     print('error when deleting user earned stamp')
-            return redirect('/badges/' + str(badge_id))
+            return redirect('/badges' + str(badge_id))
         
         # Call the google api and pull all upcoming events
         events = get_event_list()

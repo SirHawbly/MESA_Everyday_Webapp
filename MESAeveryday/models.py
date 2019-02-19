@@ -61,7 +61,6 @@ class User(Base, UserMixin):
     avatar_id = Column(Integer, ForeignKey("avatars.id"))
     password = Column('SSB', String)
     last_login = Column(DateTime)
-    role = Column(String)
 
     school = relationship("School", foreign_keys=[school_id])
     avatar = relationship("Avatar", foreign_keys=[avatar_id])
