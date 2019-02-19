@@ -226,7 +226,6 @@
                                                     <th>General Events</th>
                                                     <th>Remain Days</th>
                                                     <th>Time</th>
-                                                    <th>Location</th>
                                                 </thead>
                                                 <tbody>
                                                     {% for event in events[:10] %}    
@@ -235,7 +234,6 @@
                                                                 <td>{{event['summary']}}</td>
                                                                 <td>{{event['remain_days']}}</td>
                                                                 <td>{{event['start_string']}}</td>
-                                                                <td>{{event['location']}}</td>
                                                             </tr>
                                                         {% endif %}
                                                     {% endfor %}
@@ -245,13 +243,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <form action="{{ url_for('events') }}">
-                                <button class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-right">View
-                                    full upcoming events
-                                </button>
-                            </form>
                         </div>
                     </div>
+                    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
                     <!--/.Panel-->
                 </div>
                 <!-- /.Second row -->
