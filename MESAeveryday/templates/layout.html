@@ -113,8 +113,9 @@
         
         $(".date-custom").attr("autocomplete", "off");
         
-        $('#upEvent').DataTable();
-        $('#mesaEvent').DataTable();
+        $('#upEvent').DataTable({
+           "dom": 'f<"top"i>rt<"bottom"lp><"clear">'
+        });
         $(function () {
             $('.min-chart#chart-sales').easyPieChart({
                 barColor: "#FF5252",

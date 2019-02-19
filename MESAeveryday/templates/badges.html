@@ -109,6 +109,41 @@
     </div>
 </div>
 
+<div class="card mb-4" style="background-color: {{ badge.color }}">
+    <div class="card-header white-text primary-color">
+        Events For Badge {{ badge.badge_name }}
+    </div>
+    <div class="card-body">
+        <table>
+            {% for event in mesa_events[badge.badge_id][:5] %}
+                <tr bgcolor="#7777AA">
+                    <td>
+                        {{ event['summary'] }}
+                        - in {{ event['remain_days'] }} days
+                    </td>
+                </tr>
+                <tr bgcolor="#7777AA">
+                    <td>
+                        {{ event['start_string'] }} 
+                        at {{ event['location'] }}
+                    </td>
+                </tr>
+                <tr bgcolor="#7777AA">
+                    <td>
+                        badge: {{event['badgeColor']}}
+                    </td>
+                </tr>
+                <tr bgcolor="#7777AA">
+                    <td>
+                        <a href={{ event['htmlLink'] }}> Event Link </a>
+                    </td>                                              
+                </tr>                                                
+                <tr><td> -- </td></tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
 <!-- /.Panel -->
 
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
