@@ -4,7 +4,10 @@ __pycache__/
 MESAeveryday/credentials/
 *.pdf
 .vscode/settings.json
+<<<<<<< HEAD
 .appenv/
 app.sh
 env/
+=======
+>>>>>>> 5f46a88dea1b7888967b5bcfc34ab42f79094667
 vars.sh

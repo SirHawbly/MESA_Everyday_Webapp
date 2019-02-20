@@ -28,7 +28,7 @@
             <!--Grid column-->
             <div class="col-xl-12 col-md-6 mb-4">
                 <!--Card-->
-                <div class="card card-cascade cascading-admin-card" style="background-color: #b3cce6">
+                <div class="card card-cascade cascading-admin-card" style="background-color: {{ badge.color }}">
 
                     <!--Card Data-->
                     <div class="admin-up">
@@ -42,13 +42,14 @@
                     <!--Card content-->
                     <div class="card-body">
                         <div class="progress" style="height:30px">
-                            <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ progress[badge.badge_id].total_points }}%;height:30px" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{ progress[badge.badge_id].total_points }}%</div>
+                            <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ (progress[badge.badge_id].total_points/all_max_points[badge.badge_id].max_points*100)|round }}%;height:30px" aria-valuenow="{{ (progress[badge.badge_id].total_points/all_max_points[badge.badge_id].max_points*100)|round }}" aria-valuemin="0" aria-valuemax="100">{{ (progress[badge.badge_id].total_points/all_max_points[badge.badge_id].max_points*100)|round }}%</div>
                         </div>
                         <div class="row">
                             <div class="col-lg-8">
                                 <!--Text-->
-                                <p class="card-text" style="font-size: 150%">Total points earned: {{ progress[badge.badge_id].total_points }} points</p>
-                                <p class="card-text" style="font-size: 150%">Point until next level: {{ progress[badge.badge_id].to_next_level }} points</p>
+                                <p class="card-text" style="font-size: 150%"><b>Total points earned:</b> {{ progress[badge.badge_id].total_points }} points</p>
+                                <p class="card-text" style="font-size: 150%"><b>Point until next level:</b> {{ progress[badge.badge_id].to_next_level }} points</p>
+                                <p class="card-text" style="font-size: 150%"><b>Maximum points can be earned:</b> {{ all_max_points[badge.badge_id].max_points }} points</p>
                                 <div class="row">
                                     <div class="col-lg-5">
                                         <button id="earn_button{{ badge.badge_id }}" class="btn btn btn-flat grey lighten-3 btn-rounded waves-effect font-weight-bold dark-grey-text float-left">Earn Stamp</a></button>
@@ -59,13 +60,14 @@
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <div class="progress-circle p{{ progress[badge.badge_id].total_points }}">
-                                   <span>Level</span>
+                                <!-- <div class="progress-circle p{{ progress[badge.badge_id].total_points }}">
+                                   <span><p style="font-size: 45px">{{ progress[badge.badge_id].current_level }}</p></span>
                                    <div class="left-half-clipper">
                                       <div class="first50-bar"></div>
                                       <div class="value-bar"></div>
                                    </div>
-                                </div>
+                                </div> -->
+                                <span class="min-chart my-4" id="chart-sales" data-percent="{{ (progress[badge.badge_id].total_points/(progress[badge.badge_id].total_points + progress[badge.badge_id].to_next_level)*100)|round }}"><span class="percent"></span>{{ progress[badge.badge_id].current_level }}</span>
                             </div>
                         </div>
                     </div>
@@ -87,7 +89,7 @@
             location.href = "{{ url_for('earn_stamps') }}";
             };
             document.getElementById("progress_button{{ badge.badge_id }}").onclick = function () {
-            location.href = "/badges/{{ badge.badge_id }}";
+            location.href = "/badges{{ badge.badge_id }}";
             };
         </script>
     {% endfor %}

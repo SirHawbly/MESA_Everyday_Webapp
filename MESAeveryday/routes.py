@@ -216,7 +216,6 @@ def forgot_username():
         
 @app.route("/error", methods=['GET'])
 def error():
-    flash('Sorry, we could not process that request.', 'danger')
     return render_template('error.html')        
       
         
@@ -338,7 +337,10 @@ def account():
         passwordform= UpdatePasswordForm()
         avatars = ""
         myaccount = User.get_user_by_username(current_user.username)
-    
+
+        #Get all badges
+        badges = Badge.get_all_badges()
+
         #Update password
         if passwordform.password.data and passwordform.validate_on_submit():
             hashed_password = bcrypt.generate_password_hash(passwordform.password.data).decode('utf-8')
@@ -409,6 +411,7 @@ def account():
         
         return render_template('account.html', 
                                 title='Account', 
+                                badges=badges,
                                 avatar_files=Avatar.get_all_avatars(), 
                                 form_email=emailform, 
                                 form_name=nameform, 
@@ -420,7 +423,7 @@ def account():
                                 upcoming_events=upcoming_events, 
                                 mesa_days=mesa_days,
                                 demo_days=demo_days)
-         
+        
     except:    
 
         return redirect(url_for('error'))    
@@ -445,8 +448,7 @@ def account_deactivate():
                     return redirect(url_for('landpage'))
                 else :
                     flash('Account does not match. Please check First Name and Last Name!!', 'danger')
-            return render_template('account_deactivate.html')
-
+            return redirect(url_for('account'))
 
     except:
 
@@ -519,7 +521,7 @@ def earn_stamps():
 
         return redirect(url_for('error')) 
         
-@app.route("/badges/<badge_id>", methods=['GET', 'POST'])
+@app.route("/badges<badge_id>", methods=['GET', 'POST'])
 @login_required
 def check_badge(badge_id):
     """
@@ -563,7 +565,7 @@ def check_badge(badge_id):
                     print('deleted:\nid: ' + str(stamp_id) + '\ntime finished: ' +  str(time_finished) + '\nlog_date: ' + str(log_date))
                 else:
                     print('error when deleting user earned stamp')
-            return redirect('/badges/' + str(badge_id))
+            return redirect('/badges' + str(badge_id))
         
         # Call the google api and pull all upcoming events
         events = get_event_list()
@@ -699,7 +701,11 @@ def admin_control():
         resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
           
-        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
+        return render_template('admin_control.html', 
+                               form_email=emailform, 
+                               form_password=passwordform, 
+                               form_old_accounts=oldaccountsform, 
+                               form_reset_date=resetdateform)    
         
     except:
 
