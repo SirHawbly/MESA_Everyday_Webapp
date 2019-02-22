@@ -6,7 +6,7 @@ Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
 from flask import render_template, url_for, flash, redirect, request
-from MESAeveryday import app, bcrypt, mail
+from MESAeveryday import app, bcrypt, mail, limiter
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm, BadgePointsForm
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
@@ -80,6 +80,7 @@ def register():
         return redirect(url_for('error'))      
 
 @app.route("/login", methods=['GET', 'POST'])
+@limiter.limit ('5 per hour')
 def login():
     """
       Route that processes a login attempt
