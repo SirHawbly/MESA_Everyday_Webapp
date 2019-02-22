@@ -36,16 +36,28 @@
             <!--Grid column-->
 
             <!--Grid column-->
-            <div class="col-lg-7 mb-4">
+            <div class="col-lg-8 mb-4">
                 <!--Excerpt-->
                 <h4 class="mb-4"><strong>Badge {{ badge.badge_name }}</strong></h4>
-                <a href="" class="text" style="color: black"><h6 class="pb-1"><strong> Level <a style="font-size: 150%">{{ lv }}</a> </strong></h6></a>
-                <p><a><strong>Total points earned:</strong></a> <a style="font-size: 150%"><strong>{{ pt }} points</strong></a></p>
-                {% if to_next_lv == 0 %}
-                    <p><a><strong>You've achieved the maximum level!</strong></a></p>
-                {% else %}
-                    <p><a><strong>Point to next level:</strong></a> <a style="font-size: 150%"><strong>{{ to_next_lv }} points</strong></a></p>
-                {% endif %}
+                <div class="row">
+                    <div class="col-lg-8 mb-4">
+                        <a href="" class="text" style="color: black"><h6 class="pb-1"><strong> Level <a style="font-size: 150%">{{ lv }}</a> </strong></h6></a>
+                        <p><a><strong>Total points earned:</strong></a> <a style="font-size: 150%"><strong>{{ pt }} points</strong></a></p>
+                        {% if to_next_lv == 0 %}
+                            <p><a><strong>You've achieved the maximum level!</strong></a></p>
+                        {% else %}
+                            <p><a><strong>Point to next level:</strong></a> <a style="font-size: 150%"><strong>{{ to_next_lv }} points</strong></a></p>
+                        {% endif %}
+                    </div>
+                    <div class="col-lg-4 mb-4">
+                        <!-- <span class="badge red">{{number_upcoming}}</span> <i class="fa fa-calendar"></i>
+                        <span class="d-none d-md-inline-block">Scroll to Events Table</span> -->
+                        <button onclick="divFunction()" type="button" class="btn-floating btn-fb"><i class="fa fa-calendar" title="Click to scroll to event table"></i></button>
+                        {% if number_upcoming > 0 %}
+                        <span id="countEvent" class="counter"></span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <!--Grid column-->
 
@@ -109,6 +121,34 @@
     </div>
 </div>
 
+<div id="ediv" class="card mb-4" style="background-color: {{ badge.color }}">
+    <div class="card-header white-text primary-color">
+        {{ badge.badge_name }} Events
+    </div>
+    <div class="card-body">
+        <table class="table table-striped table-bordered table-responsive-md" id="eventTable" style="width: 100%">
+            <thead>
+                <th>General Events</th>
+                <th>Remain Days</th>
+                <th>Time</th>
+                <th>Location</th>
+            </thead>
+            <tbody>
+                {% for event in mesa_events[badge.badge_id][:10] %}
+                    {% if event['remain_days'] < 15 %} 
+                        <tr>
+                            <td>{{event['summary']}}</td>
+                            <td>{{event['remain_days']}}</td>
+                            <td>{{event['start_string']}}</td>
+                            <td>{{event['location']}}</td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <!-- /.Panel -->
 
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
@@ -147,4 +187,14 @@ function Values(ID, TimeFinished, LogDate){
 {% endblock main %}
 {% block scripts %}
     {{ super() }}
+<script type="text/javascript">
+    $('#eventTable').DataTable();
+    function divFunction() {
+        $('html, body').animate({
+            scrollTop: $('#ediv').offset().top
+        }, 'slow');
+    }
+    var x = document.getElementById("eventTable").rows.length;
+    document.getElementById("countEvent").innerHTML = document.getElementById("eventTable").rows.length-1;
+</script>
 {% endblock scripts %}
