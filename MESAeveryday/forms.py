@@ -93,6 +93,18 @@ class UpdateSchoolForm(FlaskForm):
 
     submit = SubmitField('Update School')
 
+class AddSchoolForm(FlaskForm):
+
+    schoolName = StringField('SchoolName')
+
+    submit = SubmitField('Add School')
+
+class DeleteSchoolForm(FlaskForm):
+
+    school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
+
+    submit = SubmitField('Delete School')
+
 class UpdatePasswordForm(FlaskForm):
     old_password = PasswordField('Password')
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
@@ -116,6 +128,21 @@ class EarnStampsForm(FlaskForm):
         super(EarnStampsForm, self).__init__(*args, **kwargs)
         self.badge_name = badge_name
 
+
+class AddStampForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    badgeName = StringField('badgeName')
+    submit = SubmitField('Add Stamp')
+
+
+
+class DeleteStampForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    stamp = SelectField('Stamp', choices=[])
+    submit = SubmitField('Delete Stamp')
+
 class RemoveOldAccountsForm(FlaskForm):
     years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
     submit = SubmitField('Delete Old Accounts')
@@ -124,7 +151,18 @@ class ResetDateForm(FlaskForm):
  
     reset_date = DateField('reset date', format='%m-%d', validators=[DataRequired()])
     submit = SubmitField('Change Reset Date')
-    
+class EditBadgeForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    badgeName = StringField('badgeName')
+    submit = SubmitField('Update Badge')
+
+
+class BadgeForm(FlaskForm):
+
+    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    submit = SubmitField('Update Badge')
+
 class BadgePointsForm(FlaskForm):
     level1_points = IntegerField('level 1 points', validators=[positive])
     level2_points = IntegerField('level 2 points', validators=[Optional(), positive])

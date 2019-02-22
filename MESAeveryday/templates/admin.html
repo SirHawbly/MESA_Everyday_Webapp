@@ -7,6 +7,8 @@
 <!--Navbar-->
 <ul class="nav navbar-nav nav-flex-icons ml-auto">
     <li class = "nav-item">
+
+        <a class="nav-link" href="{{ url_for('add_school') }}">Add School</a>
         <a class="nav-link" href="{{ url_for('logout') }}">Log Out</a>
     </li>
 </ul>
@@ -15,6 +17,7 @@
     You are now in admin view   
     <li><a href="{{ url_for('admin_control') }}">Control</a></li>
     <li><a href="{{ url_for('admin_settings') }}">Settings</a></li>
+
 </div>
 
 
