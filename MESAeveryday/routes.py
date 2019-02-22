@@ -7,7 +7,6 @@ https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-
 """
 from MESAeveryday import app, bcrypt, mail, limiter
 from flask import render_template, url_for, flash, redirect, request,jsonify
-
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
     UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm,BadgePointsForm
 
@@ -85,7 +84,7 @@ def register():
         return redirect(url_for('error'))      
 
 @app.route("/login", methods=['GET', 'POST'])
-@limiter.limit ('5 per hour')
+@limiter.limit ('2 per minute')
 def login():
     """
       Route that processes a login attempt
@@ -106,6 +105,7 @@ def login():
                 User.update_last_login(user.id, datetime.now())
                 login_user(user, remember=form_login.remember.data)
                 next_page = request.args.get('next')
+                limiter.reset()
                 return redirect(next_page) if next_page else redirect(url_for('dashboard'))
                 
             # User did not enter the correct credentials
@@ -219,7 +219,11 @@ def forgot_username():
     except:
 
         return redirect(url_for('error'))    
-        
+
+@app.errorhandler(429)
+def too_many_request(e):
+    return render_template('login_limit.html')
+
 @app.route("/error", methods=['GET'])
 def error():
     return render_template('error.html')        
