@@ -104,15 +104,23 @@ class UpdateSchoolForm(FlaskForm):
 
 class AddSchoolForm(FlaskForm):
 
-    schoolName = StringField('SchoolName')
+    schoolName = StringField('SchoolName', validators=[DataRequired()])
 
     submit = SubmitField('Add School')
+
+    def validate_schoolName(self, schoolName):
+        if School.get_school_by_name(schoolName.data):
+            raise ValidationError('That school already exists.')
 
 class DeleteSchoolForm(FlaskForm):
 
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
 
     submit = SubmitField('Delete School')
+    def validate_school(self, school):
+        schoolName = School.get_school_by_id(school.data)
+        if schoolName.school_name == 'Other':
+            raise ValidationError('You cannot delete \'Other\'')
 
 class UpdatePasswordForm(FlaskForm):
     old_password = PasswordField('Password')
@@ -145,7 +153,9 @@ class AddStampForm(FlaskForm):
     points = IntegerField('Points', validators=[DataRequired(), positive])
     submit = SubmitField('Add Stamp')
 
-
+    def validate_stamp_name(self, stamp_name):
+        if Stamp.get_stamp_by_name(stamp_name.data):
+            raise ValidationError('A stamp already exists with that name!')
 
 class DeleteStampForm(FlaskForm):
 

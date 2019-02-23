@@ -220,6 +220,12 @@ class User(Base, UserMixin):
             session.rollback()
             return None
 
+    def get_users_by_school(school_id):
+        #try: 
+            return session.query(User).filter(User.school_id == school_id)
+        #except:
+            session.rollback()
+            return None
 
     # Added by Millen
     # Checks if user had an admin role
@@ -286,15 +292,26 @@ class School(Base):
             session.rollback()
 
     def delete_school_by_id(id):
-        try:
+        #try:
+            other_school = School.get_school_by_name('Other')
+            users = User.get_users_by_school(id)
+            for user in users:
+                user.school_id = other_school.school_id
             session.query(School).filter(School.school_id == id).delete()
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
     def get_school_by_id(id):
         try:
            return session.query(School.school_name).filter(School.school_id == id).first()
+
+        except:
+            session.rollback()
+            return None
+    def get_school_by_name(name):
+        try:
+           return session.query(School).filter(School.school_name == name).first()
 
         except:
             session.rollback()
@@ -393,15 +410,14 @@ class Badge(Base):
             return None
 
     def update_icon(id, new_icon_id):
-        #try:
+        try:
             badge = session.query(Badge).filter(Badge.badge_id == id).first()
             badge.icon_id = new_icon_id
             session.commit()
             return True
-        #except:
+        except:
             session.rollback()
             return False
-        #return True
 
 
 
@@ -510,6 +526,13 @@ class Stamp(Base, UserMixin):
     def get_stamp_by_stamp_id(stamp_id):
         try:
             return session.query(Stamp.stamp_name).filter(Stamp.stamp_id == stamp_id).first()
+        except:
+            session.rollback()
+            return None
+
+    def get_stamp_by_name(name):
+        try:
+            return session.query(Stamp).filter(Stamp.stamp_name == name).first()
         except:
             session.rollback()
             return None

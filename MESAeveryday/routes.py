@@ -619,12 +619,12 @@ def admin():
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
-    """
+        """
         Page for admin to control various parts of the application
         Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
         Only those will a valid admin account can view this page
-    """ 
-    try:    
+        """ 
+    #try:    
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
             
@@ -649,13 +649,8 @@ def admin_control():
             return redirect(url_for('admin_control'))
 
         #Delete School Form
-        if deleteschoolform.school.data and deleteschoolfirm.validate_on_submit():
+        if deleteschoolform.school.data and deleteschoolform.validate_on_submit():
             school_id = deleteschoolform.school.data
-            """ Need better solution for this but accept this for now"""
-            if 'Other' in School.get_school_by_id(school_id):
-                flash('Not allow to delete this item', 'success')
-                return redirect(url_for('delete_school'))
-
             School.delete_school_by_id(school_id)
             flash('Succesfully Delete  !!!', 'success')
             return redirect(url_for('admin_control'))
@@ -701,7 +696,7 @@ def admin_control():
           
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
         
-    except:
+    #except:
 
         return redirect(url_for('error')) 
 
