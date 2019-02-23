@@ -51,6 +51,9 @@ select {
 #avatarSelect {
     display:none!important;
 }
+#iconSelect {
+    display:none!important;
+}
 
 .p-5 {
     padding: 0rem!important;

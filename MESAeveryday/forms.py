@@ -18,7 +18,16 @@ def positive(form, field):
         if field.data != None and field.data < 1:
             raise ValidationError('Number must be positive.')
 
+class NonValidatingSelectField(SelectField):
+    """
+    Attempt to make an open ended select multiple field that can accept dynamic
+    choices added by the browser.
+    """
+    def pre_validate(self, form):
+        pass
+
 class RegistrationForm(FlaskForm):
+
     firstname = StringField('Firstname', validators=[DataRequired()])
     lastname = StringField('Lastname', validators=[DataRequired()])
     email = StringField('Email',
@@ -132,16 +141,18 @@ class EarnStampsForm(FlaskForm):
 class AddStampForm(FlaskForm):
 
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    badgeName = StringField('badgeName')
+    stamp_name = StringField('Stamp Name', validators=[DataRequired()])
+    points = IntegerField('Points', validators=[DataRequired(), positive])
     submit = SubmitField('Add Stamp')
 
 
 
 class DeleteStampForm(FlaskForm):
 
-    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    stamp = SelectField('Stamp', choices=[])
-    submit = SubmitField('Delete Stamp')
+    badgedelete = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    stampdelete = NonValidatingSelectField('Stamp', choices={})
+    submitdelete = SubmitField('Delete Stamp')
+
 
 class RemoveOldAccountsForm(FlaskForm):
     years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
@@ -154,7 +165,7 @@ class ResetDateForm(FlaskForm):
 class EditBadgeForm(FlaskForm):
 
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    badgeName = StringField('badgeName')
+    badgeName = StringField('badgeName', validators=[DataRequired()])
     submit = SubmitField('Update Badge')
 
 

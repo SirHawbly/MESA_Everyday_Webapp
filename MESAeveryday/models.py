@@ -392,15 +392,16 @@ class Badge(Base):
             session.rollback()
             return None
 
-    def update_avatar(id, new_avatar_id):
-        try:
+    def update_icon(id, new_icon_id):
+        #try:
             badge = session.query(Badge).filter(Badge.badge_id == id).first()
-            badge.icon_id = new_avatar_id
+            badge.icon_id = new_icon_id
             session.commit()
-        except:
+            return True
+        #except:
             session.rollback()
             return False
-        return True
+        #return True
 
 
 
@@ -456,6 +457,13 @@ class Stamp(Base, UserMixin):
             session.rollback()
             return None
 
+    def get_all_stamps():
+        try:
+            return session.query(Stamp.stamp_id, Stamp.stamp_name)
+        except:
+            session.rollback()
+            return None
+
     def get_stamps_of_badge(badge_id):
         try:
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id)
@@ -486,10 +494,10 @@ class Stamp(Base, UserMixin):
             return None
 
     def add_stamp(new_stamp):
-        try:
+        #try:
             session.add(new_stamp)
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
     def get_all_stampid_stampname():
@@ -507,10 +515,10 @@ class Stamp(Base, UserMixin):
             return None
 
     def delete_stamp_by_id(id):
-        try:
+        #try:
             session.query(Stamp).filter(Stamp.stamp_id == id).delete()
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
 
