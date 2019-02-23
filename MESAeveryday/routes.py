@@ -632,8 +632,33 @@ def admin_control():
         passwordform = UpdatePasswordForm()
         oldaccountsform = RemoveOldAccountsForm()
         resetdateform = ResetDateForm()
+        addschoolform = AddSchoolForm()
+        deleteschoolform =DeleteSchoolForm()
         resetdateform.reset_date.id = 'reset_date'
         admin_account = User.get_user_by_username(current_user.username)
+
+
+        #Add School
+        if addschoolform.schoolName.data and addschoolform.validate_on_submit():
+            schoolName = request.form.get('schoolName')
+            # Add school to the database
+            new_school = School(schoolName, '', '', '', '')
+            School.add_new_school(new_school)
+            rows = School.get_school()
+            flash('New school has been created!', 'success')
+            return redirect(url_for('admin_control'))
+
+        #Delete School Form
+        if deleteschoolform.validate_on_submit():
+            school_id = deleteschoolform.school.data
+            """ Need better solution for this but accept this for now"""
+            if 'Other' in School.get_school_by_id(school_id):
+                flash('Not allow to delete this item', 'success')
+                return redirect(url_for('delete_school'))
+
+            School.delete_school_by_id(school_id)
+            flash('Succesfully Delete  !!!', 'success')
+            return redirect(url_for('admin_control'))
 
         #Update password
         if passwordform.password.data and passwordform.validate_on_submit():
@@ -674,7 +699,7 @@ def admin_control():
         resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
           
-        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
+        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
         
     except:
 
