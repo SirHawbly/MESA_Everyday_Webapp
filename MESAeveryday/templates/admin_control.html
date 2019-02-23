@@ -16,13 +16,7 @@
     <li><a href="{{ url_for('admin_settings') }}">Settings</a></li>
 </div>
 
-    <div class="content-section">
-    <legend class="border-bottom mb-4">Manage School</legend>
-     <li><a href="{{ url_for('add_school') }}">Add School</a></li>
-    <li><a href="{{ url_for('delete_school') }}">Delete School</a></li>
 
-
-    </div>
 <div class="content-section">
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -33,6 +27,35 @@
         {% endfor %}
       {% endif %}
     {% endwith %}
+
+    <!-- Add School -->
+        <form name ="form_name" method="POST" action="" enctype="multipart/form-data">
+            {{ form_school_add.hidden_tag() }}
+            <fieldset class="form-group">
+                <div class="form-group">
+                    {{ form_school_add.schoolName(class="form-control", placeholder="School Name") }}
+                </div>
+
+            </fieldset>
+            <div class="form-group">
+                {{ form_school_add.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+     <!-- Delete School -->
+        <form name="form_school" method="POST" action="" enctype="multipart/form-data">
+            {{ form_school_delete.hidden_tag() }}
+            <fieldset class="form-group">
+                 <div class="form-group">
+
+                            {{ form_school_delete.school(class="form-control", placeholder="School") }}
+
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form_school_delete.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+
     
     <!-- Update Email -->
     <form name ="form_email" method="POST" action="" enctype="multipart/form-data">
