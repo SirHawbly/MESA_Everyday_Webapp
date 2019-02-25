@@ -460,7 +460,7 @@ class Stamp(Base, UserMixin):
         self.points = points
         self.url = url
 
-    def get_stamps_of_badge(user_id, badge_id):
+    def get_user_stamps_of_badge(user_id, badge_id):
       #  try:
             reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
             if datetime.datetime.now().strftime('%m-%d') >= reset_date:

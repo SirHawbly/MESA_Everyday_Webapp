@@ -466,7 +466,7 @@ def earn_stamps():
         
         forms, t = [], 1       # several pairs of forms (stamp, date, submit). t is used to assign unique id
         for badge in badges:
-            stamps = Stamp.get_stamps_of_badge(current_user.id, badge[0])
+            stamps = Stamp.get_user_stamps_of_badge(current_user.id, badge[0])
 
             if stamps is not None:
                 form = EarnStampsForm(badge[1], prefix=badge[1])    # create a pair of form. prefix -> make each form unique
