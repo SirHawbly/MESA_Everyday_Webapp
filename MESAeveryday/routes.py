@@ -5,11 +5,17 @@ Each route selects the proper forms for each page, calculates the data to put in
 Modified from CoreyMSchafer's Flask Tutorial
 https://github.com/CoreyMSchafer/code_snippets/blob/master/Python/Flask_Blog/06-Login-Auth/flaskblog/routes.py
 """
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request,jsonify
 from MESAeveryday import app, bcrypt, mail
-from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm, BadgePointsForm
+
+from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
+    UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm,BadgePointsForm
+
+
 from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date
+
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
+
 from flask_login import login_user, current_user, logout_user, login_required, login_manager
 from flask_mail import Message
 from datetime import datetime
@@ -415,6 +421,7 @@ def account():
 @app.route("/account_deactivate", methods=['GET', 'POST'])
 @login_required
 def account_deactivate():
+
     try:
         myaccount = User.get_user_by_username(current_user.username)
         print(myaccount.id)
@@ -436,6 +443,7 @@ def account_deactivate():
     except:
 
         return redirect(url_for('error')) 
+
 @app.route("/earn_stamps", methods=['GET', 'POST'])
 @login_required
 def earn_stamps():
@@ -620,8 +628,33 @@ def admin_control():
         passwordform = UpdatePasswordForm()
         oldaccountsform = RemoveOldAccountsForm()
         resetdateform = ResetDateForm()
+        addschoolform = AddSchoolForm()
+        deleteschoolform =DeleteSchoolForm()
         resetdateform.reset_date.id = 'reset_date'
         admin_account = User.get_user_by_username(current_user.username)
+
+
+        #Add School
+        if addschoolform.schoolName.data and addschoolform.validate_on_submit():
+            schoolName = request.form.get('schoolName')
+            # Add school to the database
+            new_school = School(schoolName, '', '', '', '')
+            School.add_new_school(new_school)
+            rows = School.get_school()
+            flash('New school has been created!', 'success')
+            return redirect(url_for('admin_control'))
+
+        #Delete School Form
+        if deleteschoolform.validate_on_submit():
+            school_id = deleteschoolform.school.data
+            """ Need better solution for this but accept this for now"""
+            if 'Other' in School.get_school_by_id(school_id):
+                flash('Not allow to delete this item', 'success')
+                return redirect(url_for('delete_school'))
+
+            School.delete_school_by_id(school_id)
+            flash('Succesfully Delete  !!!', 'success')
+            return redirect(url_for('admin_control'))
 
         #Update password
         if passwordform.password.data and passwordform.validate_on_submit():
@@ -662,7 +695,7 @@ def admin_control():
         resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
           
-        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform)    
+        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
         
     except:
 
@@ -704,7 +737,141 @@ def admin_settings():
     except:
 
         return redirect(url_for('error')) 
-        
+
+
+@app.route("/add_school", methods=['GET','POST'])
+@login_required
+def add_school():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = AddSchoolForm()
+
+    if form.validate_on_submit():
+        schoolName=request.form.get('schoolName')
+        # Add school to the database
+        new_school = School(schoolName, '','','','')
+        School.add_new_school(new_school)
+        rows = School.get_school()
+        flash('New school has been created!' , 'success')
+
+    return render_template('add_school.html',form_school=form)
+
+
+@app.route("/delete_school", methods=['GET','POST'])
+@login_required
+def delete_school():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = DeleteSchoolForm()
+    if form.validate_on_submit():
+        school_id=form.school.data
+        """ Need better solution for this but accept this for now"""
+        if 'Other' in School.get_school_by_id(school_id) :
+            flash('Not allow to delete this item', 'success')
+            return redirect(url_for('delete_school'))
+
+        School.delete_school_by_id(school_id)
+        flash('Succesfully Delete  !!!', 'success')
+        return redirect(url_for('delete_school'))
+
+    return render_template('delete_school.html',form_school=form)
+
+
+
+@app.route("/add_stamp", methods=['GET','POST'])
+@login_required
+def add_stamp():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = AddStampForm()
+    if form.validate_on_submit():
+        badgeId=form.badge.data
+        stampName= request.form.get('badgeName')
+        newStamp=Stamp(stampName,badgeId,0,0)
+        Stamp.add_stamp(newStamp)
+        flash('New Stamp has been created!', 'success')
+
+    return render_template('add_stamp.html',form_stamp=form)
+
+
+@app.route("/delete_stamp", methods=['GET','POST'])
+@login_required
+def delete_stamp():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = DeleteStampForm()
+    form.stamp.choices = Stamp.get_stamps_of_badge(1)
+
+    if request.method == 'POST':
+        stampName=Stamp.get_stamp_by_stamp_id(form.stamp.data)
+        print(form.stamp.data)
+        Stamp.delete_stamp_by_id(form.stamp.data)
+        flash('Delete successfully!', 'success')
+        #return redirect(url_for('delete_stamp'))
+
+    return render_template('delete_stamp.html',form_stamp=form)
+
+@app.route('/stamp/<badgeid>')
+def stamp(badgeid):
+    stamps = Stamp.get_stamps_of_badge(badgeid)
+    stampArray = []
+    for stamp in stamps:
+        stampObj = {}
+        stampObj['id'] = stamp.stamp_id
+        stampObj['name'] = stamp.stamp_name
+        stampArray.append(stampObj)
+
+    return jsonify({'stamps' : stampArray})
+
+@app.route("/edit_badge", methods=['GET','POST'])
+@login_required
+def edit_badge():
+    if not User.verify_role(current_user.id):
+        # flash('You do not have access to view this page.', 'danger')
+        return redirect(url_for('dashboard'))
+    form = EditBadgeForm()
+    if form.validate_on_submit():
+        badgeId=form.badge.data
+        badgeName= request.form.get('badgeName')
+        Badge.update_badge_name(badgeId,badgeName)
+        flash('Badge name has been update!', 'success')
+
+    return render_template('edit_badgename.html',form_badge=form)
+
+
+@app.route("/badge_image", methods=['GET', 'POST'])
+@login_required
+def badge_image():
+
+    badge_form=BadgeForm()
+
+    avatars = ""
+    data_test = [{'1': 'red'}, {'2': 'green'}, {'3': 'blue'}]
+
+    # Update avatar
+    if request.method == 'POST':
+
+        id=request.form.get('data_select')
+        print(id)
+
+        badge_id=request.form.get('badge')
+        avatarSelect = request.form.get('avatarSelect')
+        #print(badge_id)
+        #print(avatarSelect)
+        if avatarSelect:
+            if Badge.update_avatar(badge_id, avatarSelect) == True:
+                flash('Your account has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update your account', 'danger')
+            return redirect(url_for('badge_image'))
+
+
+    return render_template('badge_image_picking.html', title='Badge Picking Image', avatar_files=Avatar.get_all_avatars(),form_badge=badge_form,data=data_test)
+
  
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -856,3 +1023,5 @@ username has been generated and it is '''+username+'''
 please keep this email handy as you will need that username every time you
 login to the app. '''
     mail.send(msg)
+
+

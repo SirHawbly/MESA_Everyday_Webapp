@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block content %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+
+        <!-- Delete School -->
+        <form name="form_school" method="POST" action="" enctype="multipart/form-data">
+            {{ form_school.hidden_tag() }}
+            <fieldset class="form-group">
+                 <div class="form-group">
+                        {% if form_school.school.errors %}
+                            {{ form_school.school(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form_school.school.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form_school.school(class="form-control", placeholder="School") }}
+                        {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ form_school.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+
+
+
+{% endblock content %}
