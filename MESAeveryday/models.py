@@ -220,6 +220,12 @@ class User(Base, UserMixin):
             session.rollback()
             return None
 
+    def get_users_by_school(school_id):
+        #try: 
+            return session.query(User).filter(User.school_id == school_id)
+        #except:
+            session.rollback()
+            return None
 
     # Added by Millen
     # Checks if user had an admin role
@@ -286,15 +292,26 @@ class School(Base):
             session.rollback()
 
     def delete_school_by_id(id):
-        try:
+        #try:
+            other_school = School.get_school_by_name('Other')
+            users = User.get_users_by_school(id)
+            for user in users:
+                user.school_id = other_school.school_id
             session.query(School).filter(School.school_id == id).delete()
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
     def get_school_by_id(id):
         try:
            return session.query(School.school_name).filter(School.school_id == id).first()
+
+        except:
+            session.rollback()
+            return None
+    def get_school_by_name(name):
+        try:
+           return session.query(School).filter(School.school_name == name).first()
 
         except:
             session.rollback()
@@ -392,15 +409,15 @@ class Badge(Base):
             session.rollback()
             return None
 
-    def update_avatar(id, new_avatar_id):
+    def update_icon(id, new_icon_id):
         try:
             badge = session.query(Badge).filter(Badge.badge_id == id).first()
-            badge.icon_id = new_avatar_id
+            badge.icon_id = new_icon_id
             session.commit()
+            return True
         except:
             session.rollback()
             return False
-        return True
 
 
 
@@ -443,7 +460,7 @@ class Stamp(Base, UserMixin):
         self.points = points
         self.url = url
 
-    def get_stamps_of_badge(user_id, badge_id):
+    def get_user_stamps_of_badge(user_id, badge_id):
       #  try:
             reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
             if datetime.datetime.now().strftime('%m-%d') >= reset_date:
@@ -453,6 +470,13 @@ class Stamp(Base, UserMixin):
             subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
        # except:
+            session.rollback()
+            return None
+
+    def get_all_stamps():
+        try:
+            return session.query(Stamp.stamp_id, Stamp.stamp_name)
+        except:
             session.rollback()
             return None
 
@@ -486,10 +510,10 @@ class Stamp(Base, UserMixin):
             return None
 
     def add_stamp(new_stamp):
-        try:
+        #try:
             session.add(new_stamp)
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
     def get_all_stampid_stampname():
@@ -506,11 +530,18 @@ class Stamp(Base, UserMixin):
             session.rollback()
             return None
 
-    def delete_stamp_by_id(id):
+    def get_stamp_by_name(name):
         try:
+            return session.query(Stamp).filter(Stamp.stamp_name == name).first()
+        except:
+            session.rollback()
+            return None
+
+    def delete_stamp_by_id(id):
+        #try:
             session.query(Stamp).filter(Stamp.stamp_id == id).delete()
             session.commit()
-        except:
+        #except:
             session.rollback()
             return None
 
