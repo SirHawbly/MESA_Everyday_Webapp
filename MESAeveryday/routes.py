@@ -84,7 +84,7 @@ def register():
         return redirect(url_for('error'))      
 
 @app.route("/login", methods=['GET', 'POST'])
-@limiter.limit ('2 per minute')
+@limiter.limit ('50 per hour')
 def login():
     """
       Route that processes a login attempt
@@ -380,8 +380,9 @@ def account():
                 flash('Sorry, we were unable to update your account', 'danger')
             return redirect(url_for('account'))
 
-        #Update avatar
         if request.method=='POST':
+
+            #Update avatar
             avatarSelect = request.form.get('avatarSelect')
             if avatarSelect:
                 if User.update_avatar(myaccount.id, avatarSelect) == True:
@@ -389,7 +390,22 @@ def account():
                 else:
                     flash('Sorry, we were unable to update your account', 'danger')
                 return redirect(url_for('account'))
+            '''
+            #deactivate Account
+            if current_user.is_authenticated:
+                firstName=request.form.get('FirstName')
+                lastName=request.form.get('LastName')
 
+                if ((firstName and lastName and firstName.lower()==current_user.first_name.lower())
+                        and (lastName.lower()==current_user.last_name.lower())):
+                    User.delete_user_by_id(myaccount.id)
+                    logout_user()
+                    return redirect(url_for('landpage'))
+                else :
+                    flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+            return redirect(url_for('account'))
+
+            '''
         #Load page
 
 
