@@ -44,7 +44,10 @@ def landpage():
         
         form_register = RegistrationForm()
         form_login = LoginForm()
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
     except:    
 
         return redirect(url_for('error'))
@@ -80,7 +83,10 @@ def register():
                 flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
                 send_generate_username(form_register.email.data, new_username)
 
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
     except:
 
         return redirect(url_for('error'))      
@@ -112,7 +118,10 @@ def login():
             else:
                 flash('Login Unsuccessful. Please check username and password', 'danger')
                 
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
     except:
 
         return redirect(url_for('error'))
@@ -151,7 +160,9 @@ def reset_request():
             flash('An email has been sent with instructions to reset your password.', 'info')
             return redirect(url_for('landpage'))
 
-        return render_template('reset_request.html', title='Rest Password', form=form)
+        return render_template('reset_request.html', 
+                               title='Rest Password', 
+                               form=form)
     except:
 
         return redirect(url_for('error'))
@@ -190,7 +201,9 @@ def reset_token(token):
             else:
                 flash('Sorry, we were unable to update your password', 'danger')
                 return redirect(url_for('landpage'))
-        return render_template('reset_token.html', title='Rest Password', form=form)
+        return render_template('reset_token.html', 
+                               title='Rest Password', 
+                               form=form)
     except:
 
         return redirect(url_for('error'))
@@ -215,7 +228,9 @@ def forgot_username():
             send_forgot_username(user)
             flash('An email has been sent with your username.', 'info')
             return redirect(url_for('landpage'))
-        return render_template('forgot_username.html', title='Rest User', form=form)
+        return render_template('forgot_username.html', 
+                               title='Rest User', 
+                               form=form)
     except:
 
         return redirect(url_for('error'))    
@@ -414,6 +429,7 @@ def account():
         demo_days = searchEvents(events, ['Demo','Day'])
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(upcoming_events)
         
         return render_template('account.html', 
                                 title='Account', 
@@ -428,6 +444,7 @@ def account():
                                 current_events=current_events, 
                                 upcoming_events=upcoming_events, 
                                 mesa_days=mesa_days,
+                                mesa_events=mesa_events,
                                 demo_days=demo_days)
         
     except:    
@@ -514,6 +531,7 @@ def earn_stamps():
         demo_days = searchEvents(events, ['Demo','Day'])
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(upcoming_events)
 
         return render_template('earnstamps.html', 
                                 title='Earn Stamps', 
@@ -524,6 +542,7 @@ def earn_stamps():
                                 current_events=current_events, 
                                 upcoming_events=upcoming_events, 
                                 mesa_days=mesa_days,
+                                mesa_events=mesa_events,
                                 demo_days=demo_days)
     except:
 
@@ -646,7 +665,9 @@ def admin():
             # Add the array of users/top scores to the total list of scores (indexed by the badge id)
             top_scores[badge.badge_id] = record_holders
            
-        return render_template('admin.html', badges=badges, top_scores=top_scores)
+        return render_template('admin.html', 
+                               badges=badges, 
+                               top_scores=top_scores)
     except:
 
         return redirect(url_for('error')) 
@@ -777,7 +798,9 @@ def admin_settings():
             form.level10_points.data = badge.level10_points                    
             badge_forms[badge.badge_id] = form 
 
-        return render_template('admin_settings.html', badge_forms=badge_forms, badges=badges)
+        return render_template('admin_settings.html', 
+                               badge_forms=badge_forms, 
+                               badges=badges)
     except:
 
         return redirect(url_for('error')) 
@@ -799,7 +822,8 @@ def add_school():
         rows = School.get_school()
         flash('New school has been created!' , 'success')
 
-    return render_template('add_school.html',form_school=form)
+    return render_template('add_school.html',
+                           form_school=form)
 
 
 @app.route("/delete_school", methods=['GET','POST'])
@@ -820,7 +844,8 @@ def delete_school():
         flash('Succesfully Delete  !!!', 'success')
         return redirect(url_for('delete_school'))
 
-    return render_template('delete_school.html',form_school=form)
+    return render_template('delete_school.html',
+                           form_school=form)
 
 
 
@@ -838,7 +863,8 @@ def add_stamp():
         Stamp.add_stamp(newStamp)
         flash('New Stamp has been created!', 'success')
 
-    return render_template('add_stamp.html',form_stamp=form)
+    return render_template('add_stamp.html',
+                           form_stamp=form)
 
 
 @app.route("/delete_stamp", methods=['GET','POST'])
@@ -857,7 +883,8 @@ def delete_stamp():
         flash('Delete successfully!', 'success')
         #return redirect(url_for('delete_stamp'))
 
-    return render_template('delete_stamp.html',form_stamp=form)
+    return render_template('delete_stamp.html',
+                           form_stamp=form)
 
 @app.route('/stamp/<badgeid>')
 def stamp(badgeid):
@@ -884,7 +911,8 @@ def edit_badge():
         Badge.update_badge_name(badgeId,badgeName)
         flash('Badge name has been update!', 'success')
 
-    return render_template('edit_badgename.html',form_badge=form)
+    return render_template('edit_badgename.html',
+                           form_badge=form)
 
 
 @app.route("/badge_image", methods=['GET', 'POST'])
@@ -914,7 +942,10 @@ def badge_image():
             return redirect(url_for('badge_image'))
 
 
-    return render_template('badge_image_picking.html', title='Badge Picking Image', avatar_files=Avatar.get_all_avatars(),form_badge=badge_form,data=data_test)
+    return render_template('badge_image_picking.html', 
+                           title='Badge Picking Image', 
+                           avatar_files=Avatar.get_all_avatars(),
+                           form_badge=badge_form,data=data_test)
 
  
 
