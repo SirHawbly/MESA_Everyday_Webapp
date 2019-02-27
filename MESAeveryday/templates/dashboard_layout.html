@@ -7,12 +7,20 @@
     .stepper li.active a .white-skin .circle, .stepper li.completed a .white-skin .circle, .white-skin .primary-color, .white-skin .stepper li.active a .circle, .white-skin .stepper li.completed a .circle {
         background-color: #716558 !important;
     }
-    .countdown {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 30px;
-    min-height:180px;
-    text-align:center;
-    width:180px;
+    .dataTables_filter {
+       float: left !important;
+    }
+    #clock1{
+    zoom: 0.25;
+    -moz-transform: scale(0.25)
+    }
+    #clock2{
+    zoom: 0.25;
+    -moz-transform: scale(0.25)
+    }
+    #clock3{
+    zoom: 0.25;
+    -moz-transform: scale(0.25)
     }
 </style>
 <body class="fixed-sn white-skin">
@@ -151,10 +159,12 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Time Until First Event
+                                    Demo Day 1
                                 </div>
                                 <div class="card-body">
-		                    <span id="clock" class="countdown" data-date-string={{events[0][ 'date_string' ]}}></span>
+
+                                        <div id="clock1" data-date-string={{events[0][ 'date_string' ]}}></div>
+
                                 </div>
                             </div>    
                         </div>
@@ -162,21 +172,22 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Time Until Last Event
+                                    Demo Day 2
                                 </div>
                                 <div class="card-body">
-                                    <span id="clock2" class="countdown" data-date-string-second={{events[-1][ 'date_string' ]}}></span>
-				</div>
+                                    <div id="clock2" data-date-string-second={{events[-1][ 'date_string' ]}}></div>
+                                </div>
                             </div>    
                         </div>
 
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                     Time Until MESA Day
+                                    MESA Day
                                 </div>
                                 <div class="card-body">
-				     <span id="clock3" class="countdown" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></span>
+                                    <!-- <span id="clock3" class="countdown" data-date-string-third=mesa_days[0][ 'date_string' ]></span> -->
+                                    <div id="clock3" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></div>
                                 </div>
                             </div>    
                         </div>
@@ -196,9 +207,10 @@
                         <div class="card-header white-text primary-color">
                             Calendar
                         </div>
-                        <div class="embed-responsive embed-responsive-16by9" style="height: 300px">
-                            <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent'
-                                allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
+                         <div class="embed-responsive embed-responsive-4by3">
+                            
+                                <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent'
+                                    allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
                         </div>
                     </div>
                     <!--/.Panel-->
@@ -245,7 +257,7 @@
                             </div>
                         </div>
                     </div>
-                    <button onclick="topFunction()" id="myBtn" title="Go to top">Top</button>
+                    <button style="font-family: Merriweather" onclick="topFunction()" id="myBtn" title="Go to top">Up</button>
                     <!--/.Panel-->
                 </div>
                 <!-- /.Second row -->
@@ -256,5 +268,29 @@
 
 {% block scripts %}
     {{ super() }}
+<script type="text/javascript">
+    var currentDate = new Date();
+    var dt = $('#clock1').attr('data-date-string');
+    var futureDate = new Date(dt);
+    var diff = futureDate.getTime() / 1000 - currentDate.getTime() / 1000;
+    var clock = $('#clock1').FlipClock(diff,{
+        clockFace: 'DailyCounter',
+        countdown: true
+    });
+    var dt2 = $('#clock2').attr('data-date-string-second');
+    var futureDate2 = new Date(dt2);
+    var diff2 = futureDate2.getTime() / 1000 - currentDate.getTime() / 1000;
+    var clock2 = $('#clock2').FlipClock(diff2,{
+        clockFace: 'DailyCounter',
+        countdown: true
+    });
+    var dt3 = $('#clock3').attr('data-date-string-third');
+    var futureDate3 = new Date(dt3);
+    var diff3 = futureDate3.getTime() / 1000 - currentDate.getTime() / 1000;
+    var clock3 = $('#clock3').FlipClock(diff3,{
+        clockFace: 'DailyCounter',
+        countdown: true
+    });
+</script>
 {% endblock scripts %}
 
