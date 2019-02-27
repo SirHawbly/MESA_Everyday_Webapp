@@ -18,7 +18,16 @@ def positive(form, field):
         if field.data != None and field.data < 1:
             raise ValidationError('Number must be positive.')
 
+class NonValidatingSelectField(SelectField):
+    """
+    Attempt to make an open ended select multiple field that can accept dynamic
+    choices added by the browser.
+    """
+    def pre_validate(self, form):
+        pass
+
 class RegistrationForm(FlaskForm):
+
     firstname = StringField('Firstname', validators=[DataRequired()])
     lastname = StringField('Lastname', validators=[DataRequired()])
     email = StringField('Email',
@@ -95,15 +104,23 @@ class UpdateSchoolForm(FlaskForm):
 
 class AddSchoolForm(FlaskForm):
 
-    schoolName = StringField('SchoolName')
+    schoolName = StringField('SchoolName', validators=[DataRequired()])
 
     submit = SubmitField('Add School')
+
+    def validate_schoolName(self, schoolName):
+        if School.get_school_by_name(schoolName.data):
+            raise ValidationError('That school already exists.')
 
 class DeleteSchoolForm(FlaskForm):
 
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
 
     submit = SubmitField('Delete School')
+    def validate_school(self, school):
+        schoolName = School.get_school_by_id(school.data)
+        if schoolName.school_name == 'Other':
+            raise ValidationError('You cannot delete \'Other\'')
 
 class UpdatePasswordForm(FlaskForm):
     old_password = PasswordField('Password')
@@ -132,16 +149,20 @@ class EarnStampsForm(FlaskForm):
 class AddStampForm(FlaskForm):
 
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    badgeName = StringField('badgeName')
+    stamp_name = StringField('Stamp Name', validators=[DataRequired()])
+    points = IntegerField('Points', validators=[DataRequired(), positive])
     submit = SubmitField('Add Stamp')
 
-
+    def validate_stamp_name(self, stamp_name):
+        if Stamp.get_stamp_by_name(stamp_name.data):
+            raise ValidationError('A stamp already exists with that name!')
 
 class DeleteStampForm(FlaskForm):
 
-    badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    stamp = SelectField('Stamp', choices=[])
-    submit = SubmitField('Delete Stamp')
+    badgedelete = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
+    stampdelete = NonValidatingSelectField('Stamp', choices={})
+    submitdelete = SubmitField('Delete Stamp')
+
 
 class RemoveOldAccountsForm(FlaskForm):
     years = SelectField('Years Inactive:', choices=[(1,'1'),(2,'2'),(3,'3'),(4,'4'),(5,'5'),(6,'6'),(7,'7'),(8,'8'),(9,'9'),(10,'10')], coerce=int)
@@ -154,7 +175,7 @@ class ResetDateForm(FlaskForm):
 class EditBadgeForm(FlaskForm):
 
     badge = SelectField('Badge', coerce=int, choices=Badge.get_all_badges_id_with_names())
-    badgeName = StringField('badgeName')
+    badgeName = StringField('badgeName', validators=[DataRequired()])
     submit = SubmitField('Update Badge')
 
 

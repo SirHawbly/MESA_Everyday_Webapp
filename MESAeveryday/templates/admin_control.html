@@ -40,9 +40,18 @@
             {{ form_school_add.hidden_tag() }}
             <fieldset class="form-group">
                 <div class="form-group">
-                    {{ form_school_add.schoolName(class="form-control", placeholder="School Name") }}
+		    {{ form_school_add.schoolName.label(class="form-control-label") }}
+                    {% if form_school_add.schoolName.errors %}
+                        {{ form_school_add.schoolName(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_school_add.schoolName.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_school_add.schoolName(class="form-control", placeholder="School Name") }}
+                    {% endif %}
                 </div>
-
             </fieldset>
             <div class="form-group">
                 {{ form_school_add.submit(class="btn btn-outline-info") }}
@@ -53,9 +62,17 @@
             {{ form_school_delete.hidden_tag() }}
             <fieldset class="form-group">
                  <div class="form-group">
-
-                            {{ form_school_delete.school(class="form-control", placeholder="School") }}
-
+		    {{ form_school_delete.school.label(class="form-control-label") }}
+                    {% if form_school_delete.school.errors %}
+                        {{ form_school_delete.school(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form_school_delete.school.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form_school_delete.school(class="form-control", placeholder="School") }}
+                    {% endif %}
                 </div>
             </fieldset>
             <div class="form-group">
