@@ -595,8 +595,11 @@ def check_badge(badge_id):
 @app.route("/admin")
 @login_required
 def admin():
-
-#    try:
+    '''
+    Default landing page for admins.
+    Page displays the top three scores for each badge, and which users have those top 3 scores
+    '''
+    try:
         # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
@@ -626,19 +629,19 @@ def admin():
             top_scores[badge.badge_id] = record_holders
            
         return render_template('admin.html', badges=badges, top_scores=top_scores)
-#    except:
+    except:
 
         return redirect(url_for('error')) 
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
-        """
-        Page for admin to control various parts of the application
-        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
-        Only those will a valid admin account can view this page
-        """ 
-    #try:    
+    """
+    Page for admin to control various parts of the application
+    Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
+    Only those will a valid admin account can view this page
+    """ 
+    try:    
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
             
@@ -710,15 +713,18 @@ def admin_control():
           
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
         
-    #except:
+    except:
 
         return redirect(url_for('error')) 
 
 @app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
 def admin_settings():
-  
-#    try: 
+    '''
+    Route for the admin settings page
+    On this page, an admin can change required badge points, add stamps, remove stamps, change badge name, or change badge icon
+    '''
+    try: 
         if not User.verify_role(current_user.id):     
             return redirect(url_for('dashboard'))
             
@@ -728,7 +734,7 @@ def admin_settings():
         deletestampform = DeleteStampForm()        
         badgenameform = EditBadgeForm()
 
-        # Changing badge score or names
+        # Changing badge score 
         for badge in badges:
             form = BadgePointsForm(prefix=str(badge.badge_id)) 
             if form.submit.data and form.validate_on_submit():
@@ -790,7 +796,7 @@ def admin_settings():
 
         return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
                 form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons())
- #   except:
+    except:
 
         return redirect(url_for('error')) 
 
