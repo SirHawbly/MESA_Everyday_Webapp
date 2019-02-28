@@ -769,11 +769,11 @@ def admin_control():
 @app.route("/admin_settings", methods=['GET', 'POST'])
 @login_required
 def admin_settings():
-        '''
-        Route for the admin settings page
-        On this page, an admin can change required badge points, add stamps, remove stamps, change badge name, or change badge icon
-        '''
-#    try: 
+    '''
+    Route for the admin settings page
+    On this page, an admin can change required badge points, add stamps, remove stamps, change badge name, or change badge icon
+    '''
+    try: 
         if not User.verify_role(current_user.id):     
             return redirect(url_for('dashboard'))
             
@@ -845,7 +845,7 @@ def admin_settings():
 
         return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
                 form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons())
-#    except:
+    except:
 
         return redirect(url_for('error'))
 
