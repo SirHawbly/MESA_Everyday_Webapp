@@ -39,12 +39,14 @@ def landpage():
     """
     
     try:
-        
+            
         form_register = RegistrationForm()
         form_login = LoginForm()
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
-    except:    
-
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
+    except:
         return redirect(url_for('error'))
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -78,9 +80,11 @@ def register():
                 flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
                 send_generate_username(form_register.email.data, new_username)
 
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
     except:
-
         return redirect(url_for('error'))      
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -112,9 +116,11 @@ def login():
             else:
                 flash('Login Unsuccessful. Please check username and password', 'danger')
                 
-        return render_template('landpage.html', title='Landing', form_l=form_login, form_r=form_register)
+        return render_template('landpage.html', 
+                               title='Landing', 
+                               form_l=form_login, 
+                               form_r=form_register)
     except:
-
         return redirect(url_for('error'))
 
 @app.route("/logout")
@@ -127,7 +133,6 @@ def logout():
         logout_user()
         return redirect(url_for('landpage'))
     except:
-
         return redirect(url_for('error'))
 
 
@@ -151,9 +156,10 @@ def reset_request():
             flash('An email has been sent with instructions to reset your password.', 'info')
             return redirect(url_for('landpage'))
 
-        return render_template('reset_request.html', title='Rest Password', form=form)
+        return render_template('reset_request.html', 
+                               title='Rest Password', 
+                               form=form)
     except:
-
         return redirect(url_for('error'))
         
 @app.route("/reset_password/<token>", methods=['GET', 'POST'])
@@ -190,9 +196,10 @@ def reset_token(token):
             else:
                 flash('Sorry, we were unable to update your password', 'danger')
                 return redirect(url_for('landpage'))
-        return render_template('reset_token.html', title='Rest Password', form=form)
+        return render_template('reset_token.html', 
+                               title='Rest Password', 
+                               form=form)
     except:
-
         return redirect(url_for('error'))
 
 @app.route("/forgot_username", methods=['GET', 'POST'])
@@ -215,9 +222,10 @@ def forgot_username():
             send_forgot_username(user)
             flash('An email has been sent with your username.', 'info')
             return redirect(url_for('landpage'))
-        return render_template('forgot_username.html', title='Rest User', form=form)
+        return render_template('forgot_username.html', 
+                               title='Rest User', 
+                               form=form)
     except:
-
         return redirect(url_for('error'))    
 
 @app.errorhandler(429)
@@ -264,8 +272,9 @@ def dashboard():
         
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(events)
         
         return render_template('dashboard.html',
@@ -273,13 +282,13 @@ def dashboard():
                                progress=all_progress,
                                all_max_points=all_max_points,
                                events=events,
-                               number_upcoming=len(upcoming_events),
+                               number_current=len(current_events),
                                upcoming_events=upcoming_events,
+                               current_events=current_events,
                                mesa_days=mesa_days,
                                mesa_events=mesa_events,
-                               other_days=other_days)
+                               demo_days=demo_days)
     except:
-
         return redirect(url_for('error'))
 
 @app.route("/events", methods=['GET', 'POST'])
@@ -309,25 +318,23 @@ def events():
 
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(events)
 
         return render_template('events.html',
                                badges=badges,
                                progress=all_progress,
                                events=events,
-                               number_upcoming=len(upcoming_events),
+                               number_current=len(current_events),
                                upcoming_events=upcoming_events,
+                               current_events=current_events,
                                mesa_days=mesa_days,
                                mesa_events=mesa_events,
-                               other_days=other_days)
+                               demo_days=demo_days)
     except:
-
         return redirect(url_for('error'))
-
-
-
    
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
@@ -427,16 +434,29 @@ def account():
         
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(events)
         
-        return render_template('account.html', title='Account', avatar_files=Avatar.get_all_avatars(), form_email=emailform, form_name=nameform, form_password=passwordform, form_school=schoolform,                       events=events, number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, badges=badges,
-                               other_days=other_days)
-         
+        return render_template('account.html', 
+                                title='Account', 
+                                badges=badges,
+                                avatar_files=Avatar.get_all_avatars(), 
+                                form_email=emailform, 
+                                form_name=nameform, 
+                                form_password=passwordform, 
+                                form_school=schoolform, 
+                                events=events, 
+                                number_current=len(current_events), 
+                                current_events=current_events, 
+                                upcoming_events=upcoming_events, 
+                                mesa_days=mesa_days,
+                                mesa_events=mesa_events,
+                                demo_days=demo_days)
+        
     except:    
-
         return redirect(url_for('error'))    
-
 
 @app.route("/account_deactivate", methods=['GET', 'POST'])
 @login_required
@@ -461,7 +481,6 @@ def account_deactivate():
             return redirect(url_for('account'))
 
     except:
-
         return redirect(url_for('error')) 
 
 @app.route("/earn_stamps", methods=['GET', 'POST'])
@@ -514,14 +533,23 @@ def earn_stamps():
         
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(events)
 
-        return render_template('earnstamps.html', title='Earn Stamps', forms=forms, badges=badges, events=events,
-                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days,
-                               other_days=other_days)
+        return render_template('earnstamps.html', 
+                                title='Earn Stamps', 
+                                forms=forms, 
+                                badges=badges, 
+                                events=events,
+                                number_current=len(current_events), 
+                                current_events=current_events, 
+                                upcoming_events=upcoming_events, 
+                                mesa_days=mesa_days,
+                                mesa_events=mesa_events,
+                                demo_days=demo_days)
     except:
-
         return redirect(url_for('error')) 
         
 @app.route("/badges<badge_id>", methods=['GET', 'POST'])
@@ -575,14 +603,28 @@ def check_badge(badge_id):
         
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
-        other_days = searchEvents(events, ['Mesa','Day'])
-        upcoming_events = [event for event in events if event['remain_days'] < 15]
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(events)
 
-        return render_template('badges.html', badges=badges, badge=badge, unearned=unearned_stamps, earned=earned_stamps, pt=points, lv=current_level, to_next_lv=to_next_lv, events=events,
-                               number_upcoming=len(upcoming_events), upcoming_events=upcoming_events, mesa_days=mesa_days, other_days=other_days, mesa_events=mesa_events)
+        return render_template('badges.html', 
+                                badges=badges,
+                                badge=badge, 
+                                unearned=unearned_stamps, 
+                                earned=earned_stamps, 
+                                pt=points, 
+                                lv=current_level, 
+                                to_next_lv=to_next_lv, 
+                                events=events,
+                                number_upcoming=len(upcoming_events),
+                                upcoming_events=upcoming_events, 
+                                number_current=len(current_events),
+                                current_events=current_events,
+                                mesa_days=mesa_days, 
+                                demo_days=demo_days, 
+                                mesa_events=mesa_events)
     except:
-
         return redirect(url_for('error')) 
 
 
@@ -599,60 +641,60 @@ def check_badge(badge_id):
 def admin():
 
 #    try:
-        # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
-        if not User.verify_role(current_user.id):
-            return redirect(url_for('dashboard'))
-            
-        # Top scores will be a dictionary of arrays. 
-        # Each array holds all the users and top scores for a specific badge
-        # The dictionary will be for each badge and is indexed based on the badge id
-        top_scores = {}    
-            
-        # Get all badges
-        badges = Badge.get_all_badges()
+    # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
+    if not User.verify_role(current_user.id):
+        return redirect(url_for('dashboard'))
         
-        # Get all the top scores/users for each badge
-        for badge in badges:
-            # Find out what the top three scores are
-            top_badge_scores = Badge.get_top_scores(badge.badge_id)
-            record_holders = []
-            
-            if top_badge_scores:
-                # For each top score, get all the users that have that score        
-                for top_score in top_badge_scores:
-                    # Add each user with a top score to and array of users/top scores
-                    users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
-                    for user in users_with_top_score:
-                        record_holders.append(user)
-            # Add the array of users/top scores to the total list of scores (indexed by the badge id)
-            top_scores[badge.badge_id] = record_holders
-           
-        return render_template('admin.html', badges=badges, top_scores=top_scores)
-#    except:
+    # Top scores will be a dictionary of arrays. 
+    # Each array holds all the users and top scores for a specific badge
+    # The dictionary will be for each badge and is indexed based on the badge id
+    top_scores = {}    
+        
+    # Get all badges
+    badges = Badge.get_all_badges()
+    
+    # Get all the top scores/users for each badge
+    for badge in badges:
+        # Find out what the top three scores are
+        top_badge_scores = Badge.get_top_scores(badge.badge_id)
+        record_holders = []
+        
+        if top_badge_scores:
+            # For each top score, get all the users that have that score        
+            for top_score in top_badge_scores:
+                # Add each user with a top score to and array of users/top scores
+                users_with_top_score = User.get_record_holders(badge.badge_id, top_score.total_points)
+                for user in users_with_top_score:
+                    record_holders.append(user)
+        # Add the array of users/top scores to the total list of scores (indexed by the badge id)
+        top_scores[badge.badge_id] = record_holders
+       
+    return render_template('admin.html', badges=badges, top_scores=top_scores)
 
-        return redirect(url_for('error')) 
+#    except:
+        #return redirect(url_for('error')) 
 
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
-        """
-        Page for admin to control various parts of the application
-        Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
-        Only those will a valid admin account can view this page
-        """ 
-    #try:    
+    """
+    Page for admin to control various parts of the application
+    Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
+    Only those will a valid admin account can view this page
+    """ 
+    try:    
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
             
         emailform = UpdateEmailForm()
         passwordform = UpdatePasswordForm()
         oldaccountsform = RemoveOldAccountsForm()
-        resetdateform = ResetDateForm()
         addschoolform = AddSchoolForm()
         deleteschoolform =DeleteSchoolForm()
+
+        resetdateform = ResetDateForm()
         resetdateform.reset_date.id = 'reset_date'
         admin_account = User.get_user_by_username(current_user.username)
-
 
         #Add School
         if addschoolform.schoolName.data and addschoolform.validate_on_submit():
@@ -711,9 +753,8 @@ def admin_control():
         emailform.email.data = current_user.email
           
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
-        
-    #except:
-
+            
+    except:
         return redirect(url_for('error')) 
 
 @app.route("/admin_settings", methods=['GET', 'POST'])
@@ -721,80 +762,77 @@ def admin_control():
 def admin_settings():
   
 #    try: 
-        if not User.verify_role(current_user.id):     
-            return redirect(url_for('dashboard'))
-            
-        badges = Badge.get_all_badges()
-        badge_forms = {}
-        addstampform = AddStampForm()
-        deletestampform = DeleteStampForm()        
-        badgenameform = EditBadgeForm()
+    if not User.verify_role(current_user.id):     
+        return redirect(url_for('dashboard'))
+        
+    badges = Badge.get_all_badges()
+    badge_forms = {}
+    addstampform = AddStampForm()
+    deletestampform = DeleteStampForm()        
+    badgenameform = EditBadgeForm()
 
-        # Changing badge score or names
-        for badge in badges:
-            form = BadgePointsForm(prefix=str(badge.badge_id)) 
-            if form.submit.data and form.validate_on_submit():
-                if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, \
-                        form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
-                    flash('Successfully changed badge points', 'success')
-                else:
-                    flash('Sorry, we were not able to change the badge points', 'danger')
-                return redirect(url_for('admin_settings'))        
-            form.level1_points.data = badge.level1_points    
-            form.level2_points.data = badge.level2_points            
-            form.level3_points.data = badge.level3_points           
-            form.level4_points.data = badge.level4_points            
-            form.level5_points.data = badge.level5_points          
-            form.level6_points.data = badge.level6_points            
-            form.level7_points.data = badge.level7_points            
-            form.level8_points.data = badge.level8_points           
-            form.level9_points.data = badge.level9_points           
-            form.level10_points.data = badge.level10_points                    
-            badge_forms[badge.badge_id] = form 
+    # Changing badge score or names
+    for badge in badges:
+        form = BadgePointsForm(prefix=str(badge.badge_id)) 
+        if form.submit.data and form.validate_on_submit():
+            if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, \
+                    form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
+                flash('Successfully changed badge points', 'success')
+            else:
+                flash('Sorry, we were not able to change the badge points', 'danger')
+            return redirect(url_for('admin_settings'))        
+        form.level1_points.data = badge.level1_points    
+        form.level2_points.data = badge.level2_points            
+        form.level3_points.data = badge.level3_points           
+        form.level4_points.data = badge.level4_points            
+        form.level5_points.data = badge.level5_points          
+        form.level6_points.data = badge.level6_points            
+        form.level7_points.data = badge.level7_points            
+        form.level8_points.data = badge.level8_points           
+        form.level9_points.data = badge.level9_points           
+        form.level10_points.data = badge.level10_points                    
+        badge_forms[badge.badge_id] = form 
 
-        # Adding New Stamp
-        if addstampform.badge.data and addstampform.validate_on_submit():
-            newStamp=Stamp(addstampform.stamp_name.data,addstampform.badge.data,addstampform.points.data,None)
-            Stamp.add_stamp(newStamp)
-            flash('New Stamp has been created!', 'success')
+    # Adding New Stamp
+    if addstampform.badge.data and addstampform.validate_on_submit():
+        newStamp=Stamp(addstampform.stamp_name.data,addstampform.badge.data,addstampform.points.data,None)
+        Stamp.add_stamp(newStamp)
+        flash('New Stamp has been created!', 'success')
+        return redirect(url_for('admin_settings'))
+
+    # Deleting a Stamp
+    if deletestampform.submitdelete.data and deletestampform.validate_on_submit():  
+        stampName=Stamp.get_stamp_by_stamp_id(deletestampform.stampdelete.data)
+        Stamp.delete_stamp_by_id(deletestampform.stampdelete.data)
+        flash('Delete successfully!', 'success')
+        return redirect(url_for('admin_settings'))
+
+    # Updating a Badge Name
+    if badgenameform.badgeName.data and badgenameform.validate_on_submit():
+        badgeId=badgenameform.badge.data
+        badgeName= badgenameform.badgeName.data
+        Badge.update_badge_name(badgeId,badgeName)
+        flash('Badge name has been update!', 'success')
+        return redirect(url_for('admin_settings'))
+
+    #Update Icon
+    if request.method=='POST':
+        iconSelect = request.form.get('iconSelect')
+        if iconSelect:
+            badgeSelect = request.form.get('iconBadgeSelect')
+
+            if Badge.update_icon(badgeSelect, iconSelect) == True:
+                flash('Badge icon has been successfully updated!', 'success')
+            else:
+                flash('Sorry, we were unable to update the badge icon', 'danger')
             return redirect(url_for('admin_settings'))
 
+    deletestampform.stampdelete.choices = Stamp.get_stamps_of_badge(1)
 
-        # Deleting a Stamp
-        if deletestampform.submitdelete.data and deletestampform.validate_on_submit():  
-            stampName=Stamp.get_stamp_by_stamp_id(deletestampform.stampdelete.data)
-            Stamp.delete_stamp_by_id(deletestampform.stampdelete.data)
-            flash('Delete successfully!', 'success')
-            return redirect(url_for('admin_settings'))
-
-        # Updating a Badge Name
-        if badgenameform.badgeName.data and badgenameform.validate_on_submit():
-            badgeId=badgenameform.badge.data
-            badgeName= badgenameform.badgeName.data
-            Badge.update_badge_name(badgeId,badgeName)
-            flash('Badge name has been update!', 'success')
-            return redirect(url_for('admin_settings'))
-
-
-        #Update Icon
-        if request.method=='POST':
-            iconSelect = request.form.get('iconSelect')
-            if iconSelect:
-                badgeSelect = request.form.get('iconBadgeSelect')
-
-                if Badge.update_icon(badgeSelect, iconSelect) == True:
-                    flash('Badge icon has been successfully updated!', 'success')
-                else:
-                    flash('Sorry, we were unable to update the badge icon', 'danger')
-                return redirect(url_for('admin_settings'))
-
-        deletestampform.stampdelete.choices = Stamp.get_stamps_of_badge(1)
-
-        return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
-                form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons())
+    return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
+            form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons())
  #   except:
-
-        return redirect(url_for('error')) 
+        #return redirect(url_for('error')) 
 
 @app.route('/stamp/<badgeid>')
 def stamp(badgeid):
@@ -811,7 +849,6 @@ def stamp(badgeid):
         stampArray.append(stampObj)
 
     return jsonify({'stamps' : stampArray})
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                         Route Functions
