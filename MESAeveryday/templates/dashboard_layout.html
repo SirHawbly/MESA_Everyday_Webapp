@@ -162,16 +162,12 @@
                                     Demo Day Countdown
                                 </div>
                                 <div class="card-body">
-                                    <table>
-                                        {% if demo_days|length > 0 %}
-                                            <tr><td>{{ demo_days[0]['summary'] }}</td></tr>
-                                            <tr><td>{{ demo_days[0]['start_string'] }}</td></tr>
-                                            <tr><td> <span id="clock1" data-date-string-one={{demo_days[0][ 'date_string' ]}}></span></td></tr>
-                                        {% else %}
-                                            No Upcoming Event
-                                        {% endif %}
-                                    </table>
-				</div>
+                                    {% if demo_days|length > 0 %}
+                                        <div id="clock1" data-date-string={{demo_days[0][ 'date_string' ]}}></div>
+                                    {% else %}
+                                        No Upcoming Event
+                                    {% endif %}
+                                </div>
                             </div>    
                         </div>
 
@@ -181,15 +177,11 @@
                                     2nd Demo Day Countdown
                                 </div>
                                 <div class="card-body">
-                                    <table>
-                                        {% if demo_days|length > 1 %}
-                                            <tr><td>{{ demo_days[1]['summary'] }}</td></tr>
-                                            <tr><td>{{ demo_days[1]['start_string'] }}</td></tr>
-                                            <tr><td><span id="clock2" data-date-string-two={{demo_days[1][ 'date_string' ]}}></span></td></tr>
-                                        {% else %}
-                                            No Upcoming Event
-                                        {% endif %}
-                                    </table>
+                                    {% if demo_days|length > 1 %}
+                                        <div id="clock2" data-date-string-second={{demo_days[1][ 'date_string' ]}}></div>
+                                    {% else %}
+                                        No Upcoming Event
+                                    {% endif %}
                                 </div>
                             </div>    
                         </div>
@@ -200,16 +192,11 @@
                                     MESA Day Countdown
                                 </div>
                                 <div class="card-body">
-                                    <table>
-                                        {% if mesa_days|length > 0 %}
-                                            <tr><td>{{ mesa_days[0]['summary'] }}</td></tr>
-                                            <tr><td>{{ mesa_days[0]['start_string'] }}</td></tr>
-                                            <tr><td><span id="clock3" data-date-string-three={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
-                                        {% else %}
-                                            No Upcoming Event
-                                        {% endif %}
-
-                                    </table>
+                                    {% if mesa_days|length > 0 %}
+                                        <div id="clock3" data-date-string-third={{mesa_days[0][ 'date_string' ]}}></div>
+                                    {% else %}
+                                        No Upcoming Event
+                                    {% endif %}    
                                 </div>
                             </div>    
                         </div>
@@ -231,8 +218,7 @@
                         </div>
                          <div class="embed-responsive embed-responsive-4by3">
                             
-                                <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent'
-                                    allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
+                            <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent' allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe>
                         </div>
                     </div>
                     <!--/.Panel-->
