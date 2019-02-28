@@ -157,40 +157,6 @@
 
 <!-- /.Panel -->
 
-<!-- Panel -->
-
-<div class="card mb-4">
-    <div class="card">
-        <div class="card-header white-text primary-color">
-            {{ badge.badge_name }} Events
-        </div>
-        <div class="card-body">
-            <table class="table table-hover mb-0" id="eventTable">
-                <thead>
-                    <th>General Events</th>
-                    <th>Remain Days</th>
-                    <th>Time</th>
-                    <th>Location</th>
-                </thead>
-                <tbody>
-                    {% for event in mesa_events[badge.badge_id][:10] %}
-                        {% if event['remain_days'] < 15 %} 
-                            <tr>
-                                <td>{{event['summary']}}</td>
-                                <td>{{event['remain_days']}}</td>
-                                <td>{{event['start_string']}}</td>
-                                <td>{{event['location']}}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
-<!-- /.Panel -->
-
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document" >
     <form  method="POST" action="/badges{{ badge.badge_id }} ">
