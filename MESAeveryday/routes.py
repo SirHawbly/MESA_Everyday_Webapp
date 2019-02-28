@@ -337,6 +337,10 @@ def account():
         Page is broken up into separate forms for each section, so they can only update their account one piece at a time
     """    
     try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+
         emailform = UpdateEmailForm()
         nameform = UpdateNameForm()
         schoolform = UpdateSchoolForm()
@@ -390,24 +394,6 @@ def account():
                 else:
                     flash('Sorry, we were unable to update your account', 'danger')
                 return redirect(url_for('account'))
-            '''
-            #deactivate Account
-            if current_user.is_authenticated:
-                firstName=request.form.get('FirstName')
-                lastName=request.form.get('LastName')
-
-                if ((firstName and lastName and firstName.lower()==current_user.first_name.lower())
-                        and (lastName.lower()==current_user.last_name.lower())):
-                    User.delete_user_by_id(myaccount.id)
-                    logout_user()
-                    return redirect(url_for('landpage'))
-                else :
-                    flash('Account does not match. Please check First Name and Last Name!!', 'danger')
-            return redirect(url_for('account'))
-
-            '''
-        #Load page
-
 
         # Get all the badges
         badges = Badge.get_all_badges_id_with_names()
@@ -443,6 +429,10 @@ def account():
 def account_deactivate():
 
     try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+
         myaccount = User.get_user_by_username(current_user.username)
         print(myaccount.id)
         if current_user.is_authenticated:
@@ -474,6 +464,10 @@ def earn_stamps():
             as to whether or not they actually did the task
     """  
     try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+
         # Get all badge names
         badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
 
@@ -532,6 +526,10 @@ def check_badge(badge_id):
         The particular badge being view is passed in through the route
     """  
     try:
+        # Send admins to the admin page
+        if (User.verify_role(current_user.id)):
+            return redirect(url_for('admin'))
+
         # Get all the badges
         badges = Badge.get_all_badges()
 
