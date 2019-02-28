@@ -201,7 +201,7 @@
                                 </div>
                                 <div class="card-body">
                                     <table>
-					{% if mesa_days|length > 0 %}
+                                        {% if mesa_days|length > 0 %}
                                             <tr><td>{{ mesa_days[0]['summary'] }}</td></tr>
                                             <tr><td>{{ mesa_days[0]['start_string'] }}</td></tr>
                                             <tr><td><span id="clock3" data-date-string-three={{mesa_days[0][ 'date_string' ]}}></span></td></tr>
