@@ -39,6 +39,9 @@ def landpage():
     """
     
     try:
+        # Send user to the dashboard if they are logged in. This page is intended for those who have not logged in yet
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
         
         form_register = RegistrationForm()
         form_login = LoginForm()
@@ -52,8 +55,12 @@ def register():
     """
       Route that processes a registration request
       After the registration is processes, it renders the landing page
-    """   
+    """ 
     try:
+        # Send user to the dashboard if they are logged in. Users shouldn't be able to create accounts while logged in
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
+
         form_register = RegistrationForm()
         form_login = LoginForm()
 
@@ -93,6 +100,9 @@ def login():
     """
     
     try:
+        # Send user to the dashboard if they are logged in. This page is intended for those who haven't logged in yet
+        if current_user.is_authenticated:
+            return redirect(url_for('dashboard'))
         form_register = RegistrationForm()
         form_login = LoginForm()
 
