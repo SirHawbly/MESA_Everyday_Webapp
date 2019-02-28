@@ -246,15 +246,16 @@
                                                     <th>General Events</th>
                                                     <th>Remain Days</th>
                                                     <th>Time</th>
+						    <th>Location</th>
                                                 </thead>
-                                                <tbody>
-                                                     {% for event in upcoming_events %}    
-                                                         <tr>
-				                              <td>{{event['summary']}}</td>
-						  	      <td>{{event['remain_days']}}</td>
-							      <td>{{event['start_string']}}</td>
-							      <td>{{event['location']}}</td>
-						         </tr>
+						 <tbody>
+                                                     {% for event in upcoming_events %}  
+                                                            <tr>
+                                                                <td>{{event['summary']}}</td>
+                                                                <td>{{event['remain_days']}}</td>
+                                                                <td>{{event['start_string']}}</td>
+								<td>{{event['location']}}</td>
+                                                            </tr>
 						     {% endfor %}
                                                 </tbody>
                                             </table>
@@ -300,4 +301,3 @@
     });
 </script>
 {% endblock scripts %}
-
