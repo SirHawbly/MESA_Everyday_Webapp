@@ -222,7 +222,7 @@ class User(Base, UserMixin):
     def get_users_by_school(school_id):
         try: 
             return session.query(User).filter(User.school_id == school_id)
-        iexcept:
+        except:
             session.rollback()
             return None
 

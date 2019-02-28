@@ -359,9 +359,7 @@
         var badge_select = document.getElementById("badgedelete");
         var stamp_select = document.getElementById("stampdelete");
         badge_select.onchange = function()  {
-
             badge = badge_select.value;
-
             fetch('/stamp/' + badge).then(function(response) {
                 response.json().then(function(data) {
                     var optionHTML = '';
@@ -369,10 +367,7 @@
                         optionHTML += '<option value="' + stamp.id + '">' + stamp.name + '</option>';
                     }
                     stamp_select.innerHTML = optionHTML;
-
-
                 })
-
             });
         }
     </script>
