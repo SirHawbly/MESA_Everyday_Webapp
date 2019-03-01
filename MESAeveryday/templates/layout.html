@@ -24,15 +24,37 @@
     <link href="../static/css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"> -->
     <link rel="stylesheet" type="text/css" href="../static/css/dataTables.bootstrap4.min.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/css/flipclock.css"/>
     <link type="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css">
     <link href="../static/css/css-circular-prog-bar.css" media="all" rel="stylesheet" type="text/css"/>
     <style>
+        h1, h2, h3, h4, h5, h6 {
+          font-family: Merriweather;
+        }
         body {
-            font-family: Merriweather;
+            font-family: Merriweather!important;
         }
         .min-chart .percent:after {
             display: none;
         }
+        #myBtn {
+          display: none;
+          position: fixed;
+          bottom: 20px;
+          right: 30px;
+          z-index: 99;
+          font-size: 18px;
+          border: none;
+          outline: none;
+          background-color: #716558;
+          color: white;
+          cursor: pointer;
+          padding: 15px;
+          border-radius: 4px;
+        }
+
+        #myBtn:hover {
+          background-color: #555;
     </style>
 </head>
 
@@ -107,14 +129,15 @@
     <script type="text/javascript" src="../static/js/calendar.resize.js"></script>
     <script type="text/javascript" src="../static/js/sideNavInit.js"></script>
     <script type="text/javascript" src="../static/js/jquery-ui.min.js"></script>
-
+    <script type="text/javascript" src="../static/js/flipclock.min.js"></script>
 
     <script type="text/javascript">
         
         $(".date-custom").attr("autocomplete", "off");
         
-        $('#upEvent').DataTable();
-        $('#mesaEvent').DataTable();
+        $('#upEvent').DataTable({
+           "dom": 'f<"top">rt<"bottom"ilp><"clear">'
+        });
         $(function () {
             $('.min-chart#chart-sales').easyPieChart({
                 barColor: "#FF5252",
@@ -123,6 +146,19 @@
                 }
             });
         });
+        window.onscroll = function() {scrollFunction()};
+
+        function scrollFunction() {
+          if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+            document.getElementById("myBtn").style.display = "block";
+          } else {
+            document.getElementById("myBtn").style.display = "none";
+          }
+        }
+        function topFunction() {
+          document.body.scrollTop = 0;
+          document.documentElement.scrollTop = 0;
+        }
     </script>
     {% block scripts %}{% endblock scripts %}
     <!--Custom scripts-->

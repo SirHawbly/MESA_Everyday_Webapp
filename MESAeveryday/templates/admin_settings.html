@@ -14,9 +14,12 @@
     You are now in the admin settings page
     <li><a href="{{ url_for('admin') }}">Dashboard</a></li>
     <li><a href="{{ url_for('admin_control') }}">Control</a></li>
+
 </div>
 
 <div class="content-section">
+
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
         {% for category, message in messages %}
@@ -40,7 +43,8 @@
             <fieldset class="form-group">
                 <img class="rounded-circle account-img" src="../static/badge_icons/{{ badge.icon.file_name }}"> {{ badge.badge_name }}               
                 <div class="form-group">                  
-          
+          		
+		    <!--Level 1 Points-->
                     {{ badge_forms[badge.badge_id].level1_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level1_points.errors %}
                         {{ badge_forms[badge.badge_id].level1_points(class="form-control form-control-lg is-invalid") }}
@@ -52,7 +56,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level1_points(class="form-control form-control-lg") }}
                     {% endif %}
-          
+
+ 		    <!--Level 2 Points-->         
                     {{ badge_forms[badge.badge_id].level2_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level2_points.errors %}
                         {{ badge_forms[badge.badge_id].level2_points(class="form-control form-control-lg is-invalid") }}
@@ -64,7 +69,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level2_points(class="form-control form-control-lg") }}
                     {% endif %}
-       
+
+ 		    <!--Level 3 Points-->      
                     {{ badge_forms[badge.badge_id].level3_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level3_points.errors %}
                         {{ badge_forms[badge.badge_id].level3_points(class="form-control form-control-lg is-invalid") }}
@@ -76,7 +82,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level3_points(class="form-control form-control-lg") }}
                     {% endif %}
-        
+
+		    <!--Level 4 Points-->
                     {{ badge_forms[badge.badge_id].level4_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level4_points.errors %}
                         {{ badge_forms[badge.badge_id].level4_points(class="form-control form-control-lg is-invalid") }}
@@ -88,7 +95,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level4_points(class="form-control form-control-lg") }}
                     {% endif %}
-           
+
+		    <!--Level 5 Points-->
                     {{ badge_forms[badge.badge_id].level5_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level5_points.errors %}
                         {{ badge_forms[badge.badge_id].level5_points(class="form-control form-control-lg is-invalid") }}
@@ -101,6 +109,7 @@
                         {{ badge_forms[badge.badge_id].level5_points(class="form-control form-control-lg") }}
                     {% endif %}
 
+		    <!--Level 6 Points-->
                     {{ badge_forms[badge.badge_id].level6_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level6_points.errors %}
                         {{ badge_forms[badge.badge_id].level6_points(class="form-control form-control-lg is-invalid") }}
@@ -112,7 +121,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level6_points(class="form-control form-control-lg") }}
                     {% endif %}
-         
+
+		    <!--Level 7 Points-->
                     {{ badge_forms[badge.badge_id].level7_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level7_points.errors %}
                         {{ badge_forms[badge.badge_id].level7_points(class="form-control form-control-lg is-invalid") }}
@@ -125,6 +135,7 @@
                         {{ badge_forms[badge.badge_id].level7_points(class="form-control form-control-lg") }}
                     {% endif %}
 
+		    <!--Level 8 Points-->
                     {{ badge_forms[badge.badge_id].level8_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level8_points.errors %}
                         {{ badge_forms[badge.badge_id].level8_points(class="form-control form-control-lg is-invalid") }}
@@ -137,6 +148,7 @@
                         {{ badge_forms[badge.badge_id].level8_points(class="form-control form-control-lg") }}
                     {% endif %}
 
+		    <!--Level 9 Points-->	    
                     {{ badge_forms[badge.badge_id].level9_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level9_points.errors %}
                         {{ badge_forms[badge.badge_id].level9_points(class="form-control form-control-lg is-invalid") }}
@@ -148,7 +160,8 @@
                     {% else %}
                         {{ badge_forms[badge.badge_id].level9_points(class="form-control form-control-lg") }}
                     {% endif %}
-               
+
+                    <!--Level 10 Points-->	    
                     {{ badge_forms[badge.badge_id].level10_points.label(class="form-control-label") }}
                     {% if badge_forms[badge.badge_id].level10_points.errors %}
                         {{ badge_forms[badge.badge_id].level10_points(class="form-control form-control-lg is-invalid") }}
@@ -162,15 +175,200 @@
                     {% endif %}
                 </div>   
             </fieldset>
+	    <!--Submit Button-->
             <div class="form-group">
                 {{ badge_forms[badge.badge_id].submit(class="btn btn-outline-info") }}
             </div>
-        </form>
+        </form>	
     {% endfor %}
+    
+    <legend class="border-bottom mb-4">Add Stamps</legend>
+    <!--Adding Stamps-->
+    <form name ="form_add_stamp" method="POST" action="" enctype="multipart/form-data">
+        {{ form_add_stamp.hidden_tag() }}
+	
+
+        <fieldset class="form-group">
+            <div class="form-group">
+
+		<!--Badge Select-->
+                {% if form_add_stamp.badge.errors %}
+                    {{ form_add_stamp.badge(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_add_stamp.badge.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form_add_stamp.badge(class="form-control", placeholder="Badge") }}
+                {% endif %}
+		
+		<!--Stamp Name-->
+	        {{ form_add_stamp.stamp_name.label(class="form-control-label") }}
+	        {% if form_add_stamp.stamp_name.errors %}
+                    {{ form_add_stamp.stamp_name(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_add_stamp.stamp_name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form_add_stamp.stamp_name(class="form-control form-control-lg") }}
+		{% endif %}
+		
+		<!--Stamp Points-->
+	        {{ form_add_stamp.points.label(class="form-control-label") }}
+		{% if form_add_stamp.points.errors %}
+                    {{ form_add_stamp.points(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+			{% for error in form_add_stamp.points.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+		    {{ form_add_stamp.points(class="form-control form-control-lg") }}
+		{% endif %}
+            </div>
+        </fieldset>
+	<!--Submit Button-->
+        <div class="form-group">
+            {{ form_add_stamp.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+
+    <legend class="border-bottom mb-4">Remove Stamps</legend>
+    <!-- Delete stamp -->
+    <form name="form_delete_stamp" method="POST" action="" enctype="multipart/form-data">
+        {{ form_delete_stamp.hidden_tag() }}
+        <fieldset class="form-group">
+            <div class="form-group">
+		<!-- Badge Select -->
+                {% if form_delete_stamp.badgedelete.errors %}
+		    {{ form_delete_stamp.badgedelete(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_delete_stamp.badgedelete.errors %}
+                            <span>{{ error }}</span>
+			{% endfor %}
+                    </div>
+                {% else %}
+                    {{ form_delete_stamp.badgedelete(class="form-control", placeholder="badge") }}
+                {% endif %}
+	
+		<!-- Stamp Select -->
+                {% if form_delete_stamp.stampdelete.errors %}
+		    {{ form_delete_stamp.stampdelete(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_delete_stamp.stampdelete.errors %}
+                            <span>{{ error }}</span>
+			{% endfor %}
+                    </div>
+                {% else %}
+                    {{ form_delete_stamp.stampdelete(class="form-control", placeholder="stamp") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form_delete_stamp.submitdelete(class="btn btn-outline-info") }}
+        </div>
+    </form>
+
+    <legend class="border-bottom mb-4">Change Badge Name</legend>
+    <!--Change Badge Name-->
+    <form name ="form_badge_name" method="POST" action="" enctype="multipart/form-data">
+        {{ form_badge_name.hidden_tag() }}
+
+        <fieldset class="form-group">
+            <div class="form-group">
+                {% if form_badge_name.badge.errors %}
+                    {{ form_badge_name.badge(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_badge_name.badge.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+		{% else %}
+                    {{ form_badge_name.badge(class="form-control", placeholder="Badge") }}
+                {% endif %}
+
+                {% if form_badge_name.badge.errors %}
+                    {{ form_badge_name.badge(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form_badge_name.badge.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+		{% else %}
+		    {{ form_badge_name.badgeName(class="form-control", placeholder="Badge Name") }}
+                {% endif %}
+            </div>
+
+        </fieldset>
+        <div class="form-group">
+            {{ form_badge_name.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+
+    <legend class="border-bottom mb-4">Change Badge Icon</legend>
+    <!--Change Badge Icon-->
+    <button type="button" class="btn btn-info btn-rounded btn-sm" data-toggle="modal" data-target="#iconModal">
+        Change Badge Icon
+    </button>
+
+<!-- Icon Popup Modal -->
+
+<div class="modal fade" id="iconModal" tabindex="-1" role="dialog" aria-labelledby="iconModalModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document" >
+  <form  method="POST" action="{{ url_for('admin_settings') }}">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="iconModalLabel">Select an Icon</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+	<select id="iconBadgeSelect" name="iconBadgeSelect">
+            {% for badge in badges %}
+	        <option value="{{ badge.badge_id }}">{{ badge.badge_name }} </option>
+            {% endfor %}  
+    	</select>
+
+        <select class="image-picker" id="iconSelect" name="iconSelect">
+              {% for file in icon_files %}
+                  <option data-img-src="static/badge_icons/{{ file.file_name }}" value="{{ file.id }}"></option>
+              {% endfor %}  
+        </select>
+            
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button class="btn btn-default" type="submit">Update Icon</button>
+      </div>
+    </div>
+    </form>
+  </div>
 </div>
+
 
 {% endblock content %}
 
 {% block scripts %}
     {{ super() }}
+    <!-- Script Dynamically Loads a Badge's Stamps -->
+    <script>
+        var badge_select = document.getElementById("badgedelete");
+        var stamp_select = document.getElementById("stampdelete");
+        badge_select.onchange = function()  {
+            badge = badge_select.value;
+            fetch('/stamp/' + badge).then(function(response) {
+                response.json().then(function(data) {
+                    var optionHTML = '';
+                    for (var stamp of data.stamps) {
+                        optionHTML += '<option value="' + stamp.id + '">' + stamp.name + '</option>';
+                    }
+                    stamp_select.innerHTML = optionHTML;
+                })
+            });
+        }
+    </script>
 {% endblock scripts %}

@@ -15,12 +15,10 @@ import json
 
 # --
 
+MAX_EVENTS = 400
+
 # If modifying these scopes, delete the file token.json.
 SCOPES = 'https://www.googleapis.com/auth/calendar'
-
-today = d.datetime.today()
-MAX_DAYS = 30
-max_delta = d.timedelta(days=MAX_DAYS)
 
 MONTHS = ['None', 'January', 'February', 'March', 
           'April', 'May', 'June', 'July', 
@@ -204,6 +202,8 @@ def add_remain_days(event):
         event['remain_days'] = 18
     """
 
+    today = d.datetime.today()
+
     # parse the date_time string and get a dict back
     t = event['start_tuple']
 		
@@ -249,7 +249,7 @@ def get_event_list():
     now = d.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     events_result = service.events().list(calendarId='primary', 
                                             timeMin=now,
-                                            maxResults=30, 
+                                            maxResults=MAX_EVENTS, 
                                             singleEvents=True,
                                             orderBy='startTime').execute()
     # grab the results
