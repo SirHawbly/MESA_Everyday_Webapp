@@ -11,19 +11,19 @@ def test_stamp_adding(test_client):
     login_account(test_client)
 
     data1 = {
-        'College Knowledge -stamps': 1,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/21/2019'
+        'College Knowledge-stamps': 1,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/21/2019'
     }
     data2 = {
-        'College Knowledge -stamps': 1,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/22/2019'
+        'College Knowledge-stamps': 1,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/22/2019'
     }
     data3 = {
-        'College Knowledge -stamps': 2,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/22/2019'
+        'College Knowledge-stamps': 2,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/22/2019'
     }
 
     with test_client:
@@ -33,7 +33,7 @@ def test_stamp_adding(test_client):
             -------------------------PASSED----------------------------
         """
         test_client.post('/earn_stamps', data=data1, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
 
         # write_response("test.txt", response)
 
@@ -47,7 +47,7 @@ def test_stamp_adding(test_client):
             --------------------------FAILED------------------------------
         """
         test_client.post('/earn_stamps', data=data2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
 
         # stamp name should still exist
         assert b"<td>Attend MESA Day</td>" in response.data
@@ -59,7 +59,7 @@ def test_stamp_adding(test_client):
             -------------------------PASSED----------------------------
         """
         test_client.post('/earn_stamps', data=data3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
 
         # stamp name should be added to badge even if not already
         assert b"<td>Attend a MESA college tour</td>" in response.data
@@ -74,7 +74,7 @@ def test_stamp_removing(test_client):
         ------------------------FAILED----------------------------
     """
     # obtaining stamp information
-    response = test_client.get('/badges/1', follow_redirects=True)
+    response = test_client.get('/badges1', follow_redirects=True)
     m = re.findall(b'(<button type="button" class="btn btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="Values\( \\\')(.+)(\\\', \\\')(.+)(\\\', \\\')(.+)(\\\'\)">)', response.data)
 
     data = []
@@ -88,7 +88,7 @@ def test_stamp_removing(test_client):
         data.append(temp)
 
     with test_client:
-        response = test_client.post('/badges/1', data=data[0], content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = test_client.post('/badges1', data=data[0], content_type='application/x-www-form-urlencoded', follow_redirects=True)
 
         # data1 should be removed
         # data3 should still exist

@@ -20,107 +20,11 @@ def write_response(filename, response):
     t.write(str(response.data))
     t.close
 
-# this passed -> login functional!
-def test_login(test_client):
-    response = login_account(test_client)
-
-    # CHECK response html to make sure it gets redirected to dashboard
-    # write_response("login.txt", response)
-    assert response.status_code == 200
-
-# @pytest.mark.skip(reason='not now')
-def test_level_adding(test_client):
+# clean-up
+def clean(test_client):
     login_account(test_client)
 
-    # predesigned test data
-    data = {
-        'College Knowledge -stamps': 1,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/20/2019'
-    }
-    data2 = {
-        'College Knowledge -stamps': 2,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/20/2019'
-    }
-    data3 = {
-        'College Knowledge -stamps': 3,
-        'College Knowledge -submit': 'earn stamp',
-        'College Knowledge -time_finished': '02/20/2019'
-    }
-
-    with test_client:
-        
-        # add 5 pts to the account
-        test_client.post('/earn_stamps', data=data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
-
-        # badge level should not increase if not adding enough stamps. (here level == 0)
-        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>5 points</strong>" in response.data               # 5 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>2 points</strong></a></p>" in response.data    # 2 pts to next level
-        
-        # add 3 pts to the account
-        test_client.post('/earn_stamps', data=data2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
-
-        # badge level should increase after adding enough stamps. (here level == 1)
-        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>8 points</strong>" in response.data               # 8 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>4 points</strong></a></p>" in response.data    # 4 pts to next level
-
-        # add 3 pts to the account
-        test_client.post('/earn_stamps', data=data3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        response = test_client.get('/badges/1', follow_redirects=True)
-
-        # badge level should not increase to 2 if not adding enough stamps. (here level == 1)
-        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>11 points</strong>" in response.data              # 11 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>1 points</strong></a></p>" in response.data    # 1 pts to next level
-
-# @pytest.mark.skip(reason="not now")
-def test_level_deleting(test_client):
-    login_account(test_client)
-
-    response = test_client.get('/badges/1', follow_redirects=True)
-    m = re.findall(b'(<button type="button" class="btn btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="Values\( \\\')(.+)(\\\', \\\')(.+)(\\\', \\\')(.+)(\\\'\)">)', response.data)
-
-    data = []
-    for r in m:
-        temp = {
-            'stamp_id': r[1].decode("utf-8"),
-            'time_finished': r[3].decode("utf-8"),
-            'log_date': r[5].decode("utf-8")
-        }
-        data.append(temp)
-
-    with test_client:
-        response = test_client.post('/badges/1', data=data[2], content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        
-        # badge level should not decrease to 0 if not deleting enough stamps. (here level == 1)
-        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>8 points</strong>" in response.data               # 8 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>4 points</strong></a></p>" in response.data    # 4 pts to next level
-
-        response = test_client.post('/badges/1', data=data[1], content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        
-        # badge level should decrease after deleting enough stamps. (here level == 0)
-        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>5 points</strong>" in response.data               # 5 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>2 points</strong></a></p>" in response.data    # 2 pts to next level
-
-        response = test_client.post('/badges/1', data=data[0], content_type='application/x-www-form-urlencoded', follow_redirects=True)
-        
-        # badge level should decrease to 0 after deleting more than enough stamps. (here level == 0)
-        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
-        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>0 points</strong>" in response.data               # 0 accum. pts
-        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>7 points</strong></a></p>" in response.data    # 7 pts to next level
-
-# @pytest.mark.skip(reason='for clean-up only')
-def test_clean_up(test_client):
-    login_account(test_client)
-
-    response = test_client.get('/badges/1', follow_redirects=True)
+    response = test_client.get('/badges1', follow_redirects=True)
     m = re.findall(b'(<button type="button" class="btn btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="Values\( \\\')(.+)(\\\', \\\')(.+)(\\\', \\\')(.+)(\\\'\)">)', response.data)
 
     data = []
@@ -135,7 +39,112 @@ def test_clean_up(test_client):
     if data:
         for d in data:
             with test_client:
-                response = test_client.post('/badges/1', data=d, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+                response = test_client.post('/badges1', data=d, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+    return response
+
+# this passed -> login functional!
+def test_login(test_client):
+    response = login_account(test_client)
+
+    # CHECK response html to make sure it gets redirected to dashboard
+    # write_response("login.txt", response)
+    assert response.status_code == 200
+
+# @pytest.mark.skip(reason='not now')
+def test_level_adding(test_client):
+    login_account(test_client)
+
+    clean(test_client)
+
+    # predesigned test data
+    data = {
+        'College Knowledge-stamps': 1,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/20/2019'
+    }
+    data2 = {
+        'College Knowledge-stamps': 2,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/20/2019'
+    }
+    data3 = {
+        'College Knowledge-stamps': 3,
+        'College Knowledge-submit': 'earn stamp',
+        'College Knowledge-time_finished': '02/20/2019'
+    }
+
+    with test_client:
+        
+        # add 5 pts to the account
+        test_client.post('/earn_stamps', data=data, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
+
+        write_response("test.txt", response)
+        # badge level should not increase if not adding enough stamps. (here level == 0)
+        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>5 points</strong>" in response.data               # 5 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>2 points</strong></a></p>" in response.data    # 2 pts to next level
+        
+        # add 3 pts to the account
+        test_client.post('/earn_stamps', data=data2, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
+
+        # badge level should increase after adding enough stamps. (here level == 1)
+        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>8 points</strong>" in response.data               # 8 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>4 points</strong></a></p>" in response.data    # 4 pts to next level
+
+        # add 3 pts to the account
+        test_client.post('/earn_stamps', data=data3, content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        response = test_client.get('/badges1', follow_redirects=True)
+
+        # badge level should not increase to 2 if not adding enough stamps. (here level == 1)
+        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>11 points</strong>" in response.data              # 11 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>1 points</strong></a></p>" in response.data    # 1 pts to next level
+
+# @pytest.mark.skip(reason="not now")
+def test_level_deleting(test_client):
+    login_account(test_client)
+
+    response = test_client.get('/badges1', follow_redirects=True)
+    m = re.findall(b'(<button type="button" class="btn btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteModal" onclick="Values\( \\\')(.+)(\\\', \\\')(.+)(\\\', \\\')(.+)(\\\'\)">)', response.data)
+
+    data = []
+    for r in m:
+        temp = {
+            'stamp_id': r[1].decode("utf-8"),
+            'time_finished': r[3].decode("utf-8"),
+            'log_date': r[5].decode("utf-8")
+        }
+        data.append(temp)
+
+    with test_client:
+        response = test_client.post('/badges1', data=data[2], content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        
+        # badge level should not decrease to 0 if not deleting enough stamps. (here level == 1)
+        assert b"<strong> Level <a style=\"font-size: 150%\">1</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>8 points</strong>" in response.data               # 8 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>4 points</strong></a></p>" in response.data    # 4 pts to next level
+
+        response = test_client.post('/badges1', data=data[1], content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        
+        # badge level should decrease after deleting enough stamps. (here level == 0)
+        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>5 points</strong>" in response.data               # 5 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>2 points</strong></a></p>" in response.data    # 2 pts to next level
+
+        response = test_client.post('/badges1', data=data[0], content_type='application/x-www-form-urlencoded', follow_redirects=True)
+        
+        # badge level should decrease to 0 after deleting more than enough stamps. (here level == 0)
+        assert b"<strong> Level <a style=\"font-size: 150%\">0</a>" in response.data
+        assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>0 points</strong>" in response.data               # 0 accum. pts
+        assert b"<a><strong>Point to next level:</strong></a> <a style=\"font-size: 150%\"><strong>7 points</strong></a></p>" in response.data    # 7 pts to next level
+
+# @pytest.mark.skip(reason='for clean-up only')
+def test_clean_up(test_client):
+
+    response = clean(test_client)
     
     assert b"<strong>Total points earned:</strong></a> <a style=\"font-size: 150%\"><strong>0 points</strong>" in response.data     # make sure there's no stamp left
     
