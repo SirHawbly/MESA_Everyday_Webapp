@@ -23,7 +23,8 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 #db_connection uses mysql+pymysql as otherwise certain libraries that are not supported by python3 will need to be installed
 #check link to it here: https://stackoverflow.com/questions/22252397/importerror-no-module-named-mysqldb
 # db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
-db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
+#db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
+db_connection = 'mysql+pymysql://' + 'devmed' + ':' + 'w3c$7aruSp' + '@' + 'db.cecs.pdx.edu' + ':3306/' + 'devmed'
 # Create a session with the database
 engine = create_engine(db_connection)
 Base = declarative_base(engine)
