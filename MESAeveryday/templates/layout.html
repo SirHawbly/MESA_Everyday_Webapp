@@ -68,33 +68,33 @@
         <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
           <ul class="list-inline mb-2">
             <li class="list-inline-item">
-              <a href="#">Phone Number</a>
+              <a href="#">503 725 4665</a>
             </li>
             <li class="list-inline-item">&sdot;</li>
             <li class="list-inline-item">
-              <a href="#">Email</a>
+              <a href="#">ormesa@gmail.com</a>
             </li>
             <li class="list-inline-item">&sdot;</li>
             <li class="list-inline-item">
-              <a href="#">Location</a>
+              <a href="#">1930 SW 4th Ave, Portland, OR 97201</a>
             </li>
           </ul>
-          <p class="text-muted small mb-4 mb-lg-0">&copy; MESA Website 2018. All Rights Reserved.</p>
+          <p class="text-muted small mb-4 mb-lg-0"> Oregon MESA &copy; 2019. All Rights Reserved.</p>
         </div>
         <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
           <ul class="list-inline mb-0">
             <li class="list-inline-item mr-3">
-              <a href="#">
+              <a href="https://www.facebook.com/oregonmesa" target="_blank">
                 <i class="fa fa-facebook fa-2x fa-fw"></i>
               </a>
             </li>
             <li class="list-inline-item mr-3">
-              <a href="#">
+              <a href="https://twitter.com/oregonmesa/" target="_blank">
                 <i class="fa fa-twitter-square fa-2x fa-fw"></i>
               </a>
             </li>
             <li class="list-inline-item">
-              <a href="#">
+              <a href="https://www.instagram.com/oregonmesa/" target="_blank">
                 <i class="fa fa-instagram fa-2x fa-fw"></i>
               </a>
             </li>
@@ -136,7 +136,7 @@
         $(".date-custom").attr("autocomplete", "off");
         
         $('#upEvent').DataTable({
-           "dom": 'f<"top">rt<"bottom"ilp><"clear">'
+           "dom": '<"top">rt<"bottom"ilp><"clear">'
         });
         $(function () {
             $('.min-chart#chart-sales').easyPieChart({
@@ -159,6 +159,10 @@
           document.body.scrollTop = 0;
           document.documentElement.scrollTop = 0;
         }
+        $('#1').DataTable({"dom": '<"top">rt<"bottom"ip><"clear">'});
+        $('#2').DataTable({"dom": '<"top">rt<"bottom"ip><"clear">'});
+        $('#3').DataTable({"dom": '<"top">rt<"bottom"ip><"clear">'});
+        $('#4').DataTable({"dom": '<"top">rt<"bottom"ip><"clear">'});
     </script>
     {% block scripts %}{% endblock scripts %}
     <!--Custom scripts-->
