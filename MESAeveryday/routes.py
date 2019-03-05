@@ -679,8 +679,25 @@ def admin():
                         record_holders.append(user)
             # Add the array of users/top scores to the total list of scores (indexed by the badge id)
             top_scores[badge.badge_id] = record_holders
-           
-        return render_template('admin.html', badges=badges, top_scores=top_scores)
+        
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(events)
+
+        return render_template('admin.html', badges=badges, top_scores=top_scores, events=events,
+                                    number_upcoming=len(upcoming_events),
+                                    upcoming_events=upcoming_events, 
+                                    number_current=len(current_events),
+                                    current_events=current_events,
+                                    mesa_days=mesa_days, 
+                                    demo_days=demo_days, 
+                                    mesa_events=mesa_events)
     except:
         return redirect(url_for('error')) 
 
@@ -760,8 +777,25 @@ def admin_control():
         #Load page
         resetdateform.reset_date.data = Reset_Date.get_reset_date().reset_date
         emailform.email.data = current_user.email
+
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(events)
           
-        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform)
+        return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform, events=events,
+                                    number_upcoming=len(upcoming_events),
+                                    upcoming_events=upcoming_events, 
+                                    number_current=len(current_events),
+                                    current_events=current_events,
+                                    mesa_days=mesa_days, 
+                                    demo_days=demo_days, 
+                                    mesa_events=mesa_events)
 
     #except:
         return redirect(url_for('error')) 
@@ -843,11 +877,27 @@ def admin_settings():
 
         deletestampform.stampdelete.choices = Stamp.get_stamps_of_badge(1)
 
-        return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
-                form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons())
-    except:
+        # Call the google api and pull all upcoming events
+        events = get_event_list()
+        
+        # Parse the events into incoming and special groups
+        mesa_days = searchEvents(events, ['Mesa','Day'])
+        demo_days = searchEvents(events, ['Demo','Day'])
+        upcoming_events = [event for event in events if event['remain_days'] < 8]
+        current_events = [event for event in events if event['remain_days'] < 3]
+        mesa_events = get_mesa_events(events)
 
-        return redirect(url_for('error'))
+        return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
+                form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons(), events=events,
+                                number_upcoming=len(upcoming_events),
+                                upcoming_events=upcoming_events, 
+                                number_current=len(current_events),
+                                current_events=current_events,
+                                mesa_days=mesa_days, 
+                                demo_days=demo_days, 
+                                mesa_events=mesa_events)
+    except:
+        return redirect(url_for('error')) 
 
 @app.route('/stamp/<badgeid>')
 def stamp(badgeid):

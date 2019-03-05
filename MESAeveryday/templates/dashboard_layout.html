@@ -22,6 +22,12 @@
     zoom: 0.25;
     -moz-transform: scale(0.25)
     }
+    .form-control-lg {
+        height: 30px; 
+        padding: 5px; 
+        font-size: 15px; 
+        border-radius: 5px; 
+    }
 </style>
 <body class="fixed-sn white-skin">
 
@@ -36,12 +42,13 @@
             </div>
             <!-- Breadcrumb-->
             <div class="breadcrumb-dn mr-auto">
-                
+                {% if current_user.username == 'admin' %}
+                    <p style="color: red">Admin View</p>
+                {% endif %}
             </div>
 
             <!--Navbar links-->
             <ul class="nav navbar-nav nav-flex-icons ml-auto">
-
                 <!-- Dropdown -->
                 <li class="nav-item dropdown notifications-nav">
                     <a class="nav-link dropdown-toggle waves-effect" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -83,7 +90,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle waves-effect" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fa fa-user"></i> <span class="clearfix d-none d-sm-inline-block">{{ current_user.username }} </span></a>
-                    </a>
+                    </a> 
                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
                         <div class="navbar-login">
                             <div class="row">
@@ -93,7 +100,11 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12">
-                                    <a class="dropdown-item text-center" href="{{ url_for('account') }}">Edit Profile</a>
+                                    {% if current_user.username != 'admin' %}
+                                        <a class="dropdown-item text-center" href="{{ url_for('account') }}">Edit Profile</a>
+                                    {% else %}
+                                        <a class="dropdown-item text-center" href="{{ url_for('admin_control') }}">Admin Control</a>
+                                    {% endif %}
                                     <a class="dropdown-item text-center" href="{{ url_for('logout') }}">Log Out</a>
                                 </div>
                             </div>
@@ -119,19 +130,24 @@
             <!-- Side navigation links -->
             <li>
                 <ul class="collapsible collapsible-accordion">
-                    <li><a href="{{ url_for('dashboard') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboard</a>
-                    </li>
-                    <li><a href="{{ url_for('earn_stamps') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-photo"></i> Get Stamp</a>
-                    </li>
-                    <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-user"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
-                        <div class="collapsible-body">
-                            <ul>
-                                {% for badge in badges %}
-                                    <li><a href="/badges{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </li>
+                    {% if current_user.username != 'admin' %}
+                        <li><a href="{{ url_for('dashboard') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboard</a>
+                        </li>
+                        <li><a href="{{ url_for('earn_stamps') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-trophy"></i> Get Stamps</a>
+                        </li>
+                        <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-line-chart"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
+                            <div class="collapsible-body">
+                                <ul>
+                                    {% for badge in badges %}
+                                        <li><a href="/badges{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url_for('admin') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Admin Dashboards</a>
+                        <li><a href="{{ url_for('admin_settings') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-cog"></i> Settings</a>
+                    {% endif %}
                 </ul>
             </li>
             <!--/. Side navigation links -->
@@ -159,7 +175,7 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    Demo Day Countdown
+                                    Demo Day 1
                                 </div>
                                 <div class="card-body">
                                     {% if demo_days|length > 0 %}
@@ -174,7 +190,7 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    2nd Demo Day Countdown
+                                    Demo Day 2
                                 </div>
                                 <div class="card-body">
                                     {% if demo_days|length > 1 %}
@@ -189,7 +205,7 @@
                         <div class="col-lg-4 col-md-8">
                             <div class="card mb-4">
                                 <div class="card-header white-text primary-color">
-                                    MESA Day Countdown
+                                    MESA Day
                                 </div>
                                 <div class="card-body">
                                     {% if mesa_days|length > 0 %}
@@ -248,7 +264,6 @@
                                                     <th>General Events</th>
                                                     <th>Remaining Days</th>
                                                     <th>Time</th>
-						    <th>Location</th>
                                                 </thead>
 						 <tbody>
                                                      {% for event in upcoming_events %}  
@@ -256,7 +271,6 @@
                                                                 <td>{{event['summary']}}</td>
                                                                 <td>{{event['remain_days']}}</td>
                                                                 <td>{{event['start_string']}}</td>
-								<td>{{event['location']}}</td>
                                                             </tr>
 						     {% endfor %}
                                                 </tbody>
