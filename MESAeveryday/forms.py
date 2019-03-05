@@ -32,16 +32,16 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
     school = SelectField('School', coerce=int, choices=School.get_all_schools_names())
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, message="your password must be at least %(min)d characters")
+    password = PasswordField('Password', validators=[DataRequired(), Length(min=8, message="your password must be at least %(min)d characters long!")
                                  , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
-                                          message="The string must contain at least 1 numeric digit and 1 symbol")])
+                                          message="The string must contain at least one numeric digit and one symbol!")])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
 
     def validate_email(self, email):
         if User.get_user_by_email(email.data):
-            raise ValidationError('That email is taken. Please choose a different one.')
+            raise ValidationError('That email is already taken. Please choose a different one.')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -58,22 +58,22 @@ class RequestResetForm(FlaskForm):
     def validate_email(self, email):
         user = User.validate_email(email)
         if user == False:
-            raise ValidationError('There is no account with that email. You must regester first.')
+            raise ValidationError('There is no account with that email. You must register with it first.')
 
 class RequestResetUserForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    submit = SubmitField('Request User Reset')
+    submit = SubmitField('Request Username')
 
     def validate_email(self, email):
         user = User.validate_email(email)
         if user == False:
-            raise ValidationError('There is no account with that email. You must regester first.')
+            raise ValidationError('There is no account with that email. You must register with it first.')
 
 class ResetPasswordForm(FlaskForm):
-    password = PasswordField('Password',  validators=[DataRequired(), Length(min=8, message="your password must be at least %(min)d characters")
+    password = PasswordField('Password',  validators=[DataRequired(), Length(min=8, message="your password must be at least %(min)d characters long!")
                                  , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
-                                          message="The string must contain at least 1 numeric digit and 1 symbol")])
+                                          message="The string must contain at least one numeric digit and one symbol!")])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
@@ -86,7 +86,7 @@ class UpdateEmailForm(FlaskForm):
     
     def validate_email(self, email):
         if User.get_user_by_email(email.data):
-            raise ValidationError('That email is taken. Please choose a different one.')
+            raise ValidationError('That email is already taken. Please choose a different one.')
 
 class UpdateNameForm(FlaskForm):
 
@@ -124,9 +124,9 @@ class DeleteSchoolForm(FlaskForm):
 class UpdatePasswordForm(FlaskForm):
     old_password = PasswordField('Password')
     password = PasswordField('Password', validators=[DataRequired(), Length(min=8,
-                                                                            message="your password must be at least %(min)d characters")
+                                                                            message="your password must be at least %(min)d characters long!")
         , Regexp("^(?=.*[0-9])(?=.*[!@#\$%\^&\*])",
-                 message="The string must contain at least 1 numeric digit and 1 symbol")])
+                 message="The string must contain at least one numeric digit and one symbol!")])
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Update Password')

@@ -73,7 +73,7 @@ def register():
             new_username = generate_username(form_register.firstname.data, form_register.lastname.data, random_code())
            
             if new_username == 'ERROR':
-                flash('Sorry, we were unable to generate an account for you.', 'danger')
+                flash('Sorry, we were unable to generate an account for you!', 'danger')
             else:
                 # Generate hashed password
                 hashed_password = bcrypt.generate_password_hash(form_register.password.data).decode('utf-8')
@@ -84,7 +84,7 @@ def register():
                 User.add_new_user(new_user)
 
                 # Tell the user their new username and send them an email with the username
-                flash('Your account has been created! You are now able to log in with the username: ' + new_username, 'success')
+                flash('Your account has been created! You are now able to log in with the username: ' + new_username + '!', 'success')
                 send_generate_username(form_register.email.data, new_username)
 
         return render_template('landpage.html', 
@@ -124,7 +124,7 @@ def login():
                 
             # User did not enter the correct credentials
             else:
-                flash('Login Unsuccessful. Please check username and password', 'danger')
+                flash('Login unsuccessful. Please check your username and password!', 'danger')
                 
         return render_template('landpage.html', 
                                title='Landing', 
@@ -163,7 +163,7 @@ def reset_request():
         if form.validate_on_submit():
             user = User.get_user_by_email(form.email.data)
             send_reset_email(user)
-            flash('An email has been sent with instructions to reset your password.', 'info')
+            flash('An email has been sent with instructions for resetting your password!', 'info')
             return redirect(url_for('landpage'))
 
         return render_template('reset_request.html', 
@@ -187,7 +187,7 @@ def reset_token(token):
         # Verify that the token is valid and has not expired
         user = User.verify_reset_token(token)
         if user is None:
-            flash('That is an invalid or expired token', 'warning')
+            flash('That is an invalid or expired token!', 'warning')
             return redirect(url_for('landpage'))
 
         form = ResetPasswordForm()
@@ -200,11 +200,11 @@ def reset_token(token):
           
             # Reset the password. If it updates correctly, tell the user that their password was updated
             if User.reset_pwd(user.id, hashed_password) == True:
-                flash('Your password has been updated! You are now able to log in', 'success')
+                flash('Your password has been updated! You may now log in using it.', 'success')
                 return redirect(url_for('landpage'))
             # If the password didn't update correctly, tell the user that it failed
             else:
-                flash('Sorry, we were unable to update your password', 'danger')
+                flash('Sorry, we were unable to update your password!', 'danger')
                 return redirect(url_for('landpage'))
         return render_template('reset_token.html', 
                                title='Rest Password', 
@@ -230,7 +230,7 @@ def forgot_username():
         if form.validate_on_submit():
             user = User.get_user_by_email(form.email.data)
             send_forgot_username(user)
-            flash('An email has been sent with your username.', 'info')
+            flash('An email has been sent with your username attached!', 'info')
             return redirect(url_for('landpage'))
         return render_template('forgot_username.html', 
                                title='Rest User', 
@@ -374,7 +374,7 @@ def account():
             if User.reset_pwd(myaccount.id, hashed_password) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('account'))
 
         #Update email
@@ -382,7 +382,7 @@ def account():
             if User.update_email(myaccount.id, emailform.email.data) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('account'))
 
         #Update name
@@ -390,7 +390,7 @@ def account():
             if User.update_name(myaccount.id, nameform.firstname.data, nameform.lastname.data) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('account'))
 
         #Update school
@@ -398,7 +398,7 @@ def account():
             if User.update_school(myaccount.id, schoolform.school.data) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('account'))
 
         if request.method=='POST':
@@ -409,7 +409,7 @@ def account():
                 if User.update_avatar(myaccount.id, avatarSelect) == True:
                     flash('Your account has been successfully updated!', 'success')
                 else:
-                    flash('Sorry, we were unable to update your account', 'danger')
+                    flash('Sorry, we were unable to update your account!', 'danger')
                 return redirect(url_for('account'))
 
         # Get all the badges
@@ -477,7 +477,7 @@ def account_deactivate():
                     logout_user()
                     return redirect(url_for('landpage'))
                 else :
-                    flash('Account does not match. Please check First Name and Last Name!!', 'danger')
+                    flash('Account information does not match. Please check your first and last name!', 'danger')
             return redirect(url_for('account'))
 
     except:
@@ -729,14 +729,14 @@ def admin_control():
             new_school = School(schoolName, '', '', '', '')
             School.add_new_school(new_school)
             rows = School.get_school()
-            flash('New school has been created!', 'success')
+            flash('New school option has been added!', 'success')
             return redirect(url_for('admin_control'))
 
         #Delete School Form
         if deleteschoolform.school.data and deleteschoolform.validate_on_submit():
             school_id = deleteschoolform.school.data
             School.delete_school_by_id(school_id)
-            flash('Succesfully Delete  !!!', 'success')
+            flash('Successfully  deleted school!', 'success')
             return redirect(url_for('admin_control'))
 
         #Update password
@@ -745,7 +745,7 @@ def admin_control():
             if User.reset_pwd(admin_account.id, hashed_password) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('admin_control'))
 
         #Update email
@@ -753,7 +753,7 @@ def admin_control():
             if User.update_email(admin_account.id, emailform.email.data) == True:
                 flash('Your account has been successfully updated!', 'success')
             else:
-                flash('Sorry, we were unable to update your account', 'danger')
+                flash('Sorry, we were unable to update your account!', 'danger')
             return redirect(url_for('admin_control'))
             
         #Remove old accounts
@@ -762,7 +762,7 @@ def admin_control():
             if results:
                 flash('Successfully removed ' + str(results) + ' account(s)!', 'success')
             else:
-                flash('No accounts were deleted', 'success')
+                flash('No accounts were deleted!', 'success')
             return redirect(url_for('admin_control'))
             
         #Change reset date    
@@ -770,7 +770,7 @@ def admin_control():
             if Reset_Date.change_date(resetdateform.reset_date.data):
                 flash('Successfully changed the reset date to ' +  str(resetdateform.reset_date.data)[5:] + '!', 'success')
             else:
-                flash('Sorry, we were not able to change the date', 'danger')
+                flash('Sorry, we were not able to change the date!', 'danger')
             return redirect(url_for('admin_control'))
             
 
@@ -823,9 +823,9 @@ def admin_settings():
             if form.submit.data and form.validate_on_submit():
                 if Badge.change_points(badge.badge_id, form.level1_points.data, form.level2_points.data, form.level3_points.data, form.level4_points.data, \
                         form.level5_points.data, form.level6_points.data, form.level7_points.data, form.level8_points.data, form.level9_points.data, form.level10_points.data):
-                    flash('Successfully changed badge points', 'success')
+                    flash('Successfully changed badge points!', 'success')
                 else:
-                    flash('Sorry, we were not able to change the badge points', 'danger')
+                    flash('Sorry, we were not able to change the badge points!', 'danger')
                 return redirect(url_for('admin_settings'))        
             form.level1_points.data = badge.level1_points    
             form.level2_points.data = badge.level2_points            
@@ -843,7 +843,7 @@ def admin_settings():
         if addstampform.badge.data and addstampform.validate_on_submit():
             newStamp=Stamp(addstampform.stamp_name.data,addstampform.badge.data,addstampform.points.data,None)
             Stamp.add_stamp(newStamp)
-            flash('New Stamp has been created!', 'success')
+            flash('New stamp has been created!', 'success')
             return redirect(url_for('admin_settings'))
 
 
@@ -851,7 +851,7 @@ def admin_settings():
         if deletestampform.submitdelete.data and deletestampform.validate_on_submit():  
             stampName=Stamp.get_stamp_by_stamp_id(deletestampform.stampdelete.data)
             Stamp.delete_stamp_by_id(deletestampform.stampdelete.data)
-            flash('Delete successfully!', 'success')
+            flash('Stamp deleted successfully!', 'success')
             return redirect(url_for('admin_settings'))
 
         # Updating a Badge Name
@@ -859,7 +859,7 @@ def admin_settings():
             badgeId=badgenameform.badge.data
             badgeName= badgenameform.badgeName.data
             Badge.update_badge_name(badgeId,badgeName)
-            flash('Badge name has been update!', 'success')
+            flash('Badge name has been successfully updated!', 'success')
             return redirect(url_for('admin_settings'))
 
 
@@ -872,7 +872,7 @@ def admin_settings():
                 if Badge.update_icon(badgeSelect, iconSelect) == True:
                     flash('Badge icon has been successfully updated!', 'success')
                 else:
-                    flash('Sorry, we were unable to update the badge icon', 'danger')
+                    flash('Sorry, we were unable to update the badge icon!', 'danger')
                 return redirect(url_for('admin_settings'))
 
         deletestampform.stampdelete.choices = Stamp.get_stamps_of_badge(1)
