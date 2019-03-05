@@ -63,7 +63,7 @@ class RequestResetForm(FlaskForm):
 class RequestResetUserForm(FlaskForm):
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
-    submit = SubmitField('Request User Reset')
+    submit = SubmitField('Request Username')
 
     def validate_email(self, email):
         user = User.validate_email(email)
