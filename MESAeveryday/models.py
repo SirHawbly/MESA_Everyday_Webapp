@@ -85,6 +85,7 @@ class User(Base, UserMixin):
             user_id = s.loads(token)['user_id']
             return session.query(User).filter(User.id==user_id).first()
         except:
+            session.rollback()
             return None
    
     def get_all_username():
