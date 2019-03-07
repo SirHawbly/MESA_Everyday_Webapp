@@ -25,7 +25,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 # db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 # Create a session with the database
-engine = create_engine(db_connection)
+engine = create_engine(db_connection, pool_recycle=3600)
 Base = declarative_base(engine)
 metadata = Base.metadata
 Session = sessionmaker(bind=engine)
