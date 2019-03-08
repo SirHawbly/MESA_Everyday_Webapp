@@ -462,7 +462,7 @@ class Stamp(Base, UserMixin):
         self.url = url
 
     def get_user_stamps_of_badge(user_id, badge_id):
-      #  try:
+        try:
             reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
             if datetime.datetime.now().strftime('%m-%d') >= reset_date:
                 last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
@@ -470,7 +470,7 @@ class Stamp(Base, UserMixin):
                 last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
             subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
-       # except:
+        except:
             session.rollback()
             return None
 
