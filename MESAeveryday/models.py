@@ -150,6 +150,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.password = hashed_pwd
+            session.commit()
         except:
             session.rollback()
             return False
