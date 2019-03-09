@@ -1,4 +1,4 @@
-{% extends "dashboard_layout.html" %}
+{% extends "admin_layout.html" %}
 {% block main %}
 
 <!-- Admin Settings Placeholder -->
@@ -19,7 +19,7 @@
 
     <div class="card-body">
     Set how many points are required for each level. <br/>
-    Each level must require more points than the previous level.<br/>
+    Each level must require more points than the previous level (points are cumulative).<br/>
     Leave fields blank to set how many levels there are (i.e. leaving level 4 blank will mean there is only 3 possible levels).  <br/><br/>
     
     {% for badge in badges %}

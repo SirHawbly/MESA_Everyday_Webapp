@@ -42,6 +42,7 @@
             </div>
             <!-- Breadcrumb-->
             <div class="breadcrumb-dn mr-auto">
+                    <p style="color: red">Admin View</p>
             </div>
 
             <!--Navbar links-->
@@ -97,7 +98,7 @@
                             </div>
                             <div class="row">
                                 <div class="col-lg-12">
-                                        <a class="dropdown-item text-center" href="{{ url_for('account') }}">Edit Profile</a>
+                                        <a class="dropdown-item text-center" href="{{ url_for('admin_control') }}">Admin Settings</a>
                                     <a class="dropdown-item text-center" href="{{ url_for('logout') }}">Log Out</a>
                                 </div>
                             </div>
@@ -123,19 +124,8 @@
             <!-- Side navigation links -->
             <li>
                 <ul class="collapsible collapsible-accordion">
-                        <li><a href="{{ url_for('dashboard') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Dashboard</a>
-                        </li>
-                        <li><a href="{{ url_for('earn_stamps') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-trophy"></i> Get Stamps</a>
-                        </li>
-                        <li><a class="collapsible-header waves-effect arrow-r"><i class="fa fa-line-chart"></i> View Progress<i class="fa fa-angle-down rotate-icon"></i></a>
-                            <div class="collapsible-body">
-                                <ul>
-                                    {% for badge in badges %}
-                                        <li><a href="/badges{{ badge.badge_id }}" class="waves-effect">{{ badge.badge_name }}</a></li>
-                                    {% endfor %}
-                                </ul>
-                            </div>
-                        </li>
+                        <li><a href="{{ url_for('admin') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-tachometer"></i> Admin Dashboard</a>
+                        <li><a href="{{ url_for('admin_settings') }}" class="collapsible-header waves-effect arrow-r"><i class="fa fa-cog"></i> Game Settings</a>
                 </ul>
             </li>
             <!--/. Side navigation links -->
@@ -222,9 +212,11 @@
                         </div>
                         <div class="embed-responsive embed-responsive-4by3">
                             <!-- <iframe class="cal-iframe embed-responsive-item" id='cv_if5' src='http://cdn.instantcal.com/cvir.html?id=cv_nav5&file=https://calendar.google.com/calendar/ical/bartlett%40pdx.edu/public/basic.ics&theme=BL&ccolor=%23ffffc0&dims=1&gtype=cv_monthgrid&gcloseable=0&gnavigable=1&gperiod=month&itype=cv_simpleevent' allowTransparency=true scrolling='no' frameborder=0 height=auto width=100%></iframe> --!>
-                            <!-- <iframe src="https://calendar.google.com/calendar/embed?src=bartlett%40pdx.edu&ctz=America%2FLos_Angeles" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe> 
-	                    <div></div> --!> 
+                            <!-- <iframe src="https://calendar.google.com/calendar/embed?src=bartlett%40pdx.edu&ctz=America%2FLos_Angeles" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe> --!>
+
                             <iframe src="https://calendar.google.com/calendar/embed?src=pdx.edu_e91ro1012j2f2qhuornmch3dtg%40group.calendar.google.com&ctz=America%2FLos_Angeles" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe> 
+	                    <div></div> 
+                            
                         </div>
                     </div>
                     <!--/.Panel-->

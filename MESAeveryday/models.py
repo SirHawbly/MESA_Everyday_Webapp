@@ -26,7 +26,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 #db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 db_connection = 'mysql+pymysql://' + 'devmed' + ':' + 'uEk7a8@zsf' + '@' + 'db.cecs.pdx.edu' + ':3306/' + 'devmed'
 # Create a session with the database
-engine = create_engine(db_connection)
+engine = create_engine(db_connection, pool_recycle=3600)
 Base = declarative_base(engine)
 metadata = Base.metadata
 Session = sessionmaker(bind=engine)
@@ -86,6 +86,7 @@ class User(Base, UserMixin):
             user_id = s.loads(token)['user_id']
             return session.query(User).filter(User.id==user_id).first()
         except:
+            session.rollback()
             return None
    
     def get_all_username():
@@ -150,6 +151,7 @@ class User(Base, UserMixin):
         try:
             row = session.query(User).filter(User.id == id).first()
             row.password = hashed_pwd
+            session.commit()
         except:
             session.rollback()
             return False
@@ -461,7 +463,7 @@ class Stamp(Base, UserMixin):
         self.url = url
 
     def get_user_stamps_of_badge(user_id, badge_id):
-      #  try:
+        try:
             reset_date = session.query(Reset_Date.reset_date).first().reset_date.strftime('%m-%d')
             if datetime.datetime.now().strftime('%m-%d') >= reset_date:
                 last_reset_date = str(datetime.datetime.now().year) + '-' + str(reset_date)
@@ -469,7 +471,7 @@ class Stamp(Base, UserMixin):
                 last_reset_date = str(datetime.datetime.now().year -1) + '-' + str(reset_date)
             subquery = session.query(UserStamp.stamp_id).filter(and_(UserStamp.user_id == user_id, UserStamp.log_date >= last_reset_date))
             return session.query(Stamp.stamp_id, Stamp.stamp_name).filter(Stamp.badge_id == badge_id).filter(Stamp.stamp_id.notin_(subquery))
-       # except:
+        except:
             session.rollback()
             return None
 
