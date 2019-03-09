@@ -59,8 +59,8 @@
                     </div>
                     <div class="col-sm-4 mb-4" style="float: right;">
                         <button onclick="divFunction()" type="button" class="btn-floating btn-fb"><i class="fa fa-calendar" title="Click to scroll to event table"></i></button>
-                        {% if number_upcoming > 0 %}
-                        <span id="countEvent" class="counter"></span>
+                        {% if mesa_events[badge.badge_id]|length %}
+                            <span id="countEvent" class="counter"></span>
                         {% endif %}
                     </div>
                 </div>

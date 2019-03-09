@@ -98,9 +98,9 @@ def register():
 @limiter.limit ('50 per hour')
 def login():
     """
-      Route that processes a login attempt
-      If the login is a success they are taken to either the page they last attempted to visit or the dashboard
-      If the login fails, the landing page is rendered
+        Route that processes a login attempt
+        If the login is a success they are taken to either the page they last attempted to visit or the dashboard
+        If the login fails, the landing page is rendered
     """
     
     try:
@@ -283,10 +283,11 @@ def dashboard():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
-        
+        mesa_events = get_mesa_events(future_events)
+
         return render_template('dashboard.html',
                                badges=badges,
                                progress=all_progress,
@@ -329,9 +330,10 @@ def events():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
 
         return render_template('events.html',
                                badges=badges,
@@ -431,9 +433,10 @@ def account():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
         
         return render_template('account.html', 
                                 title='Account', 
@@ -538,9 +541,10 @@ def earn_stamps():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
 
         return render_template('earnstamps.html', 
                                 title='Earn Stamps', 
@@ -612,9 +616,10 @@ def check_badge(badge_id):
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
 
         return render_template('badges.html', 
                                 badges=badges,
@@ -686,9 +691,10 @@ def admin():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
 
         return render_template('admin.html', badges=badges, top_scores=top_scores, events=events,
                                     number_upcoming=len(upcoming_events),
@@ -704,12 +710,12 @@ def admin():
 @app.route("/admin_control", methods=['GET', 'POST'])
 @login_required    
 def admin_control():
-        """
+    """
         Page for admin to control various parts of the application
         Admins can add or remove schools, remove old accounts, set academic year, and manage the admin account
         Only those will a valid admin account can view this page
-        """ 
- #   try:    
+    """ 
+    try:    
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
     
@@ -784,9 +790,10 @@ def admin_control():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
           
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform, events=events,
                                     number_upcoming=len(upcoming_events),
@@ -797,7 +804,7 @@ def admin_control():
                                     demo_days=demo_days, 
                                     mesa_events=mesa_events)
 
-    #except:
+    except:
         return redirect(url_for('error')) 
 
 @app.route("/admin_settings", methods=['GET', 'POST'])
@@ -883,9 +890,10 @@ def admin_settings():
         # Parse the events into incoming and special groups
         mesa_days = searchEvents(events, ['Mesa','Day'])
         demo_days = searchEvents(events, ['Demo','Day'])
+        future_events = [event for event in events if event['remain_days'] < 15]
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
-        mesa_events = get_mesa_events(events)
+        mesa_events = get_mesa_events(future_events)
 
         return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
                 form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons(), events=events,

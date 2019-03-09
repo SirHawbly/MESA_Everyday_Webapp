@@ -239,7 +239,7 @@ def get_event_list():
     store = file.Storage('MESAeveryday/credentials/token.json')
     creds = store.get()
     if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets('MESAeveryday/credentials/cal_client_cred.json', SCOPES)
+        flow = client.flow_from_clientsecrets('MESAeveryday/credentials/mesa_cal_creds.json', SCOPES)
         creds = tools.run_flow(flow, store)
 
     # get a HTTP connection to googles calendar
@@ -247,7 +247,7 @@ def get_event_list():
 
     # Call the Calendar API
     now = d.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    events_result = service.events().list(calendarId='primary', 
+    events_result = service.events().list(calendarId='pdx.edu_e91ro1012j2f2qhuornmch3dtg@group.calendar.google.com', 
                                             timeMin=now,
                                             maxResults=MAX_EVENTS, 
                                             singleEvents=True,
