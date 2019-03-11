@@ -38,19 +38,19 @@ def landpage():
       Consists of both the registration form and the login form
     """
     
-    try:
-        # Send user to the dashboard if they are logged in. This page is intended for those who have not logged in yet
-        if current_user.is_authenticated:
-            return redirect(url_for('dashboard'))
-        
-        form_register = RegistrationForm()
-        form_login = LoginForm()
-        return render_template('landpage.html', 
-                               title='Landing', 
-                               form_l=form_login, 
-                               form_r=form_register)
-    except:
-        return redirect(url_for('error'))
+    #try:
+    # Send user to the dashboard if they are logged in. This page is intended for those who have not logged in yet
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    
+    form_register = RegistrationForm()
+    form_login = LoginForm()
+    return render_template('landpage.html', 
+                           title='Landing', 
+                           form_l=form_login, 
+                           form_r=form_register)
+    #except:
+    return redirect(url_for('error'))
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -241,6 +241,10 @@ def forgot_username():
 @app.errorhandler(429)
 def too_many_request(e):
     return render_template('login_limit.html')
+
+@app.route("/term_of_service", methods=['GET'])
+def term_of_service():
+    return render_template('term_of_service.html')
 
 @app.route("/error", methods=['GET'])
 def error():
