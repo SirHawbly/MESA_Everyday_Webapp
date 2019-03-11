@@ -242,6 +242,10 @@ def forgot_username():
 def too_many_request(e):
     return render_template('login_limit.html')
 
+@app.route("/term_of_service", methods=['GET'])
+def term_of_service():
+    return render_template('term_of_service.html')
+
 @app.route("/error", methods=['GET'])
 def error():
     return render_template('error.html')        
