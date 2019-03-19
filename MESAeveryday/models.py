@@ -25,7 +25,7 @@ from sqlalchemy.orm import sessionmaker, relationship, backref
 # db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 db_connection = 'mysql+pymysql://' + os.environ['MESAusername'] + ':' + os.environ['MESApassword'] + '@' + os.environ['MESAhostname'] + ':3306/' + os.environ['MESAusername']
 # Create a session with the database
-engine = create_engine(db_connection, pool_recycle=3600)
+engine = create_engine(db_connection, pool_recycle=10)
 Base = declarative_base(engine)
 metadata = Base.metadata
 Session = sessionmaker(bind=engine)
@@ -61,8 +61,8 @@ class User(Base, UserMixin):
     password = Column('SSB', String)
     last_login = Column(DateTime)
 
-    school = relationship("School", foreign_keys=[school_id])
-    avatar = relationship("Avatar", foreign_keys=[avatar_id])
+    school = relationship("School", foreign_keys=[school_id], lazy='subquery')
+    avatar = relationship("Avatar", foreign_keys=[avatar_id], lazy='subquery')
 
     def __init__(self, username, first_name, last_name, email, password, school_id):
         self.username = username
@@ -339,7 +339,7 @@ class Badge(Base):
     level9_points = Column(Integer)
     level10_points = Column(Integer)
     
-    icon = relationship("Icon", foreign_keys=[icon_id])
+    icon = relationship("Icon", foreign_keys=[icon_id], lazy='subquery')
 
     def __init__(self, badge_name, color, level1_points, level2_points, level3_points, level4_points,
                     level5_points, level6_points, level7_points, level8_points, level9_points, level10_points):
@@ -453,7 +453,7 @@ class Stamp(Base, UserMixin):
     points = Column(Integer)
     url = Column(String)
 
-    badge = relationship("Badge", foreign_keys=[badge_id])
+    badge = relationship("Badge", foreign_keys=[badge_id], lazy='subquery')
 
     def __init__(self, stamp_name, badge_id, points, url):
         self.stamp_name = stamp_name
@@ -567,8 +567,8 @@ class UserStamp(Base, UserMixin):
     log_date = Column(DateTime, primary_key=True)
     stamp_date = Column(Date)
 
-    user = relationship("User", foreign_keys=[user_id])
-    stamp = relationship("Stamp", foreign_keys=[stamp_id])
+    user = relationship("User", foreign_keys=[user_id], lazy='subquery')
+    stamp = relationship("Stamp", foreign_keys=[stamp_id], lazy='subquery')
 
     def __init__(self, user_id, stamp_id, log_date, stamp_date):
         self.user_id = user_id

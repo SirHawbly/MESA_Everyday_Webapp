@@ -10,7 +10,7 @@ from flask import render_template, url_for, flash, redirect, request,jsonify
 from MESAeveryday.forms import RegistrationForm, LoginForm, RequestResetForm, RequestResetUserForm, ResetPasswordForm, EarnStampsForm, UpdateEmailForm, UpdateNameForm, UpdateSchoolForm, \
     UpdatePasswordForm,AddSchoolForm,DeleteSchoolForm,AddStampForm,DeleteStampForm,UpdatePasswordForm, RemoveOldAccountsForm, ResetDateForm,EditBadgeForm,BadgePointsForm
 
-from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date, Icon
+from MESAeveryday.models import User, School, Badge, Stamp, UserStamp, Avatar, Reset_Date, Icon, session
 
 from MESAeveryday.calendar_events import get_event_list, searchEvents, get_mesa_events
 
@@ -45,11 +45,13 @@ def landpage():
         
         form_register = RegistrationForm()
         form_login = LoginForm()
+        session.close()
         return render_template('landpage.html', 
                                title='Landing', 
                                form_l=form_login, 
                                form_r=form_register)
     except:
+
         return redirect(url_for('error'))
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -86,7 +88,7 @@ def register():
                 # Tell the user their new username and send them an email with the username
                 flash('Your account has been created! You are now able to log in with the username: ' + new_username + '!', 'success')
                 send_generate_username(form_register.email.data, new_username)
-
+        session.close()
         return render_template('landpage.html', 
                                title='Landing', 
                                form_l=form_login, 
@@ -125,7 +127,7 @@ def login():
             # User did not enter the correct credentials
             else:
                 flash('Login unsuccessful. Please check your username and password!', 'danger')
-                
+        session.close()
         return render_template('landpage.html', 
                                title='Landing', 
                                form_l=form_login, 
@@ -165,7 +167,7 @@ def reset_request():
             send_reset_email(user)
             flash('An email has been sent with instructions for resetting your password!', 'info')
             return redirect(url_for('landpage'))
-
+        session.close()
         return render_template('reset_request.html', 
                                title='Rest Password', 
                                form=form)
@@ -206,6 +208,7 @@ def reset_token(token):
             else:
                 flash('Sorry, we were unable to update your password!', 'danger')
                 return redirect(url_for('landpage'))
+        session.close()
         return render_template('reset_token.html', 
                                title='Rest Password', 
                                form=form)
@@ -232,6 +235,7 @@ def forgot_username():
             send_forgot_username(user)
             flash('An email has been sent with your username attached!', 'info')
             return redirect(url_for('landpage'))
+        session.close()
         return render_template('forgot_username.html', 
                                title='Rest User', 
                                form=form)
@@ -240,14 +244,17 @@ def forgot_username():
 
 @app.errorhandler(429)
 def too_many_request(e):
+    session.close()
     return render_template('login_limit.html')
 
 @app.route("/term_of_service", methods=['GET'])
 def term_of_service():
+    session.close()
     return render_template('term_of_service.html')
 
 @app.route("/error", methods=['GET'])
 def error():
+    session.close()
     return render_template('error.html')        
       
         
@@ -292,6 +299,7 @@ def dashboard():
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
 
+        session.close()
         return render_template('dashboard.html',
                                badges=badges,
                                progress=all_progress,
@@ -338,7 +346,7 @@ def events():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-
+        session.close()
         return render_template('events.html',
                                badges=badges,
                                progress=all_progress,
@@ -441,7 +449,7 @@ def account():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-        
+        session.close()
         return render_template('account.html', 
                                 title='Account', 
                                 badges=badges,
@@ -549,7 +557,7 @@ def earn_stamps():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-
+        session.close()
         return render_template('earnstamps.html', 
                                 title='Earn Stamps', 
                                 forms=forms, 
@@ -624,7 +632,7 @@ def check_badge(badge_id):
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-
+        session.close()
         return render_template('badges.html', 
                                 badges=badges,
                                 badge=badge, 
@@ -699,7 +707,7 @@ def admin():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-
+        session.close()
         return render_template('admin.html', badges=badges, top_scores=top_scores, events=events,
                                     number_upcoming=len(upcoming_events),
                                     upcoming_events=upcoming_events, 
@@ -798,7 +806,7 @@ def admin_control():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-          
+        session.close()
         return render_template('admin_control.html', form_email=emailform, form_password=passwordform, form_old_accounts=oldaccountsform, form_reset_date=resetdateform,form_school_add=addschoolform,form_school_delete=deleteschoolform, events=events,
                                     number_upcoming=len(upcoming_events),
                                     upcoming_events=upcoming_events, 
@@ -898,7 +906,7 @@ def admin_settings():
         upcoming_events = [event for event in events if event['remain_days'] < 8]
         current_events = [event for event in events if event['remain_days'] < 3]
         mesa_events = get_mesa_events(future_events)
-
+        session.close()
         return render_template('admin_settings.html', badge_forms=badge_forms, form_add_stamp=addstampform, form_delete_stamp=deletestampform, \
                 form_badge_name=badgenameform, badges=badges, icon_files=Icon.get_all_icons(), events=events,
                                 number_upcoming=len(upcoming_events),
