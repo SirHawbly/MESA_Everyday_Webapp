@@ -43,6 +43,9 @@ def load_user(user_id):
         session.rollback()
         return None
 
+def close_session():
+    session.close()
+
 #All classes here are based on a table in the database. If a change is made to the database, those changes must be reflected here as well
 
 #Class for the "users" table
