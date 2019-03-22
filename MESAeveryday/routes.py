@@ -275,10 +275,14 @@ def dashboard():
         # Send admins to the admin page
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
-
+    
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+        
         # Get all the badges
         badges = Badge.get_all_badges()
-        
+       
         # Get Badge Progress and max points
         all_progress = {}  
         all_max_points = {}       
@@ -325,7 +329,11 @@ def events():
         # Send admins to the admin page
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
-            
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+
         # Get all the badges
         badges = Badge.get_all_badges()
         #badge_names, badge_ids = [row.badge_name for row in badges], [row.badge_id for row in badges]
@@ -371,6 +379,10 @@ def account():
         # Send admins to the admin page
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
 
         emailform = UpdateEmailForm()
         nameform = UpdateNameForm()
@@ -478,6 +490,10 @@ def account_deactivate():
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
 
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+
         myaccount = User.get_user_by_username(current_user.username)
         print(myaccount.id)
         if current_user.is_authenticated:
@@ -511,6 +527,10 @@ def earn_stamps():
         # Send admins to the admin page
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
 
         # Get all badge names
         badge_names = [row.badge_name for row in Badge.get_all_badges_names()]   
@@ -583,6 +603,10 @@ def check_badge(badge_id):
         # Send admins to the admin page
         if (User.verify_role(current_user.id)):
             return redirect(url_for('admin'))
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
 
         # Get all the badges
         badges = Badge.get_all_badges()
@@ -672,7 +696,11 @@ def admin():
         # https://stackoverflow.com/questions/21895839/restricting-access-to-certain-areas-of-a-flask-view-function-by-role
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
-            
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+
         # Top scores will be a dictionary of arrays. 
         # Each array holds all the users and top scores for a specific badge
         # The dictionary will be for each badge and is indexed based on the badge id
@@ -730,7 +758,11 @@ def admin_control():
     try:    
         if not User.verify_role(current_user.id):
             return redirect(url_for('dashboard'))
-    
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+
         emailform = UpdateEmailForm()
         passwordform = UpdatePasswordForm()
         oldaccountsform = RemoveOldAccountsForm()
@@ -829,7 +861,11 @@ def admin_settings():
     try: 
         if not User.verify_role(current_user.id):     
             return redirect(url_for('dashboard'))
-            
+
+        # Using bcrypt to check the users role for some reason changes the SQLalchemy relationship loading to "lazy" instead of "subquery"
+        # Reloading the user fixes this
+        login_manager.current_user = User.get_user_by_username(current_user.username)
+
         badges = Badge.get_all_badges()
         badge_forms = {}
         addstampform = AddStampForm()
